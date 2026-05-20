@@ -85,7 +85,9 @@ def plot_skill_vs_lead(
     if ax is None:
         fig, ax = plt.subplots(figsize=figsize)
     else:
-        fig = ax.get_figure()
+        _fig = ax.get_figure()
+        assert isinstance(_fig, plt.Figure)
+        fig = _fig
 
     lead_weeks = ds_scores["lead_week"].values if "lead_week" in ds_scores.coords else np.arange(4)
 

@@ -140,6 +140,7 @@ class ReportBuilder:
         refs: list[xr.Dataset] = []
         if self.reference in ("climatology", "both"):
             logger.info("Building climatology reference (week_window=%d) …", self.week_window)
+            assert self._ds_obs is not None and self._ds_fcst is not None
             clim = climatology_reference(
                 self._ds_obs,
                 self._ds_fcst,
@@ -148,7 +149,8 @@ class ReportBuilder:
             refs.append(clim)
         if self.reference in ("persistence", "both"):
             logger.info("Building persistence reference …")
-            pers = persistence_reference(self._ds_obs, self._ds_fcst)  # type: ignore[arg-type]
+            assert self._ds_obs is not None and self._ds_fcst is not None
+            pers = persistence_reference(self._ds_obs, self._ds_fcst)
             refs.append(pers)
 
         if len(refs) == 1:
@@ -323,14 +325,15 @@ def _available_vars_for_score(ds: xr.Dataset, score: str) -> list[str]:
     """Return variable keys whose '{key}_{score}' column exists in ds."""
     results = []
     for varname in ds.data_vars:
-        if varname.endswith(f"_{score}"):
-            results.append(varname[: -len(f"_{score}")])
+        varname_str = str(varname)
+        if varname_str.endswith(f"_{score}"):
+            results.append(varname_str[: -len(f"_{score}")])
     return results[:8]  # limit to 8 for readability
 
 
 def _first_available(ds: xr.Dataset) -> str:
     """Return the first data variable name."""
-    return list(ds.data_vars)[0]
+    return str(list(ds.data_vars)[0])
 
 
 def _build_summary_table(ds: xr.Dataset) -> list[dict]:
@@ -338,7 +341,8 @@ def _build_summary_table(ds: xr.Dataset) -> list[dict]:
     rows = []
     for varname in ds.data_vars:
         # Parse variable key and metric from varname
-        parts = varname.rsplit("_", 1)
+        varname_str = str(varname)
+        parts = varname_str.rsplit("_", 1)
         if len(parts) < 2:
             continue
         var_key, metric = parts[0], parts[1]
@@ -391,7 +395,7 @@ def _build_plot_images(builder: ReportBuilder, ds: xr.Dataset) -> dict:
         try:
             fig = plot_region_map(
                 ds,
-                sv,
+                str(sv),
                 shapefile_path=builder.shapefile_path,
                 lead_weeks=LEAD_WEEKS,
             )

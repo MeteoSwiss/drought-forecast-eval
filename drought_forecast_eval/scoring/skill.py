@@ -236,8 +236,8 @@ def rpss(
     rps_f = rps_from_quantiles(obs, fcst_p10, fcst_p50, fcst_p90)
     rps_r = rps_from_quantiles(obs, ref_p10, ref_p50, ref_p90)
 
-    mean_rps_f = rps_f.mean(dim=reduce_dims)
-    mean_rps_r = rps_r.mean(dim=reduce_dims)
+    mean_rps_f: xr.DataArray = rps_f.mean(dim=reduce_dims)  # type: ignore[call-overload, assignment]
+    mean_rps_r: xr.DataArray = rps_r.mean(dim=reduce_dims)  # type: ignore[call-overload, assignment]
 
     skill = xr.where(mean_rps_r == 0, 1.0, 1.0 - mean_rps_f / mean_rps_r)
     skill.attrs["long_name"] = "RPSS"

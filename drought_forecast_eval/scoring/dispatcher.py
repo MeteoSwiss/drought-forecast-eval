@@ -275,6 +275,7 @@ def _compute_deterministic_score(
             ref_col = _find_ref_col(ds_ref, var_key, "p50")
             if ref_col is None:
                 return None
+            assert ds_ref is not None
             from drought_forecast_eval.scoring.skill import mae_skill
 
             da = mae_skill(fcst_p50, obs, ds_ref[ref_col], reduce_dims=_REDUCE_DIMS)
@@ -332,6 +333,7 @@ def _compute_quantile_score(
                 ref_p50_col = _find_ref_col(ds_ref, var_key, "p50")
                 if ref_p50_col is None:
                     return None
+                assert ds_ref is not None
                 ref_p = ds_ref[ref_p50_col]
                 from drought_forecast_eval.scoring.skill import rpss
 
@@ -339,6 +341,7 @@ def _compute_quantile_score(
                     obs, fcst_p10, fcst_p50, fcst_p90, ref_p, ref_p, ref_p, reduce_dims=_REDUCE_DIMS
                 )
             else:
+                assert ds_ref is not None
                 from drought_forecast_eval.scoring.skill import rpss
 
                 da = rpss(

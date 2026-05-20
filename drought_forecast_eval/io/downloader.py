@@ -25,7 +25,7 @@ import logging
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
-import requests
+import requests  # type: ignore[import-untyped]
 
 from drought_forecast_eval.io.archive import BGDI_ARCHIVE_URL_TEMPLATE, BGDI_HISTORIC_URL
 

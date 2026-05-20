@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Callable
+from typing import cast
 
 import numpy as np
 import xarray as xr
@@ -70,7 +71,8 @@ def _rmse_fallback(
     reduce_dims: list[str] | None = None,
     **_kwargs: object,
 ) -> xr.DataArray:
-    return np.sqrt(_mse_fallback(fcst, obs, reduce_dims=reduce_dims))
+    mse = _mse_fallback(fcst, obs, reduce_dims=reduce_dims)
+    return np.sqrt(mse)  # type: ignore[return-value]
 
 
 def _bias_fallback(
@@ -89,11 +91,16 @@ def _correlation_fallback(
     reduce_dims: list[str] | None = None,
     **_kwargs: object,
 ) -> xr.DataArray:
-    dims = reduce_dims if reduce_dims else list(fcst.dims)
-    fcst_m = fcst - fcst.mean(dim=dims)
-    obs_m = obs - obs.mean(dim=dims)
-    num = (fcst_m * obs_m).sum(dim=dims)
-    denom = np.sqrt((fcst_m**2).sum(dim=dims) * (obs_m**2).sum(dim=dims))
+    dims: list[str] = reduce_dims if reduce_dims else list(str(d) for d in fcst.dims)
+    fcst_mean: xr.DataArray = fcst.mean(dim=dims)  # type: ignore[call-overload, assignment]
+    obs_mean: xr.DataArray = obs.mean(dim=dims)  # type: ignore[call-overload, assignment]
+    fcst_m = fcst - fcst_mean
+    obs_m = obs - obs_mean
+    num: xr.DataArray = cast(xr.DataArray, fcst_m * obs_m).sum(dim=dims)
+    sq_sum = cast(xr.DataArray, fcst_m**2).sum(dim=dims) * cast(xr.DataArray, obs_m**2).sum(
+        dim=dims
+    )
+    denom: xr.DataArray = np.sqrt(sq_sum)  # type: ignore[assignment]
     return xr.where(denom == 0, np.nan, num / denom)
 
 
@@ -102,7 +109,8 @@ def _correlation_fallback(
 # ---------------------------------------------------------------------------
 
 #: The global score registry.  Keys are short metric names.
-SCORE_REGISTRY: dict[str, Callable] = {}
+#: Values are either callables or string sentinels resolved lazily in dispatcher.py.
+SCORE_REGISTRY: dict[str, Callable | str] = {}
 
 
 def _register_builtins() -> None:
@@ -141,7 +149,7 @@ DETERMINISTIC_METRICS: frozenset[str] = frozenset(
 QUANTILE_METRICS: frozenset[str] = frozenset(["pinball", "interval_score", "rpss"])
 
 
-def register_score(name: str, fn: Callable) -> None:
+def register_score(name: str, fn: Callable | str) -> None:
     """Register a custom scoring function under ``name``.
 
     Parameters
