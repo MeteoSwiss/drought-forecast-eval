@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.10', '3.11', '3.12']
+        python-version: ['3.11', '3.12', '3.13']
 
 
     steps:
@@ -46,8 +46,11 @@ jobs:
     - name: Run pytest
       run: poetry run pytest -s --cov=drought_forecast_eval --cov-fail-under=80
 
-    - name: Run linter
-      run: poetry run pylint -rn --output-format=parseable drought_forecast_eval
+    - name: Run ruff linter
+      run: poetry run ruff check drought_forecast_eval
+
+    - name: Run ruff formatter check
+      run: poetry run ruff format --check drought_forecast_eval
 
     - name: Run static checker
       run: |
