@@ -1,188 +1,58 @@
-# Contributing
+# Contributing to drought-forecast-eval
 
-Thank you for your interest in contributing to **Open Source Template**! We welcome contributions from the community and are grateful for your support.
+## Development setup
 
-## Code of Conduct
-
-This project adheres to the Contributor Covenant Code of Conduct. By participating, you are expected to uphold this code. Please read the full [Code of Conduct](CODE_OF_CONDUCT.md) before contributing.
-
-## How Can I Contribute?
-
-### Reporting Bugs
-
-Before creating bug reports, please check existing issues to avoid duplicates. When you create a bug report, include as many details as possible:
-
-- Use a clear and descriptive title
-- Describe the exact steps to reproduce the problem
-- Provide specific examples to demonstrate the steps
-- Describe the behavior you observed and what you expected to see
-- Include any error messages or stack traces
-- Note your environment (Python version, OS, etc.)
-
-You can report bugs using our **bug report template**.
-
-### Suggesting Features
-
-Feature suggestions are welcome! Please create an issue using our *feature request template* and include:
-
-- A clear and descriptive title
-- A detailed description of the proposed feature
-- Explain why this feature would be useful
-- Provide examples of how it would be used
-
-### Contributing Code
-
-1. Fork the repository
-2. Create a new branch for your feature or bugfix
-3. Make your changes following our coding standards
-4. Write or update tests as needed
-5. Ensure all tests pass and code quality checks succeed
-6. Submit a pull request
-
-## Development Setup
-
-### Prerequisites
-
-- Python 3.11 or higher (up to 3.12)
-- Poetry (for dependency management)
-- Git
-
-### Setting Up Your Environment
-
-1. Clone your fork of the repository:
-
-   ```console
-   $ git clone https://github.com/YOUR-USERNAME/open-source-template.git
-   $ cd open-source-template
-   ```
-
-2. Install dependencies:
-
-   ```console
-   $ poetry install
-   ```
-
-3. Verify your setup by running the tests:
-
-   ```console
-   $ poetry run pytest
-   ```
-
-## Code Style and Quality
-
-This project uses several tools to maintain code quality:
-
-### Formatting with YAPF
-
-We use [YAPF](https://github.com/google/yapf) for code formatting with PEP 8 style and a 120-character line limit.
-
-Format your code before committing:
-
-```console
-$ poetry run yapf -r -i open_source_template
+```bash
+git clone https://github.com/MeteoSwiss/drought-forecast-eval.git
+cd drought-forecast-eval
+poetry install --with dev,report
 ```
 
-### Linting with Pylint
+## Running tests
 
-Run pylint to check for code quality issues:
-
-```console
-$ poetry run pylint open_source_template
+```bash
+poetry run pytest                          # all tests with coverage
+poetry run pytest tests/test_scoring.py    # single module
+poetry run pytest -k "test_mae"            # by name pattern
+poetry run pytest --no-header -rN -q       # quiet mode
 ```
 
-The project configuration is in `pyproject.toml`. We disable certain docstring requirements but maintain other quality standards.
+Fixture ZIPs are auto-generated on first run via `tests/fixtures/make_fixtures.py`.
+To regenerate them manually:
 
-### Type Checking with Mypy
-
-We enforce type hints throughout the codebase:
-
-```console
-$ poetry run mypy open_source_template
+```bash
+poetry run python tests/fixtures/make_fixtures.py
 ```
 
-All function definitions must include type annotations.
+## Code style
 
-## Testing Guidelines
+This project uses `ruff` for linting and formatting:
 
-### Writing Tests
-
-- Write unit tests for all new code
-- Place tests in the `test/` directory
-- Follow the existing test structure and naming conventions
-- Use descriptive test names that explain what is being tested
-- Aim for high code coverage (check with `pytest-cov`)
-
-### Running Tests
-
-Run all tests:
-
-```console
-$ poetry run pytest
+```bash
+poetry run ruff check .
+poetry run ruff format .
 ```
 
-Run tests with coverage:
+## Adding a new metric
 
-```console
-$ poetry run pytest --cov=open_source_template --cov-report=html
-```
+1. Implement the function in `drought_forecast_eval/scoring/skill.py`
+   (or a new module) with signature `fn(fcst, obs, **kwargs) -> xr.DataArray`.
+2. Register it in `drought_forecast_eval/scoring/registry.py` (or call
+   `register_score()` at import time).
+3. If it needs quantile inputs, add it to `QUANTILE_METRICS` in `registry.py`
+   and handle it in `dispatcher._compute_quantile_score()`.
+4. Add a test in `tests/test_scoring.py`.
 
-## Documentation
+## Adding a new variable
 
-- Update documentation for any changed functionality
-- Add docstrings to new functions, classes, and modules
-- Follow the existing documentation style
-- Build documentation locally to verify changes:
+1. Add an entry to `VARIABLE_MAP` in `drought_forecast_eval/scoring/variable_map.py`.
+2. Add the corresponding columns to `FORECAST_SCHEMA` / `OBSERVATION_SCHEMA` in
+   `drought_forecast_eval/io/schema.py`.
+3. Add a test row to `tests/fixtures/make_fixtures.py` and regenerate fixtures.
 
-  ```console
-  $ poetry run sphinx-build doc doc/_build
-  ```
+## Branch / MR workflow
 
-## Pull Request Process
-
-1. **Update the CHANGELOG**: Add a brief description of your changes in **CHANGELOG**
-
-2. **Update AUTHORS**: If this is your first contribution, add your name to the **AUTHORS** file
-
-3. **Create a Pull Request**: Use our **pull request template** and ensure you:
-
-   - Provide a clear description of the changes
-   - Reference any related issues (e.g., "Closes #123")
-   - Complete the checklist in the PR template
-   - Ensure all CI checks pass
-
-4. **Code Review**: A maintainer will review your PR. Be prepared to make changes based on feedback
-
-5. **Merge**: Once approved and all checks pass, a maintainer will merge your PR
-
-### Commit Messages
-
-Write clear, concise commit messages:
-
-- Use the imperative mood ("Add feature" not "Added feature")
-- Start with a capital letter
-- Keep the first line under 50 characters
-- Add a blank line followed by a detailed description if needed
-
-Example:
-
-```text
-Add validation for input parameters
-
-- Validate that input is not None
-- Raise ValueError for invalid types
-- Add unit tests for validation logic
-```
-
-## License
-
-By contributing to this project, you agree that your contributions will be licensed under the BSD-3-Clause License.
-
-## Questions?
-
-If you have questions about contributing, please:
-
-- Check existing issues and discussions
-- Review the documentation
-- Create a new issue with your question
-
-Thank you for contributing to Open Source Template!
+- Branch from `main`; branch name: `feat/short-description` or `fix/issue-id`
+- One MR per feature / fix
+- All tests must pass; coverage should not decrease
+- Squash merge preferred for a clean history
