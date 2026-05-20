@@ -1,4 +1,8 @@
 # drought-forecast-eval
+[![codecov](https://codecov.io/gh/MeteoSwiss/drought-forecast-eval/branch/main/graph/badge.svg)](https://codecov.io/gh/MeteoSwiss/drought-forecast-eval)
+[![Python 3.11 | 3.12 | 3.13](https://img.shields.io/badge/python-3.11%20%7C%203.12%20%7C%203.13-blue)](https://www.python.org/downloads/)
+[![Tests](https://github.com/MeteoSwiss/drought-forecast-eval/actions/workflows/CI_test.yaml/badge.svg)](https://github.com/MeteoSwiss/drought-forecast-eval/actions)
+
 
 **Verification and evaluation library for Swiss drought forecasts.**
 
