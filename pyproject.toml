@@ -3,7 +3,7 @@ dynamic = ["version"]
 name = "drought-forecast-eval"
 description = "Verification library for drought forecasts on www.drought.admin.ch"
 license = "MIT"
-readme = "README.rst"
+readme = "README.md"
 authors = [{ name = "MeteoSwiss Divisions SEK and SEP" }]
 keywords = ["drought", "forecast", "verification", "Switzerland"]
 classifiers = [
