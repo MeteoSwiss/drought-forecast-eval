@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=8eb447cf"></script>
+    <script src="../../../_static/documentation_options.js?v=d6ada1c8"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/drought_forecast_eval/report/builder';</script>
@@ -516,6 +516,7 @@
         <span class="n">refs</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;climatology&quot;</span><span class="p">,</span> <span class="s2">&quot;both&quot;</span><span class="p">):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Building climatology reference (week_window=</span><span class="si">%d</span><span class="s2">) …&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">week_window</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ds_obs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ds_fcst</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="n">clim</span> <span class="o">=</span> <span class="n">climatology_reference</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_ds_obs</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_ds_fcst</span><span class="p">,</span>
@@ -524,7 +525,8 @@
             <span class="n">refs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">clim</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reference</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;persistence&quot;</span><span class="p">,</span> <span class="s2">&quot;both&quot;</span><span class="p">):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Building persistence reference …&quot;</span><span class="p">)</span>
-            <span class="n">pers</span> <span class="o">=</span> <span class="n">persistence_reference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ds_obs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ds_fcst</span><span class="p">)</span>  <span class="c1"># type: ignore[arg-type]</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ds_obs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ds_fcst</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="n">pers</span> <span class="o">=</span> <span class="n">persistence_reference</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_ds_obs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ds_fcst</span><span class="p">)</span>
             <span class="n">refs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pers</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">refs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -725,14 +727,15 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return variable keys whose &#39;{key}_{score}&#39; column exists in ds.&quot;&quot;&quot;</span>
     <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">varname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">score</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">):</span>
-            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">varname</span><span class="p">[:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">score</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)])</span>
+        <span class="n">varname_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">varname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">varname_str</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">score</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">):</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">varname_str</span><span class="p">[:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">score</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)])</span>
     <span class="k">return</span> <span class="n">results</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span>  <span class="c1"># limit to 8 for readability</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_first_available</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the first data variable name.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_build_summary_table</span><span class="p">(</span><span class="n">ds</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">dict</span><span class="p">]:</span>
@@ -740,7 +743,8 @@
     <span class="n">rows</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">varname</span> <span class="ow">in</span> <span class="n">ds</span><span class="o">.</span><span class="n">data_vars</span><span class="p">:</span>
         <span class="c1"># Parse variable key and metric from varname</span>
-        <span class="n">parts</span> <span class="o">=</span> <span class="n">varname</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">varname_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">varname</span><span class="p">)</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">varname_str</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">continue</span>
         <span class="n">var_key</span><span class="p">,</span> <span class="n">metric</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -793,7 +797,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">fig</span> <span class="o">=</span> <span class="n">plot_region_map</span><span class="p">(</span>
                 <span class="n">ds</span><span class="p">,</span>
-                <span class="n">sv</span><span class="p">,</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">sv</span><span class="p">),</span>
                 <span class="n">shapefile_path</span><span class="o">=</span><span class="n">builder</span><span class="o">.</span><span class="n">shapefile_path</span><span class="p">,</span>
                 <span class="n">lead_weeks</span><span class="o">=</span><span class="n">LEAD_WEEKS</span><span class="p">,</span>
             <span class="p">)</span>
@@ -840,7 +844,7 @@
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-Drought Forecast Eval, version: dev-ecb28d6</div>
+Drought Forecast Eval, version: dev-f8f19f0</div>
       
         <div class="footer-item"><p class="last-updated">
   Last updated on 20.05.2026.

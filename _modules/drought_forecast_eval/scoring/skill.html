@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=8eb447cf"></script>
+    <script src="../../../_static/documentation_options.js?v=d6ada1c8"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/drought_forecast_eval/scoring/skill';</script>
@@ -403,6 +403,7 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">cast</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">scores.continuous</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_scores_cont</span>
@@ -613,8 +614,8 @@
     <span class="n">rps_f</span> <span class="o">=</span> <span class="n">rps_from_quantiles</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">fcst_p10</span><span class="p">,</span> <span class="n">fcst_p50</span><span class="p">,</span> <span class="n">fcst_p90</span><span class="p">)</span>
     <span class="n">rps_r</span> <span class="o">=</span> <span class="n">rps_from_quantiles</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">ref_p10</span><span class="p">,</span> <span class="n">ref_p50</span><span class="p">,</span> <span class="n">ref_p90</span><span class="p">)</span>
 
-    <span class="n">mean_rps_f</span> <span class="o">=</span> <span class="n">rps_f</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">reduce_dims</span><span class="p">)</span>
-    <span class="n">mean_rps_r</span> <span class="o">=</span> <span class="n">rps_r</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">reduce_dims</span><span class="p">)</span>
+    <span class="n">mean_rps_f</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span> <span class="o">=</span> <span class="n">rps_f</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">reduce_dims</span><span class="p">)</span>  <span class="c1"># type: ignore[call-overload, assignment]</span>
+    <span class="n">mean_rps_r</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span> <span class="o">=</span> <span class="n">rps_r</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">reduce_dims</span><span class="p">)</span>  <span class="c1"># type: ignore[call-overload, assignment]</span>
 
     <span class="n">skill</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">mean_rps_r</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">mean_rps_f</span> <span class="o">/</span> <span class="n">mean_rps_r</span><span class="p">)</span>
     <span class="n">skill</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;long_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;RPSS&quot;</span>
@@ -824,7 +825,7 @@
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-Drought Forecast Eval, version: dev-ecb28d6</div>
+Drought Forecast Eval, version: dev-f8f19f0</div>
       
         <div class="footer-item"><p class="last-updated">
   Last updated on 20.05.2026.

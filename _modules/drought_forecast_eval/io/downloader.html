@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=8eb447cf"></script>
+    <script src="../../../_static/documentation_options.js?v=d6ada1c8"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/drought_forecast_eval/io/downloader';</script>
@@ -394,7 +394,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">datetime</span><span class="w"> </span><span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>  <span class="c1"># type: ignore[import-untyped]</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">drought_forecast_eval.io.archive</span><span class="w"> </span><span class="kn">import</span> <span class="n">BGDI_ARCHIVE_URL_TEMPLATE</span><span class="p">,</span> <span class="n">BGDI_HISTORIC_URL</span>
 
@@ -578,7 +578,7 @@
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-Drought Forecast Eval, version: dev-ecb28d6</div>
+Drought Forecast Eval, version: dev-f8f19f0</div>
       
         <div class="footer-item"><p class="last-updated">
   Last updated on 20.05.2026.
