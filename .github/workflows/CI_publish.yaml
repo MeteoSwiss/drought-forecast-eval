@@ -3,7 +3,6 @@
 # It uses the `peaceiris/actions-gh-pages` action to handle the GitHub pages publishing and
 # `pypa/gh-action-pypi-publish@release/v1` to publish to pypi using trusted publishers feature.
 #
-# Copyright (c) 2025 MeteoSwiss, created by Michele Cattaneo; michele.cattaneo@meteoswiss.ch
 
 name: CI_publish
 
