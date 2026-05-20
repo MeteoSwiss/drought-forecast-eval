@@ -1,0 +1,94 @@
+drought_forecast_eval.processing.reference
+==========================================
+
+.. py:module:: drought_forecast_eval.processing.reference
+
+.. autoapi-nested-parse::
+
+   Reference forecast construction for skill-score baselines.
+
+   Two reference strategies are implemented:
+
+   climatology_reference
+       For each ``(drought_region_id, week_of_year)`` compute the historical
+       distribution (p10 / p50 / p90) using all available years, with a
+       ``±week_window`` buffer around the target week-of-year to smooth
+       sparseness at weekly resolution.  Returns a reference dataset on the
+       same ``(forecast_reference_time, drought_region_id, lead_week)`` grid
+       as the forecast, so that RPSS = 1 − score(fcst) / score(ref) works
+       dimension-cleanly.
+
+   persistence_reference
+       For each ``forecast_reference_time``, uses the **last observed value
+       before that date** as the flat reference forecast across all lead weeks.
+       Returns a reference dataset on the same grid as the forecast.
+
+   Both functions return an ``xr.Dataset`` whose variable names match the
+   **observation** variable names (not the forecast quantile names), making
+   them directly usable as the ``ds_ref`` argument to
+   :func:`~drought_forecast_eval.scoring.skill.mae_skill` and
+   :func:`~drought_forecast_eval.scoring.skill.rpss`.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   drought_forecast_eval.processing.reference.logger
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   drought_forecast_eval.processing.reference.climatology_reference
+   drought_forecast_eval.processing.reference.persistence_reference
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:function:: climatology_reference(ds_obs: xarray.Dataset, ds_fcst: xarray.Dataset, week_window: int = 4) -> xarray.Dataset
+
+   Build a climatological reference forecast on the forecast grid.
+
+   For each target ``valid_at`` (Monday), collect all historical
+   observations within ±``week_window`` ISO-weeks of the same week-of-year
+   across all available years.  Return p10 / p50 / p90 of that sample as
+   the probabilistic reference forecast.
+
+   :Parameters: * **ds_obs** -- Observation dataset with dims ``(drought_region_id, valid_at)``.
+                * **ds_fcst** -- Forecast dataset used only for its grid coordinates
+                  ``(forecast_reference_time, drought_region_id, lead_week, valid_at)``.
+                * **week_window** -- Half-width of the week-of-year window (inclusive).  Default 4 means
+                  ±4 ISO weeks around the target week are included in the sample.
+
+   :returns: Dimensions ``(forecast_reference_time, drought_region_id, lead_week)``.
+             For each observation variable ``v`` the dataset contains
+             ``v_ref_p10``, ``v_ref_p50``, ``v_ref_p90``.
+   :rtype: xr.Dataset
+
+
+.. py:function:: persistence_reference(ds_obs: xarray.Dataset, ds_fcst: xarray.Dataset) -> xarray.Dataset
+
+   Build a persistence reference forecast on the forecast grid.
+
+   For each ``forecast_reference_time`` and ``drought_region_id``, the last
+   observed value **strictly before** the ``forecast_reference_time`` is used
+   as the flat reference across all lead weeks.
+
+   :Parameters: * **ds_obs** -- Observation dataset with dims ``(drought_region_id, valid_at)``.
+                * **ds_fcst** -- Forecast dataset used for its grid coordinates.
+
+   :returns: Dimensions ``(forecast_reference_time, drought_region_id, lead_week)``.
+             For each observation variable ``v`` the dataset contains
+             ``v_ref_p50`` (persistence is deterministic, stored as p50 for
+             consistency with the climatology reference interface).
+   :rtype: xr.Dataset
+
+

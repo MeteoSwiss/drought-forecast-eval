@@ -1,0 +1,83 @@
+drought_forecast_eval.config.settings
+=====================================
+
+.. py:module:: drought_forecast_eval.config.settings
+
+.. autoapi-nested-parse::
+
+   Global configuration and default values.
+
+   All settings can be overridden by passing arguments directly to the
+   library functions.  This module provides the authoritative defaults so
+   that values are defined in exactly one place.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   drought_forecast_eval.config.settings.BGDI_ARCHIVE_URL_TEMPLATE
+   drought_forecast_eval.config.settings.BGDI_HISTORIC_URL
+   drought_forecast_eval.config.settings.ALL_REGION_IDS
+   drought_forecast_eval.config.settings.DEFAULT_VARIABLES
+   drought_forecast_eval.config.settings.DEFAULT_SCORES
+   drought_forecast_eval.config.settings.DEFAULT_WEEK_WINDOW
+   drought_forecast_eval.config.settings.DEFAULT_CDI_THRESHOLD
+   drought_forecast_eval.config.settings.LEAD_WEEKS
+   drought_forecast_eval.config.settings.DEFAULT_SHAPEFILE
+   drought_forecast_eval.config.settings.DEFAULT_SHAPEFILE_REGION_COL
+
+
+Module Contents
+---------------
+
+.. py:data:: BGDI_ARCHIVE_URL_TEMPLATE
+   :type:  str
+   :value: 'https://data.geo.admin.ch/ch.bafu.trockenheitsdaten-numerisch/trockenheitsdaten-numerisch_curren...
+
+
+.. py:data:: BGDI_HISTORIC_URL
+   :type:  str
+   :value: 'https://data.geo.admin.ch/ch.bafu.trockenheitsdaten-numerisch/trockenheitsdaten-numerisch_histor...
+
+
+.. py:data:: ALL_REGION_IDS
+   :type:  list[int]
+
+.. py:data:: DEFAULT_VARIABLES
+   :type:  list[str]
+   :value: ['cdi', 'precip_1m_index', 'precip_3m_index', 'precip_24m_index', 'hydro_index',...
+
+
+.. py:data:: DEFAULT_SCORES
+   :type:  list[str]
+   :value: ['mae', 'rmse', 'bias', 'correlation', 'pinball', 'interval_score']
+
+
+.. py:data:: DEFAULT_WEEK_WINDOW
+   :type:  int
+   :value: 4
+
+
+.. py:data:: DEFAULT_CDI_THRESHOLD
+   :type:  float
+   :value: 2.0
+
+
+.. py:data:: LEAD_WEEKS
+   :type:  list[int]
+   :value: [0, 1, 2, 3]
+
+
+.. py:data:: DEFAULT_SHAPEFILE
+   :type:  str
+   :value: 'shapefiles/BAFU_Grossregionen_v3.shp'
+
+
+.. py:data:: DEFAULT_SHAPEFILE_REGION_COL
+   :type:  str
+   :value: 'REGION_NR'
+
+

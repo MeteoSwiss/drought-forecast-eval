@@ -1,0 +1,164 @@
+drought_forecast_eval.report
+============================
+
+.. py:module:: drought_forecast_eval.report
+
+.. autoapi-nested-parse::
+
+   Report builder: orchestrates the full pipeline into HTML/CSV/NetCDF output.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/drought_forecast_eval/report/builder/index
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   drought_forecast_eval.report.ReportBuilder
+
+
+Package Contents
+----------------
+
+.. py:class:: ReportBuilder(archive_dir: str | pathlib.Path, historic_path: str | pathlib.Path, date_range: tuple[str, str], regions: list[int] | Literal['all'] = 'all', variables: list[str] | Literal['all'] = 'all', scores: list[str] | Literal['default'] = 'default', reference: Literal['climatology', 'persistence', 'both'] = 'climatology', cdi_threshold: float = DEFAULT_CDI_THRESHOLD, shapefile_path: str | pathlib.Path | None = DEFAULT_SHAPEFILE, output_dir: str | pathlib.Path = './output', week_window: int = DEFAULT_WEEK_WINDOW, variable_map: dict | None = None)
+
+   Orchestrate the full verification pipeline.
+
+   :Parameters: * **archive_dir** -- Flat directory of daily forecast ZIP archives.
+                * **historic_path** -- Path to the historic observation ZIP (or CSV).
+                * **date_range** -- ``(start, end)`` ISO-date strings for the verification window.
+                * **regions** -- ``"all"`` or a list of integer region IDs.
+                * **variables** -- ``"all"``, a group name, or a list of variable keys.
+                * **scores** -- ``"default"`` or a list of metric names.
+                * **reference** -- Which reference forecast strategy to use: ``"climatology"``,
+                  ``"persistence"``, or ``"both"``.
+                * **cdi_threshold** -- Binary event threshold for CDI ROC-AUC.
+                * **shapefile_path** -- Path to the drought-region shapefile for map plots.
+                * **output_dir** -- Directory where all output files are written.
+                * **week_window** -- Half-width of the climatology week-of-year window (weeks).
+                * **variable_map** -- Override the global VARIABLE_MAP for custom experiments.
+
+
+   .. py:attribute:: archive_dir
+
+
+   .. py:attribute:: historic_path
+
+
+   .. py:attribute:: date_range
+
+
+   .. py:attribute:: regions
+      :value: 'all'
+
+
+
+   .. py:attribute:: variables
+      :value: 'all'
+
+
+
+   .. py:attribute:: scores
+      :value: 'default'
+
+
+
+   .. py:attribute:: reference
+      :value: 'climatology'
+
+
+
+   .. py:attribute:: cdi_threshold
+      :value: 2.0
+
+
+
+   .. py:attribute:: shapefile_path
+
+
+   .. py:attribute:: output_dir
+
+
+   .. py:attribute:: week_window
+      :value: 4
+
+
+
+   .. py:attribute:: variable_map
+      :value: None
+
+
+
+   .. py:method:: load_data() -> None
+
+      Load forecast and observation data from disk.
+
+
+
+   .. py:method:: build_reference() -> None
+
+      Construct reference forecast dataset(s).
+
+
+
+   .. py:method:: align() -> None
+
+      Align observations onto the forecast grid.
+
+
+
+   .. py:method:: compute_scores() -> xarray.Dataset
+
+      Run the scoring pipeline and return the scores dataset.
+
+      This is idempotent: subsequent calls return the cached result.
+
+
+
+   .. py:method:: plot_skill_curves(score: str = 'mae', variables: list[str] | None = None) -> matplotlib.pyplot.Figure
+
+      Generate skill-vs-lead-week plot.
+
+
+
+   .. py:method:: plot_region_maps(score_variable: str | None = None) -> matplotlib.pyplot.Figure
+
+      Generate 4-panel regional map for a score variable.
+
+
+
+   .. py:method:: export_csv(path: str | pathlib.Path | None = None) -> pathlib.Path
+
+      Export scores summary to CSV (aggregated over regions and lead weeks).
+
+
+
+   .. py:method:: export_netcdf(path: str | pathlib.Path | None = None) -> pathlib.Path
+
+      Write full scores dataset to NetCDF4.
+
+
+
+   .. py:method:: export_html(path: str | pathlib.Path | None = None) -> pathlib.Path
+
+      Render the verification report to HTML.
+
+
+
+   .. py:method:: run() -> dict[str, pathlib.Path]
+
+      Execute the full pipeline: load → align → score → export.
+
+      :rtype: dict mapping output type to file path.
+
+
+

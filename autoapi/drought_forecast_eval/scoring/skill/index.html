@@ -1,0 +1,751 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>drought_forecast_eval.scoring.skill &#8212; Drought Forecast Eval</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=4ae1632d" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../../_static/documentation_options.js?v=72831c39"></script>
+    <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'autoapi/drought_forecast_eval/scoring/skill/index';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '_static/switcher_config.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="drought_forecast_eval.scoring.variable_map" href="../variable_map/index.html" />
+    <link rel="prev" title="drought_forecast_eval.scoring.registry" href="../registry/index.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="dev" />
+    <meta name="docbuild:last-update" content="20.05.2026"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../../_static/app-icon_meteoswiss_rounded_rgb.png" class="logo__image only-light" alt=""/>
+    <img src="../../../../_static/app-icon_meteoswiss_rounded_rgb.png" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">Drought Forecast Eval</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../readme.html">
+    <no title>
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../changelog.html">
+    Changelog
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../../index.html">
+    API Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../readme.html">
+    <no title>
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../../changelog.html">
+    Changelog
+  </a>
+</li>
+
+
+<li class="nav-item current active">
+  <a class="nav-link nav-internal" href="../../../index.html">
+    API Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><ul class="current nav bd-sidenav">
+<li class="toctree-l1 current active has-children"><a class="reference internal" href="../../index.html">drought_forecast_eval</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../config/index.html">drought_forecast_eval.config</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../config/settings/index.html">drought_forecast_eval.config.settings</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../io/index.html">drought_forecast_eval.io</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../io/archive/index.html">drought_forecast_eval.io.archive</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../io/downloader/index.html">drought_forecast_eval.io.downloader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../io/loader/index.html">drought_forecast_eval.io.loader</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../io/schema/index.html">drought_forecast_eval.io.schema</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../processing/index.html">drought_forecast_eval.processing</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../processing/alignment/index.html">drought_forecast_eval.processing.alignment</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../processing/lead_time/index.html">drought_forecast_eval.processing.lead_time</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../processing/reference/index.html">drought_forecast_eval.processing.reference</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../report/index.html">drought_forecast_eval.report</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../report/builder/index.html">drought_forecast_eval.report.builder</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 current active has-children"><a class="reference internal" href="../index.html">drought_forecast_eval.scoring</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../dispatcher/index.html">drought_forecast_eval.scoring.dispatcher</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../registry/index.html">drought_forecast_eval.scoring.registry</a></li>
+<li class="toctree-l3 current active"><a class="current reference internal" href="#">drought_forecast_eval.scoring.skill</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../variable_map/index.html">drought_forecast_eval.scoring.variable_map</a></li>
+</ul>
+</details></li>
+<li class="toctree-l2 has-children"><a class="reference internal" href="../../visualization/index.html">drought_forecast_eval.visualization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../visualization/experiment_comparison/index.html">drought_forecast_eval.visualization.experiment_comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../visualization/region_map/index.html">drought_forecast_eval.visualization.region_map</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../visualization/skill_curves/index.html">drought_forecast_eval.visualization.skill_curves</a></li>
+</ul>
+</details></li>
+</ul>
+</details></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../../index.html" class="nav-link">API Reference</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">drought_forecast_eval</a></li>
+    
+    
+    <li class="breadcrumb-item"><a href="../index.html" class="nav-link">drought_forecast_eval.scoring</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">drought_forecast_eval.scoring.skill</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-drought_forecast_eval.scoring.skill">
+<span id="drought-forecast-eval-scoring-skill"></span><h1>drought_forecast_eval.scoring.skill<a class="headerlink" href="#module-drought_forecast_eval.scoring.skill" title="Link to this heading">#</a></h1>
+<p>Skill score wrappers and helper scoring functions.</p>
+<p>All functions accept and return <code class="docutils literal notranslate"><span class="pre">xr.DataArray</span></code> / <code class="docutils literal notranslate"><span class="pre">xr.Dataset</span></code> objects so
+that they compose cleanly with the <code class="docutils literal notranslate"><span class="pre">scores</span></code> library and with xarray’s
+<code class="docutils literal notranslate"><span class="pre">groupby</span></code> / <code class="docutils literal notranslate"><span class="pre">mean</span></code> machinery.</p>
+<section id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">#</a></h2>
+<dl class="simple">
+<dt>mae_skill</dt><dd><p>Skill score relative to a reference based on MAE.
+SS = 1 − MAE(fcst, obs) / MAE(ref, obs)</p>
+</dd>
+<dt>rpss</dt><dd><p>Ranked Probability Skill Score relative to a reference.
+RPSS = 1 − RPS(fcst, obs) / RPS(ref, obs)</p>
+</dd>
+<dt>rps_from_quantiles</dt><dd><p>Approximate RPS from p10/p50/p90 quantile forecasts by constructing
+a piecewise-linear CDF and integrating.</p>
+</dd>
+<dt>roc_auc_xr</dt><dd><p>Area under the ROC curve for a binary event defined by a threshold.
+Operates on the p50 (median) forecast treated as a deterministic
+probability proxy, or on an ensemble.</p>
+</dd>
+<dt>interval_score_xr</dt><dd><p>Winkler interval score for a (p10, p90) prediction interval.</p>
+</dd>
+<dt>pinball_loss_xr</dt><dd><p>Pinball (quantile) loss for a single quantile level.</p>
+</dd>
+</dl>
+</section>
+<section id="id1">
+<h2>Functions<a class="headerlink" href="#id1" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="autosummary longtable table">
+<tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#drought_forecast_eval.scoring.skill.mae_skill" title="drought_forecast_eval.scoring.skill.mae_skill"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mae_skill</span></code></a>(→ xarray.DataArray)</p></td>
+<td><p>Compute MAE-based skill score.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#drought_forecast_eval.scoring.skill.rps_from_quantiles" title="drought_forecast_eval.scoring.skill.rps_from_quantiles"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rps_from_quantiles</span></code></a>(→ xarray.DataArray)</p></td>
+<td><p>Compute approximate RPS from three-quantile forecast.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#drought_forecast_eval.scoring.skill.rpss" title="drought_forecast_eval.scoring.skill.rpss"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rpss</span></code></a>(→ xarray.DataArray)</p></td>
+<td><p>Ranked Probability Skill Score (RPSS).</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#drought_forecast_eval.scoring.skill.interval_score_xr" title="drought_forecast_eval.scoring.skill.interval_score_xr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interval_score_xr</span></code></a>(→ xarray.DataArray)</p></td>
+<td><p>Winkler interval score for a (1−alpha) prediction interval.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#drought_forecast_eval.scoring.skill.pinball_loss_xr" title="drought_forecast_eval.scoring.skill.pinball_loss_xr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">pinball_loss_xr</span></code></a>(→ xarray.DataArray)</p></td>
+<td><p>Pinball (quantile) loss for a single quantile level.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#drought_forecast_eval.scoring.skill.roc_auc_xr" title="drought_forecast_eval.scoring.skill.roc_auc_xr"><code class="xref py py-obj docutils literal notranslate"><span class="pre">roc_auc_xr</span></code></a>(→ xarray.DataArray)</p></td>
+<td><p>Compute ROC-AUC for a binary drought event.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<section id="module-contents">
+<h2>Module Contents<a class="headerlink" href="#module-contents" title="Link to this heading">#</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="drought_forecast_eval.scoring.skill.mae_skill">
+<span class="sig-name descname"><span class="pre">mae_skill</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fcst</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduce_dims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">xarray.DataArray</span></span></span><a class="reference internal" href="../../../../_modules/drought_forecast_eval/scoring/skill.html#mae_skill"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drought_forecast_eval.scoring.skill.mae_skill" title="Link to this definition">#</a></dt>
+<dd><p>Compute MAE-based skill score.</p>
+<p>SS = 1 - MAE(fcst, obs) / MAE(ref, obs)</p>
+<p>A skill score of 1 is perfect; 0 means equal to reference; negative
+means worse than reference.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fcst</strong> – Forecast DataArray (deterministic or p50).</p></li>
+<li><p><strong>obs</strong> – Observation DataArray.</p></li>
+<li><p><strong>ref</strong> – Reference forecast DataArray (same shape as obs).</p></li>
+<li><p><strong>reduce_dims</strong> – Dimensions over which to average MAE before computing the ratio.
+Defaults to <code class="docutils literal notranslate"><span class="pre">[&quot;forecast_reference_time&quot;]</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>xr.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="drought_forecast_eval.scoring.skill.rps_from_quantiles">
+<span class="sig-name descname"><span class="pre">rps_from_quantiles</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p10</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p50</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p90</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thresholds</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">numpy.ndarray</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">xarray.DataArray</span></span></span><a class="reference internal" href="../../../../_modules/drought_forecast_eval/scoring/skill.html#rps_from_quantiles"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drought_forecast_eval.scoring.skill.rps_from_quantiles" title="Link to this definition">#</a></dt>
+<dd><p>Compute approximate RPS from three-quantile forecast.</p>
+<p>A piecewise-linear CDF is constructed from p10 / p50 / p90 and evaluated
+at <code class="docutils literal notranslate"><span class="pre">thresholds</span></code>.  The observed CDF is a step function at the observed
+value.  RPS is the squared area between the two CDFs (discrete
+approximation).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> – Observed values DataArray.</p></li>
+<li><p><strong>p10, p50, p90</strong> – Forecast quantile DataArrays.</p></li>
+<li><p><strong>thresholds</strong> – Evaluation points.  If <code class="docutils literal notranslate"><span class="pre">None</span></code>, 20 equally-spaced percentiles of the
+combined forecast range are used.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>RPS values (same dims as obs, minus the quantile axis).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xr.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="drought_forecast_eval.scoring.skill.rpss">
+<span class="sig-name descname"><span class="pre">rpss</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fcst_p10</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fcst_p50</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fcst_p90</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_p10</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_p50</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_p90</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduce_dims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">xarray.DataArray</span></span></span><a class="reference internal" href="../../../../_modules/drought_forecast_eval/scoring/skill.html#rpss"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drought_forecast_eval.scoring.skill.rpss" title="Link to this definition">#</a></dt>
+<dd><p>Ranked Probability Skill Score (RPSS).</p>
+<p>RPSS = 1 − mean(RPS_fcst) / mean(RPS_ref)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> – Observation DataArray.</p></li>
+<li><p><strong>fcst_p10, fcst_p50, fcst_p90</strong> – Forecast quantile DataArrays.</p></li>
+<li><p><strong>ref_p10, ref_p50, ref_p90</strong> – Reference quantile DataArrays.</p></li>
+<li><p><strong>reduce_dims</strong> – Dimensions over which to average RPS.  Defaults to
+<code class="docutils literal notranslate"><span class="pre">[&quot;forecast_reference_time&quot;]</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>xr.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="drought_forecast_eval.scoring.skill.interval_score_xr">
+<span class="sig-name descname"><span class="pre">interval_score_xr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lower</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">upper</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">alpha</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.2</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">xarray.DataArray</span></span></span><a class="reference internal" href="../../../../_modules/drought_forecast_eval/scoring/skill.html#interval_score_xr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drought_forecast_eval.scoring.skill.interval_score_xr" title="Link to this definition">#</a></dt>
+<dd><p>Winkler interval score for a (1−alpha) prediction interval.</p>
+<p>IS = (upper − lower) + (2/alpha)·max(lower − obs, 0) + (2/alpha)·max(obs − upper, 0)</p>
+<p>Default alpha=0.2 corresponds to the 80% prediction interval (p10–p90).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> – Observation DataArray.</p></li>
+<li><p><strong>lower</strong> – Lower bound of the prediction interval (e.g. p10 forecast).</p></li>
+<li><p><strong>upper</strong> – Upper bound of the prediction interval (e.g. p90 forecast).</p></li>
+<li><p><strong>alpha</strong> – Significance level; <code class="docutils literal notranslate"><span class="pre">alpha=0.2</span></code> means 80% interval.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>xr.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="drought_forecast_eval.scoring.skill.pinball_loss_xr">
+<span class="sig-name descname"><span class="pre">pinball_loss_xr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fcst</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantile</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">xarray.DataArray</span></span></span><a class="reference internal" href="../../../../_modules/drought_forecast_eval/scoring/skill.html#pinball_loss_xr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drought_forecast_eval.scoring.skill.pinball_loss_xr" title="Link to this definition">#</a></dt>
+<dd><p>Pinball (quantile) loss for a single quantile level.</p>
+<dl class="simple">
+<dt>L(q, y, f) = (y − f) · q         if y ≥ f</dt><dd><p>= (f − y) · (1 − q)   if y &lt; f</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> – Observation DataArray.</p></li>
+<li><p><strong>fcst</strong> – Forecast DataArray at the given quantile level.</p></li>
+<li><p><strong>quantile</strong> – Quantile probability level (e.g. 0.10, 0.50, 0.90).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>xr.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="drought_forecast_eval.scoring.skill.roc_auc_xr">
+<span class="sig-name descname"><span class="pre">roc_auc_xr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fcst_p50</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.DataArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reduce_dims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">xarray.DataArray</span></span></span><a class="reference internal" href="../../../../_modules/drought_forecast_eval/scoring/skill.html#roc_auc_xr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drought_forecast_eval.scoring.skill.roc_auc_xr" title="Link to this definition">#</a></dt>
+<dd><p>Compute ROC-AUC for a binary drought event.</p>
+<p>The binary event is defined as <code class="docutils literal notranslate"><span class="pre">value</span> <span class="pre">&gt;=</span> <span class="pre">threshold</span></code>.  The p50
+forecast is used as a deterministic probability proxy (rank-based AUC).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>obs</strong> – Observation DataArray.</p></li>
+<li><p><strong>fcst_p50</strong> – Forecast median DataArray.</p></li>
+<li><p><strong>threshold</strong> – Event threshold.  Default 2 (CDI ≥ 2 = drought event).</p></li>
+<li><p><strong>reduce_dims</strong> – Dimensions over which to pool samples for the ROC curve.  Defaults
+to <code class="docutils literal notranslate"><span class="pre">[&quot;forecast_reference_time&quot;,</span> <span class="pre">&quot;drought_region_id&quot;]</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>AUC value(s), one per remaining dimension (typically <code class="docutils literal notranslate"><span class="pre">lead_week</span></code>).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xr.DataArray</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="../registry/index.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">drought_forecast_eval.scoring.registry</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="../variable_map/index.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">drought_forecast_eval.scoring.variable_map</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Functions</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module Contents</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.scoring.skill.mae_skill"><code class="docutils literal notranslate"><span class="pre">mae_skill()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.scoring.skill.rps_from_quantiles"><code class="docutils literal notranslate"><span class="pre">rps_from_quantiles()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.scoring.skill.rpss"><code class="docutils literal notranslate"><span class="pre">rpss()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.scoring.skill.interval_score_xr"><code class="docutils literal notranslate"><span class="pre">interval_score_xr()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.scoring.skill.pinball_loss_xr"><code class="docutils literal notranslate"><span class="pre">pinball_loss_xr()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.scoring.skill.roc_auc_xr"><code class="docutils literal notranslate"><span class="pre">roc_auc_xr()</span></code></a></li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item"><!-- This will display the version of the docs -->
+Drought Forecast Eval, version: dev-ef82c59</div>
+      
+        <div class="footer-item"><p class="last-updated">
+  Last updated on 20.05.2026.
+  <br/>
+</p></div>
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2026, MeteoSwiss.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

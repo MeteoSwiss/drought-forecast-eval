@@ -1,0 +1,91 @@
+drought_forecast_eval.visualization
+===================================
+
+.. py:module:: drought_forecast_eval.visualization
+
+.. autoapi-nested-parse::
+
+   Visualization layer: skill curves, regional maps, experiment comparisons.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/drought_forecast_eval/visualization/experiment_comparison/index
+   /autoapi/drought_forecast_eval/visualization/region_map/index
+   /autoapi/drought_forecast_eval/visualization/skill_curves/index
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   drought_forecast_eval.visualization.plot_skill_vs_lead
+   drought_forecast_eval.visualization.plot_region_map
+   drought_forecast_eval.visualization.plot_experiment_diff
+
+
+Package Contents
+----------------
+
+.. py:function:: plot_skill_vs_lead(ds_scores: xarray.Dataset, variables: list[str], score: str = 'mae', ds_scores_b: xarray.Dataset | None = None, label_a: str = 'Forecast', label_b: str = 'Reference', aggregate_regions: bool = True, show_shading: bool = True, zero_line: bool = True, title: str | None = None, ax: matplotlib.pyplot.Axes | None = None, figsize: tuple[float, float] = (8, 5)) -> matplotlib.pyplot.Figure
+
+   Plot score vs. lead week for multiple variables.
+
+   :Parameters: * **ds_scores** -- Scores dataset with dimensions ``(lead_week, drought_region_id)``.
+                * **variables** -- List of variable keys (e.g. ``["spi_1m", "spi_6m"]``).
+                  The function looks for ``{variable}_{score}`` in the dataset.
+                * **score** -- Metric name suffix (e.g. ``"mae"``, ``"rpss"``).
+                * **ds_scores_b** -- Optional second scores dataset for experiment comparison.
+                * **label_a, label_b** -- Legend labels for the two experiments.
+                * **aggregate_regions** -- If True, average over ``drought_region_id`` before plotting; show
+                  shading as ±1 std across regions.
+                * **show_shading** -- Show ±1 std shading (only when ``aggregate_regions=True``).
+                * **zero_line** -- Draw a horizontal dashed line at y=0.
+                * **title** -- Figure title.  Auto-generated if ``None``.
+                * **ax** -- Existing axes to draw on.  A new figure is created if ``None``.
+                * **figsize** -- Figure size in inches.
+
+   :rtype: matplotlib.figure.Figure
+
+
+.. py:function:: plot_region_map(ds_scores: xarray.Dataset, score_variable: str, shapefile_path: str | pathlib.Path | None = None, region_id_column: str = 'REGION_NR', lead_weeks: list[int] | None = None, cmap: str = 'RdYlGn', vmin: float | None = None, vmax: float | None = None, title: str | None = None, figsize: tuple[float, float] = (14, 10)) -> matplotlib.pyplot.Figure
+
+   Plot a 4-panel choropleth map of score values per drought region.
+
+   :Parameters: * **ds_scores** -- Scores dataset with dimensions ``(lead_week, drought_region_id)``.
+                * **score_variable** -- Name of the score variable to plot (e.g. ``"spi_1m_mae"``).
+                * **shapefile_path** -- Path to the ``.shp`` / ``.geojson`` file of the 38 drought regions.
+                  If ``None`` or the file does not exist, falls back to a bar chart.
+                * **region_id_column** -- Name of the integer attribute column in the shapefile that holds the
+                  ``drought_region_id`` (1–38).
+                * **lead_weeks** -- Subset of lead weeks to plot.  Defaults to ``[0, 1, 2, 3]``.
+                * **cmap** -- Matplotlib colormap name.
+                * **vmin, vmax** -- Colour scale limits.  If ``None``, derived from the data.
+                * **title** -- Figure suptitle.
+                * **figsize** -- Figure size in inches.
+
+   :rtype: matplotlib.figure.Figure
+
+
+.. py:function:: plot_experiment_diff(ds_scores_a: xarray.Dataset, ds_scores_b: xarray.Dataset, variables: list[str], score: str = 'mae', label_a: str = 'Experiment A', label_b: str = 'Experiment B', aggregate_regions: bool = True, figsize: tuple[float, float] | None = None, title: str | None = None) -> matplotlib.pyplot.Figure
+
+   Compare two score datasets side by side with a difference panel.
+
+   :Parameters: * **ds_scores_a** -- First (baseline) scores dataset.
+                * **ds_scores_b** -- Second (comparison) scores dataset.
+                * **variables** -- Variable keys to compare (e.g. ``["spi_1m", "cdi"]``).
+                * **score** -- Score metric name suffix (e.g. ``"mae"``, ``"rpss"``).
+                * **label_a, label_b** -- Legend / axis labels for the two experiments.
+                * **aggregate_regions** -- Average over ``drought_region_id`` before plotting.
+                * **figsize** -- Figure size.  Auto-sized based on number of variables if ``None``.
+                * **title** -- Figure suptitle.
+
+   :rtype: matplotlib.figure.Figure
+
+

@@ -1,0 +1,80 @@
+drought_forecast_eval.io.downloader
+===================================
+
+.. py:module:: drought_forecast_eval.io.downloader
+
+.. autoapi-nested-parse::
+
+   Utilities to download ZIP archives from the BGDI open-data portal.
+
+   The functions here are thin wrappers around ``requests`` and replicate what
+   a cron-triggered ``wget`` script would do, but in pure Python so they can be
+   called from notebooks or the :class:`~drought_forecast_eval.report.builder.ReportBuilder`.
+
+   BGDI URL patterns
+   -----------------
+   Rolling daily archive (one per day)::
+
+       https://data.geo.admin.ch/ch.bafu.trockenheitsdaten-numerisch/
+       trockenheitsdaten-numerisch_current/
+       trockenheitsdaten-numerisch_current.csv.{YYYYMMDD}2100.zip
+
+   Full historic archive (single file, updated weekly)::
+
+       https://data.geo.admin.ch/ch.bafu.trockenheitsdaten-numerisch/
+       trockenheitsdaten-numerisch_historic/
+       trockenheitsdaten-numerisch_historic.csv.zip
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   drought_forecast_eval.io.downloader.logger
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   drought_forecast_eval.io.downloader.download_archive
+   drought_forecast_eval.io.downloader.download_historic
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:function:: download_archive(dest_dir: str | pathlib.Path, start: str | datetime.date | datetime.datetime | None = None, end: str | datetime.date | datetime.datetime | None = None, overwrite: bool = False) -> list[pathlib.Path]
+
+   Download daily rolling archive ZIPs from BGDI.
+
+   Iterates every calendar day in ``[start, end]`` and tries to fetch the
+   corresponding ZIP.  Missing days (404s) are silently skipped — not every
+   day has a published archive.
+
+   :Parameters: * **dest_dir** -- Local directory where ZIPs will be stored (flat layout).
+                * **start** -- First date to download.  Defaults to yesterday.
+                * **end** -- Last date to download (inclusive).  Defaults to today.
+                * **overwrite** -- Re-download files that already exist locally.
+
+   :returns: Paths of successfully downloaded files.
+   :rtype: list of Path
+
+
+.. py:function:: download_historic(dest_path: str | pathlib.Path, overwrite: bool = False) -> pathlib.Path
+
+   Download the full historic observation archive from BGDI.
+
+   :Parameters: * **dest_path** -- Local file path where the ZIP will be saved, e.g.
+                  ``/data/historic/trockenheitsdaten-numerisch_historic.csv.zip``.
+                * **overwrite** -- Re-download if the file already exists.
+
+   :returns: The path to the downloaded file.
+   :rtype: Path
+
+

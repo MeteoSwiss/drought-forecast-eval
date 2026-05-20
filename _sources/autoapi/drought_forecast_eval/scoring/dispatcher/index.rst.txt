@@ -1,0 +1,73 @@
+drought_forecast_eval.scoring.dispatcher
+========================================
+
+.. py:module:: drought_forecast_eval.scoring.dispatcher
+
+.. autoapi-nested-parse::
+
+   Scoring dispatcher: route variable bundles to the correct scorers.
+
+   ``compute_scores`` is the single entry point.  It:
+
+   1. Resolves the ``variables`` argument against ``VARIABLE_MAP``.
+   2. Resolves the ``scores`` argument against ``SCORE_REGISTRY``.
+   3. For every (variable, score) pair, checks whether the mode
+      (deterministic / quantile) is compatible with the metric.
+   4. Calls the appropriate scorer, reducing over ``forecast_reference_time``
+      so the output has dims ``(lead_week, drought_region_id)``.
+   5. Attaches reference-forecast skill scores when ``ds_ref`` is provided.
+   6. Returns a single ``xr.Dataset`` with one variable per
+      ``{variable_key}_{metric_name}`` combination.
+   7. Optionally writes the result to a NetCDF4 file.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   drought_forecast_eval.scoring.dispatcher.logger
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   drought_forecast_eval.scoring.dispatcher.compute_scores
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:function:: compute_scores(ds: xarray.Dataset, variables: list[str] | Literal['all'] = 'all', scores: list[str] | Literal['default'] = 'default', ds_ref: xarray.Dataset | None = None, cdi_threshold: float = 2.0, output_path: str | pathlib.Path | None = None, variable_map: dict | None = None) -> xarray.Dataset
+
+   Compute verification scores for all requested variables.
+
+   :Parameters: * **ds** -- Merged dataset from :func:`~drought_forecast_eval.processing.alignment.align_obs_to_forecast`.
+                  Must contain both forecast and observation variables.
+                * **variables** -- List of variable keys from ``VARIABLE_MAP`` (e.g. ``["spi_1m", "cdi"]``),
+                  a group name (``"precipitation"``, ``"streamflow"``, ``"soil_moisture"``,
+                  ``"cdi"``), or ``"all"`` to score everything.
+                * **scores** -- List of metric names from ``SCORE_REGISTRY``, or ``"default"`` which
+                  expands to ``["mae", "rmse", "bias", "correlation"]`` plus quantile
+                  metrics for quantile-mode variables.
+                * **ds_ref** -- Optional reference forecast dataset (from
+                  :func:`~drought_forecast_eval.processing.reference.climatology_reference`
+                  or :func:`~drought_forecast_eval.processing.reference.persistence_reference`).
+                  Required for ``"mae_skill"`` and ``"rpss"``.
+                * **cdi_threshold** -- Threshold for binary drought event used in ROC-AUC.  Default 2.
+                * **output_path** -- If provided, the result dataset is written to this NetCDF4 path.
+                * **variable_map** -- Override the global ``VARIABLE_MAP``.  Useful for custom experiments.
+
+   :returns: Dimensions: ``(lead_week, drought_region_id)``.
+             Variables: ``{var_key}_{metric}`` for every computed score.
+             Global attributes record the computation parameters.
+   :rtype: xr.Dataset
+
+   :raises ValueError: If none of the requested variables are present in the dataset.
+
+

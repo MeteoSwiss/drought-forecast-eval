@@ -1,0 +1,154 @@
+drought_forecast_eval.scoring.skill
+===================================
+
+.. py:module:: drought_forecast_eval.scoring.skill
+
+.. autoapi-nested-parse::
+
+   Skill score wrappers and helper scoring functions.
+
+   All functions accept and return ``xr.DataArray`` / ``xr.Dataset`` objects so
+   that they compose cleanly with the ``scores`` library and with xarray's
+   ``groupby`` / ``mean`` machinery.
+
+   Functions
+   ---------
+   mae_skill
+       Skill score relative to a reference based on MAE.
+       SS = 1 − MAE(fcst, obs) / MAE(ref, obs)
+
+   rpss
+       Ranked Probability Skill Score relative to a reference.
+       RPSS = 1 − RPS(fcst, obs) / RPS(ref, obs)
+
+   rps_from_quantiles
+       Approximate RPS from p10/p50/p90 quantile forecasts by constructing
+       a piecewise-linear CDF and integrating.
+
+   roc_auc_xr
+       Area under the ROC curve for a binary event defined by a threshold.
+       Operates on the p50 (median) forecast treated as a deterministic
+       probability proxy, or on an ensemble.
+
+   interval_score_xr
+       Winkler interval score for a (p10, p90) prediction interval.
+
+   pinball_loss_xr
+       Pinball (quantile) loss for a single quantile level.
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   drought_forecast_eval.scoring.skill.mae_skill
+   drought_forecast_eval.scoring.skill.rps_from_quantiles
+   drought_forecast_eval.scoring.skill.rpss
+   drought_forecast_eval.scoring.skill.interval_score_xr
+   drought_forecast_eval.scoring.skill.pinball_loss_xr
+   drought_forecast_eval.scoring.skill.roc_auc_xr
+
+
+Module Contents
+---------------
+
+.. py:function:: mae_skill(fcst: xarray.DataArray, obs: xarray.DataArray, ref: xarray.DataArray, reduce_dims: list[str] | None = None) -> xarray.DataArray
+
+   Compute MAE-based skill score.
+
+   SS = 1 - MAE(fcst, obs) / MAE(ref, obs)
+
+   A skill score of 1 is perfect; 0 means equal to reference; negative
+   means worse than reference.
+
+   :Parameters: * **fcst** -- Forecast DataArray (deterministic or p50).
+                * **obs** -- Observation DataArray.
+                * **ref** -- Reference forecast DataArray (same shape as obs).
+                * **reduce_dims** -- Dimensions over which to average MAE before computing the ratio.
+                  Defaults to ``["forecast_reference_time"]``.
+
+   :rtype: xr.DataArray
+
+
+.. py:function:: rps_from_quantiles(obs: xarray.DataArray, p10: xarray.DataArray, p50: xarray.DataArray, p90: xarray.DataArray, thresholds: numpy.ndarray | None = None) -> xarray.DataArray
+
+   Compute approximate RPS from three-quantile forecast.
+
+   A piecewise-linear CDF is constructed from p10 / p50 / p90 and evaluated
+   at ``thresholds``.  The observed CDF is a step function at the observed
+   value.  RPS is the squared area between the two CDFs (discrete
+   approximation).
+
+   :Parameters: * **obs** -- Observed values DataArray.
+                * **p10, p50, p90** -- Forecast quantile DataArrays.
+                * **thresholds** -- Evaluation points.  If ``None``, 20 equally-spaced percentiles of the
+                  combined forecast range are used.
+
+   :returns: RPS values (same dims as obs, minus the quantile axis).
+   :rtype: xr.DataArray
+
+
+.. py:function:: rpss(obs: xarray.DataArray, fcst_p10: xarray.DataArray, fcst_p50: xarray.DataArray, fcst_p90: xarray.DataArray, ref_p10: xarray.DataArray, ref_p50: xarray.DataArray, ref_p90: xarray.DataArray, reduce_dims: list[str] | None = None) -> xarray.DataArray
+
+   Ranked Probability Skill Score (RPSS).
+
+   RPSS = 1 − mean(RPS_fcst) / mean(RPS_ref)
+
+   :Parameters: * **obs** -- Observation DataArray.
+                * **fcst_p10, fcst_p50, fcst_p90** -- Forecast quantile DataArrays.
+                * **ref_p10, ref_p50, ref_p90** -- Reference quantile DataArrays.
+                * **reduce_dims** -- Dimensions over which to average RPS.  Defaults to
+                  ``["forecast_reference_time"]``.
+
+   :rtype: xr.DataArray
+
+
+.. py:function:: interval_score_xr(obs: xarray.DataArray, lower: xarray.DataArray, upper: xarray.DataArray, alpha: float = 0.2) -> xarray.DataArray
+
+   Winkler interval score for a (1−alpha) prediction interval.
+
+   IS = (upper − lower) + (2/alpha)·max(lower − obs, 0) + (2/alpha)·max(obs − upper, 0)
+
+   Default alpha=0.2 corresponds to the 80% prediction interval (p10–p90).
+
+   :Parameters: * **obs** -- Observation DataArray.
+                * **lower** -- Lower bound of the prediction interval (e.g. p10 forecast).
+                * **upper** -- Upper bound of the prediction interval (e.g. p90 forecast).
+                * **alpha** -- Significance level; ``alpha=0.2`` means 80% interval.
+
+   :rtype: xr.DataArray
+
+
+.. py:function:: pinball_loss_xr(obs: xarray.DataArray, fcst: xarray.DataArray, quantile: float) -> xarray.DataArray
+
+   Pinball (quantile) loss for a single quantile level.
+
+   L(q, y, f) = (y − f) · q         if y ≥ f
+              = (f − y) · (1 − q)   if y < f
+
+   :Parameters: * **obs** -- Observation DataArray.
+                * **fcst** -- Forecast DataArray at the given quantile level.
+                * **quantile** -- Quantile probability level (e.g. 0.10, 0.50, 0.90).
+
+   :rtype: xr.DataArray
+
+
+.. py:function:: roc_auc_xr(obs: xarray.DataArray, fcst_p50: xarray.DataArray, threshold: float = 2.0, reduce_dims: list[str] | None = None) -> xarray.DataArray
+
+   Compute ROC-AUC for a binary drought event.
+
+   The binary event is defined as ``value >= threshold``.  The p50
+   forecast is used as a deterministic probability proxy (rank-based AUC).
+
+   :Parameters: * **obs** -- Observation DataArray.
+                * **fcst_p50** -- Forecast median DataArray.
+                * **threshold** -- Event threshold.  Default 2 (CDI ≥ 2 = drought event).
+                * **reduce_dims** -- Dimensions over which to pool samples for the ROC curve.  Defaults
+                  to ``["forecast_reference_time", "drought_region_id"]``.
+
+   :returns: AUC value(s), one per remaining dimension (typically ``lead_week``).
+   :rtype: xr.DataArray
+
+

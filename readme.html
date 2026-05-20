@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Getting Started &#8212; Open Source Template</title>
+    <title>&lt;no title&gt; &#8212; Drought Forecast Eval</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=35d5577b"></script>
+    <script src="_static/documentation_options.js?v=72831c39"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'readme';</script>
@@ -127,7 +127,7 @@
     <img src="_static/app-icon_meteoswiss_rounded_rgb.png" class="logo__image only-dark pst-js-only" alt=""/>
   
   
-    <p class="title logo__title">Open Source Template</p>
+    <p class="title logo__title">Drought Forecast Eval</p>
   
 </a></div>
     
@@ -143,7 +143,7 @@
     
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="#">
-    Getting Started
+    <no title>
   </a>
 </li>
 
@@ -256,7 +256,7 @@
     
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="#">
-    Getting Started
+    <no title>
   </a>
 </li>
 
@@ -351,7 +351,7 @@
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">Getting Started</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">&lt;no title&gt;</span></li>
   </ul>
 </nav>
 </div>
@@ -368,84 +368,179 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <a class="reference external image-reference" href="https://pypi.org/project/Open-Source-Template/"><img alt="https://img.shields.io/pypi/v/Open-Source-Template.svg" src="https://img.shields.io/pypi/v/Open-Source-Template.svg" />
-</a>
-<a class="reference external image-reference" href="https://pypi.org/project/Open-Source-Template/"><img alt="https://img.shields.io/pypi/pyversions/Open-Source-Template.svg" src="https://img.shields.io/pypi/pyversions/Open-Source-Template.svg" />
-</a>
-<a class="reference external image-reference" href="https://pypi.org/project/Open-Source-Template/"><img alt="https://img.shields.io/pypi/l/Open-Source-Template.svg" src="https://img.shields.io/pypi/l/Open-Source-Template.svg" />
-</a>
-<a class="reference external image-reference" href="https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/github-code-scanning/codeql"><img alt="https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/github-code-scanning/codeql/badge.svg" src="https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/github-code-scanning/codeql/badge.svg" />
-</a>
-<a class="reference external image-reference" href="https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/CI_test.yaml"><img alt="https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/CI_test.yaml/badge.svg" src="https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/CI_test.yaml/badge.svg" />
-</a>
-<a class="reference external image-reference" href="https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/CI_publish_dev_documentation.yaml"><img alt="https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/CI_publish_dev_documentation.yaml/badge.svg" src="https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/CI_publish_dev_documentation.yaml/badge.svg" />
-</a>
-<section id="getting-started">
-<h1>Getting Started<a class="headerlink" href="#getting-started" title="Link to this heading">#</a></h1>
-<p>A demo for the OSS template at MeteoSwiss.</p>
-<p>The template can be use as an example how to configure MeteoSwiss Github projects.</p>
-<p>It uses:</p>
+  <p># drought-forecast-eval</p>
+<p><strong>Verification and evaluation library for Swiss drought forecasts.</strong></p>
+<p>Quantifies the quality of operational drought forecasts issued by the Swiss
+drought monitoring system ([drought.admin.ch](<a class="reference external" href="https://drought.admin.ch">https://drought.admin.ch</a>)) across
+the 38 official drought warning regions, for all forecast variables (SPI,
+precipitation, streamflow, soil moisture, CDI) and all lead times (week 0–3).</p>
+<p>—</p>
+<p>## Features</p>
 <ul class="simple">
-<li><p>Github actions to execute the CI/CD pipelines</p></li>
-<li><p>Github pages to host the documentation</p></li>
-<li><p>PyPI to publish the python packages</p></li>
+<li><p><strong>Data loading</strong> — parse flat archives of daily BGDI ZIP dumps into <cite>xr.Dataset</cite></p></li>
+<li><p><strong>Observation loading</strong> — read the full historic observation archive</p></li>
+<li><p><strong>Alignment</strong> — merge forecast and observation grids on <cite>(region, valid_at)</cite></p></li>
+<li><p><strong>Reference forecasts</strong> — climatology (week-of-year ± window) and persistence</p></li>
+<li><p><strong>Scoring</strong> — MAE, RMSE, Bias, Correlation, Pinball loss, Interval score, RPSS, ROC-AUC</p></li>
+<li><p><strong>Extensible registry</strong> — add custom metrics with <cite>register_score()</cite></p></li>
+<li><p><strong>Visualisation</strong> — skill-vs-lead curves, 4-panel regional maps, experiment diffs</p></li>
+<li><p><strong>Report generation</strong> — HTML report with embedded plots, CSV/NetCDF export</p></li>
+<li><p><strong>Experiment comparison</strong> — compare two time periods or data sources side-by-side</p></li>
 </ul>
-<section id="development-setup-with-poetry">
-<h2>Development Setup with Poetry<a class="headerlink" href="#development-setup-with-poetry" title="Link to this heading">#</a></h2>
-<section id="building-the-project">
-<h3>Building the Project<a class="headerlink" href="#building-the-project" title="Link to this heading">#</a></h3>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span><span class="nb">cd</span><span class="w"> </span>open-source-template
-<span class="gp">$ </span>poetry<span class="w"> </span>install
-</pre></div>
-</div>
-</section>
-<section id="run-tests">
-<h3>Run Tests<a class="headerlink" href="#run-tests" title="Link to this heading">#</a></h3>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>poetry<span class="w"> </span>run<span class="w"> </span>pytest
-</pre></div>
-</div>
-</section>
-<section id="run-quality-tools">
-<h3>Run Quality Tools<a class="headerlink" href="#run-quality-tools" title="Link to this heading">#</a></h3>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>poetry<span class="w"> </span>run<span class="w"> </span>pylint<span class="w"> </span>open_source_template
-<span class="gp">$ </span>poetry<span class="w"> </span>run<span class="w"> </span>mypy<span class="w"> </span>open_source_template
-</pre></div>
-</div>
-</section>
-<section id="generate-documentation">
-<h3>Generate Documentation<a class="headerlink" href="#generate-documentation" title="Link to this heading">#</a></h3>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>poetry<span class="w"> </span>run<span class="w"> </span>sphinx-build<span class="w"> </span>doc<span class="w"> </span>doc/_build
-</pre></div>
-</div>
-<p>Then open the index.html file generated in <em>open-source-template/doc/_build/</em>.</p>
-</section>
-<section id="build-wheels">
-<h3>Build wheels<a class="headerlink" href="#build-wheels" title="Link to this heading">#</a></h3>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>poetry<span class="w"> </span>build
-</pre></div>
-</div>
-</section>
-</section>
-<section id="using-the-library">
-<h2>Using the Library<a class="headerlink" href="#using-the-library" title="Link to this heading">#</a></h2>
-<p>To install open-source-template in your project, run this command in your terminal:</p>
-<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>poetry<span class="w"> </span>add<span class="w"> </span>open-source-template
-</pre></div>
-</div>
-<p>You can then use the library in your project through</p>
+<p>—</p>
+<p>## Quick start</p>
+<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
+<span class="pre">poetry</span> <span class="pre">install</span> <span class="pre">--with</span> <span class="pre">dev,report,notebook</span>
+<span class="pre">`</span></code></p>
+<p><a href="#id1"><span class="problematic" id="id2">``</span></a><a href="#id3"><span class="problematic" id="id4">`</span></a>python
+from drought_forecast_eval import (</p>
 <blockquote>
-<div><p>import open_source_template</p>
+<div><p>load_forecasts, load_observations,
+align_obs_to_forecast, climatology_reference,
+compute_scores, ReportBuilder,</p>
 </div></blockquote>
-</section>
-<section id="releasing">
-<h2>Releasing<a class="headerlink" href="#releasing" title="Link to this heading">#</a></h2>
+<p>)</p>
+<p># Load data
+ds_fcst = load_forecasts(“/data/zips”, date_range=(“2025-01-01”, “2025-12-31”))
+ds_obs  = load_observations(“/data/historic.zip”)</p>
+<p># Align and score
+ds      = align_obs_to_forecast(ds_fcst, ds_obs)
+ds_ref  = climatology_reference(ds_obs, ds_fcst)
+scores  = compute_scores(ds, variables=”all”, scores=”default”, ds_ref=ds_ref)
+scores.to_netcdf(“scores.nc”)</p>
+<p># Or run the full pipeline at once
+builder = ReportBuilder(</p>
+<blockquote>
+<div><p>archive_dir=”/data/zips”,
+historic_path=”/data/historic.zip”,
+date_range=(“2025-01-01”, “2025-12-31”),
+output_dir=”./output”,</p>
+</div></blockquote>
+<p>)
+builder.run()   # → output/scores.nc, output/report.html, output/scores_summary.csv
+<a href="#id5"><span class="problematic" id="id6">``</span></a><a href="#id7"><span class="problematic" id="id8">`</span></a></p>
+<p>—</p>
+<p>## CLI</p>
+<p>After installation the <cite>drought-eval</cite> command is available via the Poetry
+environment.</p>
+<p><a href="#id9"><span class="problematic" id="id10">``</span></a><a href="#id11"><span class="problematic" id="id12">`</span></a>bash
+# Run with all defaults — uses every ZIP in data/zipfiles/
+poetry run drought-eval</p>
+<p># Restrict to a specific date window
+poetry run drought-eval –start 2025-07-04 –end 2025-12-31</p>
+<p># Persistence reference, only SPI variables, MAE + RPSS
+poetry run drought-eval </p>
+<blockquote>
+<div><p>–reference persistence –variables spi_1m,spi_3m,spi_6m –scores mae,rpss</p>
+</div></blockquote>
+<p># Full run including an HTML report (requires: poetry install –with report)
+poetry run drought-eval –html</p>
+<p># Custom archive and output directory, with verbose logging
+poetry run drought-eval </p>
+<blockquote>
+<div><p>–archive-dir /data/zipfiles –output-dir  /results/2025 –verbose</p>
+</div></blockquote>
+<p><a href="#id13"><span class="problematic" id="id14">``</span></a><a href="#id15"><span class="problematic" id="id16">`</span></a></p>
+<p>Full option reference:</p>
+<p><a href="#id17"><span class="problematic" id="id18">``</span></a>`
+Options:</p>
+<blockquote>
+<div><dl class="option-list">
+<dt><kbd><span class="option">--archive-dir</span></kbd></dt>
+<dd><p>DIRECTORY        Flat directory of daily forecast ZIPs.
+[default: data/zipfiles]</p>
+</dd>
+<dt><kbd><span class="option">--historic-path <var>FILE</var></span></kbd></dt>
+<dd><p>Historic observations ZIP from BGDI.
+[default: data/historic/trockenheitsdaten-
+numerisch_historic.csv.zip]</p>
+</dd>
+<dt><kbd><span class="option">--output-dir</span></kbd></dt>
+<dd><p>DIRECTORY        Directory for scores .nc and summary .csv.
+[default: output]</p>
+</dd>
+<dt><kbd><span class="option">--start</span></kbd></dt>
+<dd><p>YYYY-MM-DD        Start date (inclusive).</p>
+</dd>
+<dt><kbd><span class="option">--end</span></kbd></dt>
+<dd><p>YYYY-MM-DD        End date (inclusive).</p>
+</dd>
+<dt><kbd><span class="option">--reference</span></kbd></dt>
+<dd><p>[climatology|persistence|both]
+Reference forecast strategy.
+[default: climatology]</p>
+</dd>
+<dt><kbd><span class="option">--variables</span></kbd></dt>
+<dd><p>TEXT              ‘all’, a group (cdi/spi/precip), or
+comma-separated variable keys.</p>
+</dd>
+<dt><kbd><span class="option">--scores</span></kbd></dt>
+<dd><p>TEXT              ‘default’ or comma-separated metric names.</p>
+</dd>
+<dt><kbd><span class="option">--html</span></kbd></dt>
+<dd><p>Render an HTML report to OUTPUT_DIR/report.html
+(requires poetry install –with report).</p>
+</dd>
+<dt><kbd><span class="option">-v</span>, <span class="option">--verbose</span></kbd></dt>
+<dd><p>Enable DEBUG logging.</p>
+</dd>
+<dt><kbd><span class="option">--help</span></kbd></dt>
+<dd><p>Show this message and exit.</p>
+</dd>
+</dl>
+</div></blockquote>
+<p><a href="#id19"><span class="problematic" id="id20">``</span></a><a href="#id21"><span class="problematic" id="id22">`</span></a></p>
+<p>—</p>
+<p>## Installation</p>
+<div class="line-block">
+<div class="line">Use case | Command |</div>
+</div>
+<p><a href="#id25"><span class="problematic" id="id26">|----------|</span></a>———|
+| Core library | <cite>poetry install</cite> |
+| + HTML reports | <cite>poetry install –with report</cite> |
+| + Jupyter notebook | <cite>poetry install –with notebook</cite> |
+| Everything | <cite>poetry install –with dev,report,notebook</cite> |</p>
+<p>Python ≥ 3.11 required.</p>
+<p>—</p>
+<p>## Project layout</p>
+<p><code class="docutils literal notranslate"><span class="pre">`</span>
+<span class="pre">drought_forecast_eval/</span>
+<span class="pre">├──</span> <span class="pre">io/</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">#</span> <span class="pre">archive</span> <span class="pre">scanning,</span> <span class="pre">ZIP</span> <span class="pre">loading,</span> <span class="pre">schema</span> <span class="pre">validation,</span> <span class="pre">downloader</span>
+<span class="pre">├──</span> <span class="pre">processing/</span>&#160;&#160;&#160; <span class="pre">#</span> <span class="pre">lead-time</span> <span class="pre">computation,</span> <span class="pre">obs/fcst</span> <span class="pre">alignment,</span> <span class="pre">reference</span> <span class="pre">forecasts</span>
+<span class="pre">├──</span> <span class="pre">scoring/</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">#</span> <span class="pre">variable</span> <span class="pre">map,</span> <span class="pre">score</span> <span class="pre">registry,</span> <span class="pre">dispatcher,</span> <span class="pre">skill</span> <span class="pre">functions</span>
+<span class="pre">├──</span> <span class="pre">visualization/</span> <span class="pre">#</span> <span class="pre">skill</span> <span class="pre">curves,</span> <span class="pre">regional</span> <span class="pre">maps,</span> <span class="pre">experiment</span> <span class="pre">comparisons</span>
+<span class="pre">├──</span> <span class="pre">report/</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">#</span> <span class="pre">ReportBuilder</span> <span class="pre">+</span> <span class="pre">Jinja2</span> <span class="pre">HTML</span> <span class="pre">template</span>
+<span class="pre">└──</span> <span class="pre">config/</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">#</span> <span class="pre">defaults</span> <span class="pre">and</span> <span class="pre">constants</span>
+<span class="pre">notebooks/</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">#</span> <span class="pre">template_verification.ipynb</span>
+<span class="pre">tests/</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">#</span> <span class="pre">pytest</span> <span class="pre">suite</span> <span class="pre">with</span> <span class="pre">synthetic</span> <span class="pre">fixtures</span>
+<span class="pre">docs/</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">#</span> <span class="pre">data_access.md,</span> <span class="pre">methodology.md,</span> <span class="pre">reproducibility.md</span>
+<span class="pre">`</span></code></p>
+<p>—</p>
+<p>## Variables and scoring modes</p>
+<div class="line-block">
+<div class="line">Variable group | Mode | Metrics |</div>
+</div>
+<p><a href="#id27"><span class="problematic" id="id28">|----------------|</span></a>——<a href="#id29"><span class="problematic" id="id30">|---------|</span></a>
+| CDI, hydro/soil/precip indices | Deterministic | MAE, RMSE, Bias, Correlation, MAE-Skill, ROC-AUC |
+| SPI-1/3/6/12/24, precip sums, soil_moisture_ufc | Quantile (p10/p50/p90) | + Pinball loss, Interval score, RPSS |</p>
+<p>—</p>
+<p>## Documentation</p>
 <ul class="simple">
-<li><p>Adapt CHANGELOG.rst with release information</p></li>
-<li><p>Adapt <code class="docutils literal notranslate"><span class="pre">doc/_static/switcher_config.json</span></code> adding the new documentation URL for the release</p></li>
-<li><p>Create a new Release in the Github project</p></li>
+<li><p>[Data access](docs/data_access.md) — BGDI URLs, download scripts, CSV column reference</p></li>
+<li><p>[Methodology](docs/methodology.md) — scoring formulas, RPS approximation, skill score convention</p></li>
+<li><p>[Reproducibility](docs/reproducibility.md) — environment setup, pinning, error handling, custom experiments</p></li>
 </ul>
-</section>
-</section>
+<p>—</p>
+<p>## Contributing</p>
+<p>See [CONTRIBUTING.md](CONTRIBUTING.md).</p>
+<p>—</p>
+<p>## License</p>
+<p>MIT — see LICENSE.</p>
+<p>## Citation</p>
+<p>If you use this library in a publication, please cite the <cite>scores</cite> library it depends on:</p>
+<p>&gt; Leeuwenburg et al. (2024). scores: A Python package for verifying and evaluating models
+&gt; and predictions with xarray. <a href="#id23"><span class="problematic" id="id24">*</span></a>Journal of Open Source Software, 9*(99), 6889.
+&gt; <a class="reference external" href="https://doi.org/10.21105/joss.06889">https://doi.org/10.21105/joss.06889</a></p>
 
 
                 </article>
@@ -493,18 +588,9 @@
     <i class="fa-solid fa-list"></i> On this page
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#development-setup-with-poetry">Development Setup with Poetry</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-project">Building the Project</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-tests">Run Tests</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#run-quality-tools">Run Quality Tools</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#generate-documentation">Generate Documentation</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#build-wheels">Build wheels</a></li>
+    <ul class="simple visible nav section-nav flex-column">
 </ul>
-</li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#using-the-library">Using the Library</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#releasing">Releasing</a></li>
-</ul>
+
   </nav></div>
 
 </div></div>
@@ -529,7 +615,7 @@
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-Open Source Template, version: dev-c18188b</div>
+Drought Forecast Eval, version: dev-ef82c59</div>
       
         <div class="footer-item"><p class="last-updated">
   Last updated on 20.05.2026.

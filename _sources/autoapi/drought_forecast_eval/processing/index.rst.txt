@@ -1,0 +1,106 @@
+drought_forecast_eval.processing
+================================
+
+.. py:module:: drought_forecast_eval.processing
+
+.. autoapi-nested-parse::
+
+   Processing layer: lead-time computation, obs/fcst alignment, reference forecasts.
+
+
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   /autoapi/drought_forecast_eval/processing/alignment/index
+   /autoapi/drought_forecast_eval/processing/lead_time/index
+   /autoapi/drought_forecast_eval/processing/reference/index
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   drought_forecast_eval.processing.align_obs_to_forecast
+   drought_forecast_eval.processing.compute_lead_weeks
+   drought_forecast_eval.processing.climatology_reference
+   drought_forecast_eval.processing.persistence_reference
+
+
+Package Contents
+----------------
+
+.. py:function:: align_obs_to_forecast(ds_fcst: xarray.Dataset, ds_obs: xarray.Dataset) -> xarray.Dataset
+
+   Merge observations onto the forecast ``(frt, region, lead_week)`` grid.
+
+   :Parameters: * **ds_fcst** -- Forecast dataset with dims ``(forecast_reference_time, drought_region_id,
+                  lead_week)`` and coordinate ``valid_at``.
+                * **ds_obs** -- Observation dataset with dims ``(drought_region_id, valid_at)``.
+
+   :returns: The forecast dataset with observation variables appended under the
+             suffix ``_obs``.  Dimensions remain
+             ``(forecast_reference_time, drought_region_id, lead_week)``.
+   :rtype: xr.Dataset
+
+   :raises ValueError: If ``ds_fcst`` is missing the ``valid_at`` coordinate.
+
+
+.. py:function:: compute_lead_weeks(valid_at: pandas.Series, forecast_reference_time: pandas.Timestamp | str) -> pandas.Series
+
+   Compute integer lead-week offsets.
+
+   :Parameters: * **valid_at** -- Series of ``datetime64`` values representing the Monday of each
+                  forecast target week.
+                * **forecast_reference_time** -- The issue datetime of the forecast (any weekday).
+
+   :returns: Integer lead weeks (0, 1, 2, 3, …).  Negative values indicate
+             that ``valid_at`` precedes the issue week (can occur for the
+             "analysis" row in some dumps); these are **retained** so callers
+             can decide how to handle them.
+   :rtype: pd.Series of int
+
+
+.. py:function:: climatology_reference(ds_obs: xarray.Dataset, ds_fcst: xarray.Dataset, week_window: int = 4) -> xarray.Dataset
+
+   Build a climatological reference forecast on the forecast grid.
+
+   For each target ``valid_at`` (Monday), collect all historical
+   observations within ±``week_window`` ISO-weeks of the same week-of-year
+   across all available years.  Return p10 / p50 / p90 of that sample as
+   the probabilistic reference forecast.
+
+   :Parameters: * **ds_obs** -- Observation dataset with dims ``(drought_region_id, valid_at)``.
+                * **ds_fcst** -- Forecast dataset used only for its grid coordinates
+                  ``(forecast_reference_time, drought_region_id, lead_week, valid_at)``.
+                * **week_window** -- Half-width of the week-of-year window (inclusive).  Default 4 means
+                  ±4 ISO weeks around the target week are included in the sample.
+
+   :returns: Dimensions ``(forecast_reference_time, drought_region_id, lead_week)``.
+             For each observation variable ``v`` the dataset contains
+             ``v_ref_p10``, ``v_ref_p50``, ``v_ref_p90``.
+   :rtype: xr.Dataset
+
+
+.. py:function:: persistence_reference(ds_obs: xarray.Dataset, ds_fcst: xarray.Dataset) -> xarray.Dataset
+
+   Build a persistence reference forecast on the forecast grid.
+
+   For each ``forecast_reference_time`` and ``drought_region_id``, the last
+   observed value **strictly before** the ``forecast_reference_time`` is used
+   as the flat reference across all lead weeks.
+
+   :Parameters: * **ds_obs** -- Observation dataset with dims ``(drought_region_id, valid_at)``.
+                * **ds_fcst** -- Forecast dataset used for its grid coordinates.
+
+   :returns: Dimensions ``(forecast_reference_time, drought_region_id, lead_week)``.
+             For each observation variable ``v`` the dataset contains
+             ``v_ref_p50`` (persistence is deterministic, stored as p50 for
+             consistency with the climatology reference interface).
+   :rtype: xr.Dataset
+
+

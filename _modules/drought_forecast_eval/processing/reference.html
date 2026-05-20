@@ -1,0 +1,698 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>drought_forecast_eval.processing.reference &#8212; Drought Forecast Eval</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "";
+  </script>
+  <!--
+    this give us a css class that will be invisible only if js is disabled
+  -->
+  <noscript>
+    <style>
+      .pst-js-only { display: none !important; }
+
+    </style>
+  </noscript>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8878045cc6db502f8baf" rel="stylesheet" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=8f2a1f02" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=4ae1632d" />
+  
+  <!-- So that users can add custom icons -->
+  <script src="../../../_static/scripts/fontawesome.js?digest=8878045cc6db502f8baf"></script>
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
+
+    <script src="../../../_static/documentation_options.js?v=72831c39"></script>
+    <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/drought_forecast_eval/processing/reference';</script>
+    <script>
+        DOCUMENTATION_OPTIONS.theme_version = '0.16.1';
+        DOCUMENTATION_OPTIONS.theme_switcher_json_url = '_static/switcher_config.json';
+        DOCUMENTATION_OPTIONS.theme_switcher_version_match = 'dev';
+        DOCUMENTATION_OPTIONS.show_version_warning_banner =
+            false;
+        </script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  <meta name="docsearch:version" content="dev" />
+    <meta name="docbuild:last-update" content="20.05.2026"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <div id="pst-skip-link" class="skip-link d-print-none"><a href="#main-content">Skip to main content</a></div>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>Back to top</button>
+
+  
+  <dialog id="pst-search-dialog">
+    
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form>
+  </dialog>
+
+  <div class="pst-async-banner-revealer d-none">
+  <aside id="bd-header-version-warning" class="d-none d-print-none" aria-label="Version warning"></aside>
+</div>
+
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar d-print-none">
+<div class="bd-header__inner bd-page-width">
+  <button class="pst-navbar-icon sidebar-toggle primary-toggle" aria-label="Site navigation">
+    <span class="fa-solid fa-bars"></span>
+  </button>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+    
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/app-icon_meteoswiss_rounded_rgb.png" class="logo__image only-light" alt=""/>
+    <img src="../../../_static/app-icon_meteoswiss_rounded_rgb.png" class="logo__image only-dark pst-js-only" alt=""/>
+  
+  
+    <p class="title logo__title">Drought Forecast Eval</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../readme.html">
+    <no title>
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../changelog.html">
+    Changelog
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../autoapi/index.html">
+    API Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+        </div>
+      
+      
+        <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+      
+        <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-2"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-2"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-2"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-2">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+<button class="btn search-button-field search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+ <i class="fa-solid fa-magnifying-glass"></i>
+ <span class="search-button__default-text">Search</span>
+ <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+</button>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <dialog id="pst-primary-sidebar-modal"></dialog>
+      <div id="pst-primary-sidebar" class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          
+          
+            <div class="navbar-item">
+<nav>
+  <ul class="bd-navbar-elements navbar-nav">
+    
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../readme.html">
+    <no title>
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../changelog.html">
+    Changelog
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../../../autoapi/index.html">
+    API Reference
+  </a>
+</li>
+
+  </ul>
+</nav></div>
+          
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item">
+
+<button class="btn btn-sm nav-link pst-navbar-icon theme-switch-button pst-js-only" aria-label="Color mode" data-bs-title="Color mode"  data-bs-placement="bottom" data-bs-toggle="tooltip">
+  <i class="theme-switch fa-solid fa-sun                fa-lg" data-mode="light" title="Light"></i>
+  <i class="theme-switch fa-solid fa-moon               fa-lg" data-mode="dark"  title="Dark"></i>
+  <i class="theme-switch fa-solid fa-circle-half-stroke fa-lg" data-mode="auto"  title="System Settings"></i>
+</button></div>
+        
+          <div class="navbar-item">
+<div class="version-switcher__container dropdown pst-js-only">
+  <button id="pst-version-switcher-button-3"
+    type="button"
+    class="version-switcher__button btn btn-sm dropdown-toggle"
+    data-bs-toggle="dropdown"
+    aria-haspopup="listbox"
+    aria-controls="pst-version-switcher-list-3"
+    aria-label="Version switcher list"
+  >
+    Choose version  <!-- this text may get changed later by javascript -->
+    <span class="caret"></span>
+  </button>
+  <div id="pst-version-switcher-list-3"
+    class="version-switcher__menu dropdown-menu list-group-flush py-0"
+    role="listbox" aria-labelledby="pst-version-switcher-button-3">
+    <!-- dropdown will be populated by javascript on page load -->
+  </div>
+</div></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+      <div class="sidebar-primary-item">
+<div id="ethical-ad-placement"
+      class="flat"
+      data-ea-publisher="readthedocs"
+      data-ea-type="readthedocs-sidebar"
+      data-ea-manual="true">
+</div></div>
+  </div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main" role="main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article d-print-none">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+<nav aria-label="Breadcrumb" class="d-print-none">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">drought_forecast_eval.processing.reference</span></li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for drought_forecast_eval.processing.reference</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Reference forecast construction for skill-score baselines.</span>
+
+<span class="sd">Two reference strategies are implemented:</span>
+
+<span class="sd">climatology_reference</span>
+<span class="sd">    For each ``(drought_region_id, week_of_year)`` compute the historical</span>
+<span class="sd">    distribution (p10 / p50 / p90) using all available years, with a</span>
+<span class="sd">    ``±week_window`` buffer around the target week-of-year to smooth</span>
+<span class="sd">    sparseness at weekly resolution.  Returns a reference dataset on the</span>
+<span class="sd">    same ``(forecast_reference_time, drought_region_id, lead_week)`` grid</span>
+<span class="sd">    as the forecast, so that RPSS = 1 − score(fcst) / score(ref) works</span>
+<span class="sd">    dimension-cleanly.</span>
+
+<span class="sd">persistence_reference</span>
+<span class="sd">    For each ``forecast_reference_time``, uses the **last observed value</span>
+<span class="sd">    before that date** as the flat reference forecast across all lead weeks.</span>
+<span class="sd">    Returns a reference dataset on the same grid as the forecast.</span>
+
+<span class="sd">Both functions return an ``xr.Dataset`` whose variable names match the</span>
+<span class="sd">**observation** variable names (not the forecast quantile names), making</span>
+<span class="sd">them directly usable as the ``ds_ref`` argument to</span>
+<span class="sd">:func:`~drought_forecast_eval.scoring.skill.mae_skill` and</span>
+<span class="sd">:func:`~drought_forecast_eval.scoring.skill.rpss`.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Climatology reference</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="climatology_reference">
+<a class="viewcode-back" href="../../../autoapi/drought_forecast_eval/processing/reference/index.html#drought_forecast_eval.climatology_reference">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">climatology_reference</span><span class="p">(</span>
+    <span class="n">ds_obs</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">ds_fcst</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">week_window</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a climatological reference forecast on the forecast grid.</span>
+
+<span class="sd">    For each target ``valid_at`` (Monday), collect all historical</span>
+<span class="sd">    observations within ±``week_window`` ISO-weeks of the same week-of-year</span>
+<span class="sd">    across all available years.  Return p10 / p50 / p90 of that sample as</span>
+<span class="sd">    the probabilistic reference forecast.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ds_obs:</span>
+<span class="sd">        Observation dataset with dims ``(drought_region_id, valid_at)``.</span>
+<span class="sd">    ds_fcst:</span>
+<span class="sd">        Forecast dataset used only for its grid coordinates</span>
+<span class="sd">        ``(forecast_reference_time, drought_region_id, lead_week, valid_at)``.</span>
+<span class="sd">    week_window:</span>
+<span class="sd">        Half-width of the week-of-year window (inclusive).  Default 4 means</span>
+<span class="sd">        ±4 ISO weeks around the target week are included in the sample.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    xr.Dataset</span>
+<span class="sd">        Dimensions ``(forecast_reference_time, drought_region_id, lead_week)``.</span>
+<span class="sd">        For each observation variable ``v`` the dataset contains</span>
+<span class="sd">        ``v_ref_p10``, ``v_ref_p50``, ``v_ref_p90``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Convert observations to pandas for efficient grouped operations</span>
+    <span class="n">obs_df</span> <span class="o">=</span> <span class="n">ds_obs</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">obs_df</span><span class="p">[</span><span class="s2">&quot;week_of_year&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">obs_df</span><span class="p">[</span><span class="s2">&quot;valid_at&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">isocalendar</span><span class="p">()</span><span class="o">.</span><span class="n">week</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+
+    <span class="c1"># Target grid: valid_at per (frt, region, lead_week)</span>
+    <span class="n">valid_at_da</span> <span class="o">=</span> <span class="n">ds_fcst</span><span class="p">[</span><span class="s2">&quot;valid_at&quot;</span><span class="p">]</span>  <span class="c1"># dims: (frt, region, lead_week)</span>
+    <span class="n">region_dim</span> <span class="o">=</span> <span class="s2">&quot;drought_region_id&quot;</span>
+    <span class="n">frt_dim</span> <span class="o">=</span> <span class="s2">&quot;forecast_reference_time&quot;</span>
+    <span class="n">lead_dim</span> <span class="o">=</span> <span class="s2">&quot;lead_week&quot;</span>
+
+    <span class="c1"># Flatten the grid to iterate efficiently</span>
+    <span class="n">frt_vals</span> <span class="o">=</span> <span class="n">ds_fcst</span><span class="p">[</span><span class="n">frt_dim</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">region_vals</span> <span class="o">=</span> <span class="n">ds_fcst</span><span class="p">[</span><span class="n">region_dim</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">lead_vals</span> <span class="o">=</span> <span class="n">ds_fcst</span><span class="p">[</span><span class="n">lead_dim</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="n">obs_vars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ds_obs</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
+
+    <span class="c1"># Build output arrays:  shape (n_frt, n_region, n_lead)</span>
+    <span class="n">n_frt</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">frt_vals</span><span class="p">)</span>
+    <span class="n">n_region</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">region_vals</span><span class="p">)</span>
+    <span class="n">n_lead</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lead_vals</span><span class="p">)</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_frt</span><span class="p">,</span> <span class="n">n_region</span><span class="p">,</span> <span class="n">n_lead</span><span class="p">)</span>
+
+    <span class="n">results</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">_ref_</span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obs_vars</span>
+        <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;p10&quot;</span><span class="p">,</span> <span class="s2">&quot;p50&quot;</span><span class="p">,</span> <span class="s2">&quot;p90&quot;</span><span class="p">)</span>
+    <span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">i_r</span><span class="p">,</span> <span class="n">region</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">region_vals</span><span class="p">):</span>
+        <span class="n">region_obs</span> <span class="o">=</span> <span class="n">obs_df</span><span class="p">[</span><span class="n">obs_df</span><span class="p">[</span><span class="n">region_dim</span><span class="p">]</span> <span class="o">==</span> <span class="n">region</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i_f</span><span class="p">,</span> <span class="n">frt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">frt_vals</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">i_l</span><span class="p">,</span> <span class="n">lead</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lead_vals</span><span class="p">):</span>
+                <span class="n">target_valid_at</span> <span class="o">=</span> <span class="n">valid_at_da</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span>
+                    <span class="p">{</span><span class="n">frt_dim</span><span class="p">:</span> <span class="n">frt</span><span class="p">,</span> <span class="n">region_dim</span><span class="p">:</span> <span class="n">region</span><span class="p">,</span> <span class="n">lead_dim</span><span class="p">:</span> <span class="n">lead</span><span class="p">}</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">values</span>
+                <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">target_valid_at</span><span class="p">):</span>
+                    <span class="k">continue</span>
+                <span class="n">target_ts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">target_valid_at</span><span class="p">)</span>
+                <span class="n">target_woy</span> <span class="o">=</span> <span class="n">target_ts</span><span class="o">.</span><span class="n">isocalendar</span><span class="p">()</span><span class="o">.</span><span class="n">week</span>
+
+                <span class="c1"># Weeks within window (handle wrap-around at 52/53)</span>
+                <span class="n">lo</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">target_woy</span><span class="p">)</span> <span class="o">-</span> <span class="n">week_window</span>
+                <span class="n">hi</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">target_woy</span><span class="p">)</span> <span class="o">+</span> <span class="n">week_window</span>
+                <span class="k">if</span> <span class="n">lo</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">region_obs</span><span class="p">[</span><span class="s2">&quot;week_of_year&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">lo</span> <span class="o">+</span> <span class="mi">52</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span>
+                        <span class="n">region_obs</span><span class="p">[</span><span class="s2">&quot;week_of_year&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">hi</span>
+                    <span class="p">)</span>
+                <span class="k">elif</span> <span class="n">hi</span> <span class="o">&gt;</span> <span class="mi">52</span><span class="p">:</span>
+                    <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">region_obs</span><span class="p">[</span><span class="s2">&quot;week_of_year&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">lo</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span>
+                        <span class="n">region_obs</span><span class="p">[</span><span class="s2">&quot;week_of_year&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">hi</span> <span class="o">-</span> <span class="mi">52</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">region_obs</span><span class="p">[</span><span class="s2">&quot;week_of_year&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">lo</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span>
+                        <span class="n">region_obs</span><span class="p">[</span><span class="s2">&quot;week_of_year&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">hi</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># Exclude the target year itself to avoid data leakage</span>
+                <span class="n">target_year</span> <span class="o">=</span> <span class="n">target_ts</span><span class="o">.</span><span class="n">year</span>
+                <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">region_obs</span><span class="p">[</span><span class="s2">&quot;valid_at&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">year</span> <span class="o">!=</span> <span class="n">target_year</span><span class="p">)</span>
+
+                <span class="n">sample</span> <span class="o">=</span> <span class="n">region_obs</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                        <span class="s2">&quot;Climatology: only </span><span class="si">%d</span><span class="s2"> samples for region=</span><span class="si">%s</span><span class="s2"> woy=</span><span class="si">%s</span><span class="s2"> ±</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">),</span> <span class="n">region</span><span class="p">,</span> <span class="n">target_woy</span><span class="p">,</span> <span class="n">week_window</span><span class="p">,</span>
+                    <span class="p">)</span>
+
+                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obs_vars</span><span class="p">:</span>
+                    <span class="n">vals</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">values</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">results</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">_ref_p10&quot;</span><span class="p">][</span><span class="n">i_f</span><span class="p">,</span> <span class="n">i_r</span><span class="p">,</span> <span class="n">i_l</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+                    <span class="n">results</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">_ref_p50&quot;</span><span class="p">][</span><span class="n">i_f</span><span class="p">,</span> <span class="n">i_r</span><span class="p">,</span> <span class="n">i_l</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
+                    <span class="n">results</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">_ref_p90&quot;</span><span class="p">][</span><span class="n">i_f</span><span class="p">,</span> <span class="n">i_r</span><span class="p">,</span> <span class="n">i_l</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="mi">90</span><span class="p">)</span>
+
+    <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">frt_dim</span><span class="p">:</span> <span class="n">frt_vals</span><span class="p">,</span>
+        <span class="n">region_dim</span><span class="p">:</span> <span class="n">region_vals</span><span class="p">,</span>
+        <span class="n">lead_dim</span><span class="p">:</span> <span class="n">lead_vals</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">data_vars</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">k</span><span class="p">:</span> <span class="p">([</span><span class="n">frt_dim</span><span class="p">,</span> <span class="n">region_dim</span><span class="p">,</span> <span class="n">lead_dim</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="n">ds_ref</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">data_vars</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span>
+    <span class="n">ds_ref</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;reference_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;climatology&quot;</span>
+    <span class="n">ds_ref</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;week_window&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">week_window</span>
+    <span class="k">return</span> <span class="n">ds_ref</span></div>
+
+
+
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Persistence reference</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="persistence_reference">
+<a class="viewcode-back" href="../../../autoapi/drought_forecast_eval/processing/reference/index.html#drought_forecast_eval.persistence_reference">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">persistence_reference</span><span class="p">(</span>
+    <span class="n">ds_obs</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">ds_fcst</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a persistence reference forecast on the forecast grid.</span>
+
+<span class="sd">    For each ``forecast_reference_time`` and ``drought_region_id``, the last</span>
+<span class="sd">    observed value **strictly before** the ``forecast_reference_time`` is used</span>
+<span class="sd">    as the flat reference across all lead weeks.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ds_obs:</span>
+<span class="sd">        Observation dataset with dims ``(drought_region_id, valid_at)``.</span>
+<span class="sd">    ds_fcst:</span>
+<span class="sd">        Forecast dataset used for its grid coordinates.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    xr.Dataset</span>
+<span class="sd">        Dimensions ``(forecast_reference_time, drought_region_id, lead_week)``.</span>
+<span class="sd">        For each observation variable ``v`` the dataset contains</span>
+<span class="sd">        ``v_ref_p50`` (persistence is deterministic, stored as p50 for</span>
+<span class="sd">        consistency with the climatology reference interface).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">obs_df</span> <span class="o">=</span> <span class="n">ds_obs</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
+    <span class="n">obs_df</span> <span class="o">=</span> <span class="n">obs_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;valid_at&quot;</span><span class="p">)</span>
+
+    <span class="n">frt_dim</span> <span class="o">=</span> <span class="s2">&quot;forecast_reference_time&quot;</span>
+    <span class="n">region_dim</span> <span class="o">=</span> <span class="s2">&quot;drought_region_id&quot;</span>
+    <span class="n">lead_dim</span> <span class="o">=</span> <span class="s2">&quot;lead_week&quot;</span>
+
+    <span class="n">frt_vals</span> <span class="o">=</span> <span class="n">ds_fcst</span><span class="p">[</span><span class="n">frt_dim</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">region_vals</span> <span class="o">=</span> <span class="n">ds_fcst</span><span class="p">[</span><span class="n">region_dim</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">lead_vals</span> <span class="o">=</span> <span class="n">ds_fcst</span><span class="p">[</span><span class="n">lead_dim</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+    <span class="n">obs_vars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ds_obs</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
+    <span class="n">n_frt</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">frt_vals</span><span class="p">)</span>
+    <span class="n">n_region</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">region_vals</span><span class="p">)</span>
+    <span class="n">n_lead</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lead_vals</span><span class="p">)</span>
+    <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_frt</span><span class="p">,</span> <span class="n">n_region</span><span class="p">,</span> <span class="n">n_lead</span><span class="p">)</span>
+
+    <span class="n">results</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">_ref_p50&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obs_vars</span>
+    <span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">i_r</span><span class="p">,</span> <span class="n">region</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">region_vals</span><span class="p">):</span>
+        <span class="n">region_obs</span> <span class="o">=</span> <span class="n">obs_df</span><span class="p">[</span><span class="n">obs_df</span><span class="p">[</span><span class="n">region_dim</span><span class="p">]</span> <span class="o">==</span> <span class="n">region</span><span class="p">]</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;valid_at&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i_f</span><span class="p">,</span> <span class="n">frt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">frt_vals</span><span class="p">):</span>
+            <span class="n">frt_ts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">frt</span><span class="p">)</span>
+            <span class="c1"># Last observation strictly before frt</span>
+            <span class="n">prior</span> <span class="o">=</span> <span class="n">region_obs</span><span class="p">[</span><span class="n">region_obs</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;</span> <span class="n">frt_ts</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">prior</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s2">&quot;Persistence: no prior obs for region=</span><span class="si">%s</span><span class="s2"> before </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">frt_ts</span>
+                <span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">last_obs</span> <span class="o">=</span> <span class="n">prior</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obs_vars</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">last_obs</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                    <span class="n">val</span> <span class="o">=</span> <span class="n">last_obs</span><span class="p">[</span><span class="n">v</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">i_l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_lead</span><span class="p">):</span>
+                        <span class="n">results</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">_ref_p50&quot;</span><span class="p">][</span><span class="n">i_f</span><span class="p">,</span> <span class="n">i_r</span><span class="p">,</span> <span class="n">i_l</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+    <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">frt_dim</span><span class="p">:</span> <span class="n">frt_vals</span><span class="p">,</span>
+        <span class="n">region_dim</span><span class="p">:</span> <span class="n">region_vals</span><span class="p">,</span>
+        <span class="n">lead_dim</span><span class="p">:</span> <span class="n">lead_vals</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">data_vars</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">k</span><span class="p">:</span> <span class="p">([</span><span class="n">frt_dim</span><span class="p">,</span> <span class="n">region_dim</span><span class="p">,</span> <span class="n">lead_dim</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="n">ds_ref</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">data_vars</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span>
+    <span class="n">ds_ref</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;reference_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;persistence&quot;</span>
+    <span class="k">return</span> <span class="n">ds_ref</span></div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer d-print-none">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script defer src="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf"></script>
+<script defer src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item"><!-- This will display the version of the docs -->
+Drought Forecast Eval, version: dev-ef82c59</div>
+      
+        <div class="footer-item"><p class="last-updated">
+  Last updated on 20.05.2026.
+  <br/>
+</p></div>
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2026, MeteoSwiss.
+      <br/>
+    
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  <!-- # L10n: Setting the PST URL as an argument as this does not need to be localized -->
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.16.1.
+</p></div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.2.3.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

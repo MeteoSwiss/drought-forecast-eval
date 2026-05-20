@@ -1,0 +1,64 @@
+drought_forecast_eval.processing.alignment
+==========================================
+
+.. py:module:: drought_forecast_eval.processing.alignment
+
+.. autoapi-nested-parse::
+
+   Align observation data onto the forecast grid and merge into one Dataset.
+
+   The forecast dataset has dimensions ``(forecast_reference_time, drought_region_id,
+   lead_week)`` with a derived ``valid_at`` coordinate.  Observations are indexed by
+   ``(drought_region_id, valid_at)``.
+
+   Alignment strategy
+   ------------------
+   1. For every ``(forecast_reference_time, drought_region_id, lead_week)`` cell,
+      look up ``valid_at`` from the forecast coordinates.
+   2. Select the corresponding observation row at the same ``(drought_region_id,
+      valid_at)`` point.
+   3. Attach observation variables to the merged dataset with an ``_obs`` suffix
+      to avoid clashes with forecast variable names.
+
+   Missing observations (NaN) are kept — coverage statistics are reported via
+   ``logging`` so the caller is informed without crashing.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   drought_forecast_eval.processing.alignment.logger
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   drought_forecast_eval.processing.alignment.align_obs_to_forecast
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:function:: align_obs_to_forecast(ds_fcst: xarray.Dataset, ds_obs: xarray.Dataset) -> xarray.Dataset
+
+   Merge observations onto the forecast ``(frt, region, lead_week)`` grid.
+
+   :Parameters: * **ds_fcst** -- Forecast dataset with dims ``(forecast_reference_time, drought_region_id,
+                  lead_week)`` and coordinate ``valid_at``.
+                * **ds_obs** -- Observation dataset with dims ``(drought_region_id, valid_at)``.
+
+   :returns: The forecast dataset with observation variables appended under the
+             suffix ``_obs``.  Dimensions remain
+             ``(forecast_reference_time, drought_region_id, lead_week)``.
+   :rtype: xr.Dataset
+
+   :raises ValueError: If ``ds_fcst`` is missing the ``valid_at`` coordinate.
+
+

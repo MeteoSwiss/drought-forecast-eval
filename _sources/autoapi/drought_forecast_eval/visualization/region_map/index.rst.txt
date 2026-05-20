@@ -1,0 +1,68 @@
+drought_forecast_eval.visualization.region_map
+==============================================
+
+.. py:module:: drought_forecast_eval.visualization.region_map
+
+.. autoapi-nested-parse::
+
+   Choropleth map of Switzerland drought regions coloured by a score value.
+
+   ``plot_region_map``
+       Creates a 4-panel figure (one panel per lead week) showing each of the
+       38 drought regions coloured by the value of a chosen score variable.
+
+       Requires ``geopandas`` and a shapefile / GeoJSON of the regions.
+       Falls back to a bar-chart-per-region plot if no shapefile is provided or
+       if ``geopandas`` is not installed.
+
+   Shapefile note
+   --------------
+   The authoritative shapefile is stored in the MeteoSwiss internal GitLab::
+
+       https://service.meteoswiss.ch/git/climateanalysis/pycats/droughtmonitor/
+       -/tree/main/droughtmonitor/regions/BAFU_Grossregionen_v3_reproj
+
+   Clone that repo and pass the ``.shp`` path as ``shapefile_path``.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   drought_forecast_eval.visualization.region_map.logger
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   drought_forecast_eval.visualization.region_map.plot_region_map
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:function:: plot_region_map(ds_scores: xarray.Dataset, score_variable: str, shapefile_path: str | pathlib.Path | None = None, region_id_column: str = 'REGION_NR', lead_weeks: list[int] | None = None, cmap: str = 'RdYlGn', vmin: float | None = None, vmax: float | None = None, title: str | None = None, figsize: tuple[float, float] = (14, 10)) -> matplotlib.pyplot.Figure
+
+   Plot a 4-panel choropleth map of score values per drought region.
+
+   :Parameters: * **ds_scores** -- Scores dataset with dimensions ``(lead_week, drought_region_id)``.
+                * **score_variable** -- Name of the score variable to plot (e.g. ``"spi_1m_mae"``).
+                * **shapefile_path** -- Path to the ``.shp`` / ``.geojson`` file of the 38 drought regions.
+                  If ``None`` or the file does not exist, falls back to a bar chart.
+                * **region_id_column** -- Name of the integer attribute column in the shapefile that holds the
+                  ``drought_region_id`` (1–38).
+                * **lead_weeks** -- Subset of lead weeks to plot.  Defaults to ``[0, 1, 2, 3]``.
+                * **cmap** -- Matplotlib colormap name.
+                * **vmin, vmax** -- Colour scale limits.  If ``None``, derived from the data.
+                * **title** -- Figure suptitle.
+                * **figsize** -- Figure size in inches.
+
+   :rtype: matplotlib.figure.Figure
+
+

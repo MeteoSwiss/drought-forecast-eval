@@ -1,0 +1,72 @@
+drought_forecast_eval.scoring.variable_map
+==========================================
+
+.. py:module:: drought_forecast_eval.scoring.variable_map
+
+.. autoapi-nested-parse::
+
+   Canonical mapping from observation variables to forecast variable bundles.
+
+   Each entry in ``VARIABLE_MAP`` describes one verifiable quantity:
+
+       obs:    name of the observation variable in the aligned dataset (``_obs`` suffix).
+       fcst:   list of forecast variable names (one for deterministic, three for quantile).
+       mode:   ``"deterministic"`` or ``"quantile"``.
+
+   The map is designed to be user-overridable.  To add or modify entries::
+
+       from drought_forecast_eval.scoring.variable_map import VARIABLE_MAP
+       VARIABLE_MAP["my_var"] = {
+           "obs":  "my_var_obs",
+           "fcst": ["my_var_p10", "my_var_p50", "my_var_p90"],
+           "mode": "quantile",
+       }
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   drought_forecast_eval.scoring.variable_map.VARIABLE_MAP
+   drought_forecast_eval.scoring.variable_map.VARIABLE_GROUPS
+
+
+Classes
+-------
+
+.. autoapisummary::
+
+   drought_forecast_eval.scoring.variable_map.VariableEntry
+
+
+Module Contents
+---------------
+
+.. py:class:: VariableEntry
+
+   Bases: :py:obj:`TypedDict`
+
+
+   Type definition for a single VARIABLE_MAP entry.
+
+
+   .. py:attribute:: obs
+      :type:  str
+
+
+   .. py:attribute:: fcst
+      :type:  list[str]
+
+
+   .. py:attribute:: mode
+      :type:  Literal['deterministic', 'quantile']
+
+
+.. py:data:: VARIABLE_MAP
+   :type:  dict[str, VariableEntry]
+
+.. py:data:: VARIABLE_GROUPS
+   :type:  dict[str, list[str]]
+

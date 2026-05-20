@@ -1,0 +1,78 @@
+drought_forecast_eval.io.archive
+================================
+
+.. py:module:: drought_forecast_eval.io.archive
+
+.. autoapi-nested-parse::
+
+   Archive scanning: map a flat directory of ZIP files to (datetime, Path) pairs.
+
+   Filename convention
+   -------------------
+       trockenheitsdaten-numerisch_current.csv.YYYYMMDDHHII.zip
+
+   The 8-digit date block (YYYYMMDD) immediately preceding the 4-digit hour-minute
+   block encodes the ``forecast_reference_time``.  The time component (HHII) is
+   ignored for verification purposes; if two ZIPs share the same YYYYMMDD date only
+   the latest one (lexicographically last) is kept.
+
+   .. rubric:: Example
+
+   >>> from drought_forecast_eval.io.archive import scan_archive
+   >>> entries = scan_archive("/data/drought_zips", date_range=("2025-07-01","2025-09-30"))
+   >>> entries[0]
+   (datetime.datetime(2025, 7, 1, 0, 0), PosixPath('/data/drought_zips/trockenheitsdaten...zip'))
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   drought_forecast_eval.io.archive.logger
+   drought_forecast_eval.io.archive.BGDI_ARCHIVE_URL_TEMPLATE
+   drought_forecast_eval.io.archive.BGDI_HISTORIC_URL
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   drought_forecast_eval.io.archive.scan_archive
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: BGDI_ARCHIVE_URL_TEMPLATE
+   :value: 'https://data.geo.admin.ch/ch.bafu.trockenheitsdaten-numerisch/trockenheitsdaten-numerisch_curren...
+
+
+.. py:data:: BGDI_HISTORIC_URL
+   :value: 'https://data.geo.admin.ch/ch.bafu.trockenheitsdaten-numerisch/trockenheitsdaten-numerisch_histor...
+
+
+.. py:function:: scan_archive(archive_dir: str | pathlib.Path, date_range: tuple[str, str] | None = None, region_ids: list[int] | None = None) -> list[tuple[datetime.datetime, pathlib.Path]]
+
+   Scan a flat directory and return sorted (forecast_reference_time, path) pairs.
+
+   Only files matching the expected filename pattern are returned.  If multiple
+   ZIPs share the same date (e.g. re-runs), only the lexicographically last one
+   is kept (highest HHII suffix → most recent run of that day).
+
+   :Parameters: * **archive_dir** -- Path to the flat directory containing ZIP files.
+                * **date_range** -- Optional ``(start, end)`` ISO-date strings (inclusive on both ends).
+                  If ``None``, all available ZIPs are returned.
+                * **region_ids** -- Unused at this layer; accepted for API symmetry so callers can pass
+                  region selection once and forward it unchanged.
+
+   :returns: Sorted ascending by forecast_reference_time.
+   :rtype: list of (datetime, Path)
+
+   :raises FileNotFoundError: If ``archive_dir`` does not exist.
+
+

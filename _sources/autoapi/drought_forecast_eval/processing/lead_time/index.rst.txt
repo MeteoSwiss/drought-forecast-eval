@@ -1,0 +1,53 @@
+drought_forecast_eval.processing.lead_time
+==========================================
+
+.. py:module:: drought_forecast_eval.processing.lead_time
+
+.. autoapi-nested-parse::
+
+   Lead-time utilities.
+
+   The drought forecast is issued daily but ``valid_at`` always encodes the
+   Monday of the target week.  Lead time is therefore expressed as an integer
+   week offset (0, 1, 2, 3) relative to the Monday of the week in which
+   ``forecast_reference_time`` falls.
+
+   .. rubric:: Examples
+
+   >>> import pandas as pd
+   >>> from drought_forecast_eval.processing.lead_time import compute_lead_weeks
+   >>> frt = pd.Timestamp("2026-03-24")          # Tuesday
+   >>> valid_at = pd.Series([pd.Timestamp("2026-03-23"),   # Monday of the same week → week 0
+   ...                       pd.Timestamp("2026-03-30"),   # next Monday → week 1
+   ...                       pd.Timestamp("2026-04-06")])  # week 2
+   >>> compute_lead_weeks(valid_at, frt).tolist()
+   [0, 1, 2]
+
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   drought_forecast_eval.processing.lead_time.compute_lead_weeks
+
+
+Module Contents
+---------------
+
+.. py:function:: compute_lead_weeks(valid_at: pandas.Series, forecast_reference_time: pandas.Timestamp | str) -> pandas.Series
+
+   Compute integer lead-week offsets.
+
+   :Parameters: * **valid_at** -- Series of ``datetime64`` values representing the Monday of each
+                  forecast target week.
+                * **forecast_reference_time** -- The issue datetime of the forecast (any weekday).
+
+   :returns: Integer lead weeks (0, 1, 2, 3, …).  Negative values indicate
+             that ``valid_at`` precedes the issue week (can occur for the
+             "analysis" row in some dumps); these are **retained** so callers
+             can decide how to handle them.
+   :rtype: pd.Series of int
+
+

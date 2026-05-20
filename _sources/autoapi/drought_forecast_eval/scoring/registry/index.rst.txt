@@ -1,0 +1,72 @@
+drought_forecast_eval.scoring.registry
+======================================
+
+.. py:module:: drought_forecast_eval.scoring.registry
+
+.. autoapi-nested-parse::
+
+   Score registry: named callable store, extensible by users.
+
+   The registry maps a short name (string) to a callable with the signature::
+
+       fn(fcst: xr.DataArray, obs: xr.DataArray, **kwargs) -> xr.DataArray
+
+   Built-in registrations use the ``scores`` library where available and fall
+   back to plain xarray / numpy otherwise.
+
+   Usage
+   -----
+   >>> from drought_forecast_eval.scoring.registry import register_score, SCORE_REGISTRY
+   >>> def my_metric(fcst, obs, **kwargs):
+   ...     return (fcst - obs).mean()
+   >>> register_score("my_metric", my_metric)
+   >>> "my_metric" in SCORE_REGISTRY
+   True
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   drought_forecast_eval.scoring.registry.logger
+   drought_forecast_eval.scoring.registry.SCORE_REGISTRY
+   drought_forecast_eval.scoring.registry.DETERMINISTIC_METRICS
+   drought_forecast_eval.scoring.registry.QUANTILE_METRICS
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   drought_forecast_eval.scoring.registry.register_score
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:data:: SCORE_REGISTRY
+   :type:  dict[str, Callable]
+
+.. py:data:: DETERMINISTIC_METRICS
+   :type:  frozenset[str]
+
+.. py:data:: QUANTILE_METRICS
+   :type:  frozenset[str]
+
+.. py:function:: register_score(name: str, fn: Callable) -> None
+
+   Register a custom scoring function under ``name``.
+
+   :Parameters: * **name** -- Short identifier for the metric (e.g. ``"my_crps"``).
+                * **fn** -- Callable with signature
+                  ``fn(fcst: xr.DataArray, obs: xr.DataArray, **kwargs) -> xr.DataArray``.
+
+   :raises ValueError: If ``name`` is already registered and ``fn`` differs from the
+       existing entry.
+
+

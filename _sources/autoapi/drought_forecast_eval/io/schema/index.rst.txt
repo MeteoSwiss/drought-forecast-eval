@@ -1,0 +1,82 @@
+drought_forecast_eval.io.schema
+===============================
+
+.. py:module:: drought_forecast_eval.io.schema
+
+.. autoapi-nested-parse::
+
+   Schema definitions and validation for forecast and observation CSV files.
+
+   Both schemas are defined as dicts mapping column name → expected pandas dtype.
+   Validation emits warnings on unexpected columns (forward-compatibility) and
+   raises ``SchemaError`` on missing required columns or unparseable types.
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   drought_forecast_eval.io.schema.FORECAST_SCHEMA
+   drought_forecast_eval.io.schema.OBSERVATION_SCHEMA
+
+
+Exceptions
+----------
+
+.. autoapisummary::
+
+   drought_forecast_eval.io.schema.SchemaError
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   drought_forecast_eval.io.schema.validate_forecast
+   drought_forecast_eval.io.schema.validate_observation
+
+
+Module Contents
+---------------
+
+.. py:exception:: SchemaError
+
+   Bases: :py:obj:`ValueError`
+
+
+   Raised when a DataFrame does not conform to the expected schema.
+
+
+.. py:data:: FORECAST_SCHEMA
+   :type:  dict[str, Any]
+
+.. py:data:: OBSERVATION_SCHEMA
+   :type:  dict[str, Any]
+
+.. py:function:: validate_forecast(df: pandas.DataFrame) -> pandas.DataFrame
+
+   Validate and coerce a raw forecast DataFrame to the expected schema.
+
+   :Parameters: **df** -- Raw DataFrame read from ``weekly_forecast_regions.csv``.
+
+   :returns: Validated and type-coerced DataFrame.
+   :rtype: pd.DataFrame
+
+   :raises SchemaError: If required columns are missing or contain unparseable values.
+
+
+.. py:function:: validate_observation(df: pandas.DataFrame) -> pandas.DataFrame
+
+   Validate and coerce a raw observation DataFrame to the expected schema.
+
+   :Parameters: **df** -- Raw DataFrame read from ``weekly_historic_regions.csv``.
+
+   :returns: Validated and type-coerced DataFrame.
+   :rtype: pd.DataFrame
+
+   :raises SchemaError: If required columns are missing or contain unparseable values.
+
+

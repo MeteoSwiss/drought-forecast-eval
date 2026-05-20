@@ -1,0 +1,55 @@
+drought_forecast_eval.visualization.experiment_comparison
+=========================================================
+
+.. py:module:: drought_forecast_eval.visualization.experiment_comparison
+
+.. autoapi-nested-parse::
+
+   Experiment comparison visualizations.
+
+   ``plot_experiment_diff``
+       Side-by-side or difference plot comparing two score datasets:
+       e.g. period A vs period B, or data source A vs data source B.
+
+       Produces a figure with three columns per variable:
+       [experiment A | experiment B | B − A difference]
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   drought_forecast_eval.visualization.experiment_comparison.logger
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   drought_forecast_eval.visualization.experiment_comparison.plot_experiment_diff
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:function:: plot_experiment_diff(ds_scores_a: xarray.Dataset, ds_scores_b: xarray.Dataset, variables: list[str], score: str = 'mae', label_a: str = 'Experiment A', label_b: str = 'Experiment B', aggregate_regions: bool = True, figsize: tuple[float, float] | None = None, title: str | None = None) -> matplotlib.pyplot.Figure
+
+   Compare two score datasets side by side with a difference panel.
+
+   :Parameters: * **ds_scores_a** -- First (baseline) scores dataset.
+                * **ds_scores_b** -- Second (comparison) scores dataset.
+                * **variables** -- Variable keys to compare (e.g. ``["spi_1m", "cdi"]``).
+                * **score** -- Score metric name suffix (e.g. ``"mae"``, ``"rpss"``).
+                * **label_a, label_b** -- Legend / axis labels for the two experiments.
+                * **aggregate_regions** -- Average over ``drought_region_id`` before plotting.
+                * **figsize** -- Figure size.  Auto-sized based on number of variables if ``None``.
+                * **title** -- Figure suptitle.
+
+   :rtype: matplotlib.figure.Figure
+
+
