@@ -141,7 +141,9 @@ class ReportBuilder:
         if self.reference in ("climatology", "both"):
             logger.info("Building climatology reference (week_window=%d) …", self.week_window)
             clim = climatology_reference(
-                self._ds_obs, self._ds_fcst, week_window=self.week_window  # type: ignore[arg-type]
+                self._ds_obs,
+                self._ds_fcst,
+                week_window=self.week_window,  # type: ignore[arg-type]
             )
             refs.append(clim)
         if self.reference in ("persistence", "both"):
@@ -237,8 +239,7 @@ class ReportBuilder:
             from jinja2 import Environment, FileSystemLoader
         except ImportError as exc:
             raise ImportError(
-                "jinja2 is required for HTML export. "
-                "Install it with: poetry install --with report"
+                "jinja2 is required for HTML export. Install it with: poetry install --with report"
             ) from exc
 
         ds = self.compute_scores()
@@ -258,7 +259,9 @@ class ReportBuilder:
         n_regions = (
             len(self.regions)
             if isinstance(self.regions, list)
-            else int(ds["drought_region_id"].size) if "drought_region_id" in ds.coords else 38
+            else int(ds["drought_region_id"].size)
+            if "drought_region_id" in ds.coords
+            else 38
         )
 
         html = template.render(
@@ -267,7 +270,8 @@ class ReportBuilder:
                 "n_regions": n_regions,
                 "regions": self.regions,
                 "reference_type": self._ds_ref.attrs.get("reference_type", "none")
-                if self._ds_ref else "none",
+                if self._ds_ref
+                else "none",
                 "cdi_threshold": self.cdi_threshold,
                 "variables": (
                     self.variables if isinstance(self.variables, list) else DEFAULT_VARIABLES
@@ -313,6 +317,7 @@ class ReportBuilder:
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _available_vars_for_score(ds: xr.Dataset, score: str) -> list[str]:
     """Return variable keys whose '{key}_{score}' column exists in ds."""
@@ -385,13 +390,12 @@ def _build_plot_images(builder: ReportBuilder, ds: xr.Dataset) -> dict:
     for sv in list(ds.data_vars)[:3]:
         try:
             fig = plot_region_map(
-                ds, sv,
+                ds,
+                sv,
                 shapefile_path=builder.shapefile_path,
                 lead_weeks=LEAD_WEEKS,
             )
-            plots["region_maps"].append(
-                {"path": _fig_to_b64(fig), "caption": sv}
-            )
+            plots["region_maps"].append({"path": _fig_to_b64(fig), "caption": sv})
         except Exception as exc:
             logger.warning("Could not generate region map for '%s': %s", sv, exc)
 

@@ -46,6 +46,7 @@ _HEADER_DATE_RE = re.compile(r"letzte Aktualisierung[:\s]+(\d{2}\.\d{2}\.\d{4})"
 # Internal helpers
 # ---------------------------------------------------------------------------
 
+
 def _read_csv_from_zip(zf: zipfile.ZipFile, csv_name: str) -> tuple[pd.DataFrame, str | None]:
     """Read a named CSV from an open ZipFile, stripping comment lines.
 
@@ -91,6 +92,7 @@ def _find_csv_in_zip(zf: zipfile.ZipFile, target: str) -> str | None:
 # ---------------------------------------------------------------------------
 # load_forecasts
 # ---------------------------------------------------------------------------
+
 
 def load_forecasts(
     archive_dir: str | Path,
@@ -154,9 +156,7 @@ def load_forecasts(
         frames.append(df)
 
     if not frames:
-        raise RuntimeError(
-            "All ZIP files failed to load. Errors:\n" + "\n".join(errors)
-        )
+        raise RuntimeError("All ZIP files failed to load. Errors:\n" + "\n".join(errors))
 
     if errors:
         logger.warning("%d ZIP(s) had errors and were skipped.", len(errors))
@@ -179,8 +179,7 @@ def _load_single_forecast_zip(path: Path, frt: datetime) -> pd.DataFrame:
             header_frt = datetime.strptime(header_date, "%d.%m.%Y")
             if header_frt.date() != frt.date():
                 logger.warning(
-                    "%s: filename date (%s) differs from header date (%s); "
-                    "using filename date.",
+                    "%s: filename date (%s) differs from header date (%s); using filename date.",
                     path.name,
                     frt.date(),
                     header_frt.date(),
@@ -202,22 +201,12 @@ def _forecast_df_to_xarray(df: pd.DataFrame) -> xr.Dataset:
     df = df.sort_values(index_cols)
 
     # Store valid_at as a coordinate variable before pivoting
-    valid_at_map = (
-        df.set_index(index_cols)["valid_at"]
-        .to_xarray()
-    )
+    valid_at_map = df.set_index(index_cols)["valid_at"].to_xarray()
 
     # Build the dataset from all numeric forecast variables
-    value_cols = [
-        c for c in df.columns
-        if c not in [*index_cols, "valid_at"]
-    ]
+    value_cols = [c for c in df.columns if c not in [*index_cols, "valid_at"]]
 
-    ds = (
-        df[index_cols + value_cols]
-        .set_index(index_cols)
-        .to_xarray()
-    )
+    ds = df[index_cols + value_cols].set_index(index_cols).to_xarray()
     ds = ds.assign_coords(valid_at=valid_at_map)
     ds["forecast_reference_time"].attrs["long_name"] = "Forecast reference time"
     ds["lead_week"].attrs["long_name"] = "Lead time (weeks)"
@@ -230,6 +219,7 @@ def _forecast_df_to_xarray(df: pd.DataFrame) -> xr.Dataset:
 # ---------------------------------------------------------------------------
 # load_observations
 # ---------------------------------------------------------------------------
+
 
 def load_observations(
     historic_path: str | Path,
@@ -267,10 +257,7 @@ def load_observations(
     elif historic_path.suffix == ".csv":
         df = _load_obs_from_csv(historic_path)
     else:
-        raise ValueError(
-            f"Unsupported file type '{historic_path.suffix}'. "
-            "Expected .zip or .csv."
-        )
+        raise ValueError(f"Unsupported file type '{historic_path.suffix}'. Expected .zip or .csv.")
 
     df = validate_observation(df)
     # Rename measured_at → valid_at for a unified time coordinate
@@ -294,7 +281,9 @@ def _load_obs_from_zip(path: Path) -> pd.DataFrame:
             csv_name = candidates[0]
             logger.warning(
                 "Expected '%s' inside %s; using '%s' as fallback.",
-                _HISTORIC_CSV, path.name, csv_name,
+                _HISTORIC_CSV,
+                path.name,
+                csv_name,
             )
         df, _ = _read_csv_from_zip(zf, csv_name)
     return df

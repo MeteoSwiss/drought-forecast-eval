@@ -29,6 +29,7 @@ logger = logging.getLogger(__name__)
 
 try:
     import scores.continuous as _scores_cont
+
     _SCORES_AVAILABLE = True
 except ImportError:
     _SCORES_AVAILABLE = False
@@ -41,6 +42,7 @@ except ImportError:
 # ---------------------------------------------------------------------------
 # Fallback implementations (used when scores is not installed)
 # ---------------------------------------------------------------------------
+
 
 def _mae_fallback(
     fcst: xr.DataArray,
@@ -121,11 +123,11 @@ def _register_builtins() -> None:
     # Probabilistic scores are imported lazily from skill.py to avoid
     # circular imports; they are registered here by name and resolved in
     # dispatcher.py.
-    SCORE_REGISTRY["pinball"] = "pinball_loss_xr"        # resolved in dispatcher
+    SCORE_REGISTRY["pinball"] = "pinball_loss_xr"  # resolved in dispatcher
     SCORE_REGISTRY["interval_score"] = "interval_score_xr"  # resolved in dispatcher
-    SCORE_REGISTRY["rpss"] = "rpss"                          # resolved in dispatcher
-    SCORE_REGISTRY["mae_skill"] = "mae_skill"                # resolved in dispatcher
-    SCORE_REGISTRY["roc_auc"] = "roc_auc_xr"                # resolved in dispatcher
+    SCORE_REGISTRY["rpss"] = "rpss"  # resolved in dispatcher
+    SCORE_REGISTRY["mae_skill"] = "mae_skill"  # resolved in dispatcher
+    SCORE_REGISTRY["roc_auc"] = "roc_auc_xr"  # resolved in dispatcher
 
 
 _register_builtins()
@@ -136,9 +138,7 @@ DETERMINISTIC_METRICS: frozenset[str] = frozenset(
 )
 
 #: Names of metrics that require quantile bundles
-QUANTILE_METRICS: frozenset[str] = frozenset(
-    ["pinball", "interval_score", "rpss"]
-)
+QUANTILE_METRICS: frozenset[str] = frozenset(["pinball", "interval_score", "rpss"])
 
 
 def register_score(name: str, fn: Callable) -> None:
@@ -159,8 +159,6 @@ def register_score(name: str, fn: Callable) -> None:
         existing entry.
     """
     if name in SCORE_REGISTRY and SCORE_REGISTRY[name] is not fn:
-        logger.warning(
-            "Overwriting existing score '%s' in registry.", name
-        )
+        logger.warning("Overwriting existing score '%s' in registry.", name)
     SCORE_REGISTRY[name] = fn
     logger.debug("Registered score: '%s'", name)

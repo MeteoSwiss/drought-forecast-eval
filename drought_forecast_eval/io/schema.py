@@ -104,6 +104,7 @@ OBSERVATION_SCHEMA: dict[str, Any] = {
 # Validation helpers
 # ---------------------------------------------------------------------------
 
+
 def _parse_date_column(df: pd.DataFrame, col: str) -> pd.DataFrame:
     """Parse a date column that may be in DD.MM.YYYY or YYYY-MM-DD format."""
     df = df.copy()
@@ -112,9 +113,7 @@ def _parse_date_column(df: pd.DataFrame, col: str) -> pd.DataFrame:
     parsed = pd.to_datetime(raw, format="%Y-%m-%d", errors="coerce")
     mask_failed = parsed.isna()
     if mask_failed.any():
-        parsed[mask_failed] = pd.to_datetime(
-            raw[mask_failed], format="%d.%m.%Y", errors="coerce"
-        )
+        parsed[mask_failed] = pd.to_datetime(raw[mask_failed], format="%d.%m.%Y", errors="coerce")
     if parsed.isna().any():
         bad = raw[parsed.isna()].unique()[:5].tolist()
         raise SchemaError(

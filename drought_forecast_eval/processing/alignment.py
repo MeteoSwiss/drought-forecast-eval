@@ -90,8 +90,7 @@ def align_obs_to_forecast(
     obs_df["obs_day"] = pd.to_datetime(obs_df["valid_at"]).dt.floor("D")
     obs_lookup: dict[tuple, dict] = {}
     obs_var_names = [
-        c for c in obs_df.columns
-        if c not in ["drought_region_id", "valid_at", "obs_day"]
+        c for c in obs_df.columns if c not in ["drought_region_id", "valid_at", "obs_day"]
     ]
     for _, row in obs_df.iterrows():
         key = (int(row["drought_region_id"]), row["obs_day"])
@@ -112,8 +111,9 @@ def align_obs_to_forecast(
             for i_r, region_id in enumerate(region_vals):
                 for i_l in range(n_lead):
                     raw_ts = valid_at_np[i_f, i_r, i_l]
-                    if raw_ts is None or (hasattr(raw_ts, '__class__') and
-                                          raw_ts.__class__.__name__ == 'NaTType'):
+                    if raw_ts is None or (
+                        hasattr(raw_ts, "__class__") and raw_ts.__class__.__name__ == "NaTType"
+                    ):
                         continue
                     day = pd.Timestamp(raw_ts).floor("D")
                     val_dict = obs_lookup.get((int(region_id), day))

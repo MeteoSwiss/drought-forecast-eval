@@ -69,8 +69,8 @@ DEFAULT_SCORES: list[str] = [
     "rmse",
     "bias",
     "correlation",
-    "pinball",        # quantile variables only
-    "interval_score", # quantile variables only
+    "pinball",  # quantile variables only
+    "interval_score",  # quantile variables only
 ]
 
 # ---------------------------------------------------------------------------

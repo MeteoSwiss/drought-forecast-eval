@@ -75,8 +75,14 @@ def plot_experiment_diff(
             (ax_b, ds_scores_b, label_b, _PALETTE_B),
         ]:
             if col_name not in ds:
-                ax.text(0.5, 0.5, f"'{col_name}'\nnot found",
-                        ha="center", va="center", transform=ax.transAxes)
+                ax.text(
+                    0.5,
+                    0.5,
+                    f"'{col_name}'\nnot found",
+                    ha="center",
+                    va="center",
+                    transform=ax.transAxes,
+                )
                 ax.set_title(f"{var_key}\n{label}")
                 continue
 
@@ -99,12 +105,19 @@ def plot_experiment_diff(
             ax_diff.set_ylabel(f"Δ {score.upper()}")
             ax_diff.grid(True, linestyle="--", alpha=0.4)
         else:
-            ax_diff.text(0.5, 0.5, "Cannot compute\ndifference",
-                         ha="center", va="center", transform=ax_diff.transAxes)
+            ax_diff.text(
+                0.5,
+                0.5,
+                "Cannot compute\ndifference",
+                ha="center",
+                va="center",
+                transform=ax_diff.transAxes,
+            )
 
     fig.suptitle(
         title or f"Experiment comparison — {score.upper()}",
-        fontsize=13, fontweight="bold",
+        fontsize=13,
+        fontweight="bold",
     )
     fig.tight_layout()
     return fig
@@ -113,6 +126,7 @@ def plot_experiment_diff(
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
 
 def _plot_lead_line(
     ax: plt.Axes,

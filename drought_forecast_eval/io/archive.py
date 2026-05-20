@@ -116,9 +116,7 @@ def scan_archive(
     if date_range is not None:
         start = datetime.strptime(date_range[0], "%Y-%m-%d")
         end = datetime.strptime(date_range[1], "%Y-%m-%d")
-        date_to_path = {
-            dt: p for dt, p in date_to_path.items() if start <= dt <= end
-        }
+        date_to_path = {dt: p for dt, p in date_to_path.items() if start <= dt <= end}
 
     entries = sorted(date_to_path.items())
     logger.info(

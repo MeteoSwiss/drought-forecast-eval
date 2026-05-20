@@ -38,6 +38,7 @@ logger = logging.getLogger(__name__)
 # Climatology reference
 # ---------------------------------------------------------------------------
 
+
 def climatology_reference(
     ds_obs: xr.Dataset,
     ds_fcst: xr.Dataset,
@@ -92,9 +93,7 @@ def climatology_reference(
     shape = (n_frt, n_region, n_lead)
 
     results: dict[str, np.ndarray] = {
-        f"{v}_ref_{q}": np.full(shape, np.nan)
-        for v in obs_vars
-        for q in ("p10", "p50", "p90")
+        f"{v}_ref_{q}": np.full(shape, np.nan) for v in obs_vars for q in ("p10", "p50", "p90")
     }
 
     for i_r, region in enumerate(region_vals):
@@ -121,9 +120,7 @@ def climatology_reference(
                         region_obs["week_of_year"] <= hi - 52
                     )
                 else:
-                    mask = (region_obs["week_of_year"] >= lo) & (
-                        region_obs["week_of_year"] <= hi
-                    )
+                    mask = (region_obs["week_of_year"] >= lo) & (region_obs["week_of_year"] <= hi)
 
                 # Exclude the target year itself to avoid data leakage
                 target_year = target_ts.year
@@ -133,7 +130,10 @@ def climatology_reference(
                 if len(sample) < 3:
                     logger.debug(
                         "Climatology: only %d samples for region=%s woy=%s ±%d",
-                        len(sample), region, target_woy, week_window,
+                        len(sample),
+                        region,
+                        target_woy,
+                        week_window,
                     )
 
                 for v in obs_vars:
@@ -149,10 +149,7 @@ def climatology_reference(
         region_dim: region_vals,
         lead_dim: lead_vals,
     }
-    data_vars = {
-        k: ([frt_dim, region_dim, lead_dim], v)
-        for k, v in results.items()
-    }
+    data_vars = {k: ([frt_dim, region_dim, lead_dim], v) for k, v in results.items()}
     ds_ref = xr.Dataset(data_vars, coords=coords)
     ds_ref.attrs["reference_type"] = "climatology"
     ds_ref.attrs["week_window"] = week_window
@@ -162,6 +159,7 @@ def climatology_reference(
 # ---------------------------------------------------------------------------
 # Persistence reference
 # ---------------------------------------------------------------------------
+
 
 def persistence_reference(
     ds_obs: xr.Dataset,
@@ -205,9 +203,7 @@ def persistence_reference(
     n_lead = len(lead_vals)
     shape = (n_frt, n_region, n_lead)
 
-    results: dict[str, np.ndarray] = {
-        f"{v}_ref_p50": np.full(shape, np.nan) for v in obs_vars
-    }
+    results: dict[str, np.ndarray] = {f"{v}_ref_p50": np.full(shape, np.nan) for v in obs_vars}
 
     for i_r, region in enumerate(region_vals):
         region_obs = obs_df[obs_df[region_dim] == region].set_index("valid_at")
@@ -216,9 +212,7 @@ def persistence_reference(
             # Last observation strictly before frt
             prior = region_obs[region_obs.index < frt_ts]
             if prior.empty:
-                logger.debug(
-                    "Persistence: no prior obs for region=%s before %s", region, frt_ts
-                )
+                logger.debug("Persistence: no prior obs for region=%s before %s", region, frt_ts)
                 continue
             last_obs = prior.iloc[-1]
             for v in obs_vars:
@@ -232,10 +226,7 @@ def persistence_reference(
         region_dim: region_vals,
         lead_dim: lead_vals,
     }
-    data_vars = {
-        k: ([frt_dim, region_dim, lead_dim], v)
-        for k, v in results.items()
-    }
+    data_vars = {k: ([frt_dim, region_dim, lead_dim], v) for k, v in results.items()}
     ds_ref = xr.Dataset(data_vars, coords=coords)
     ds_ref.attrs["reference_type"] = "persistence"
     return ds_ref

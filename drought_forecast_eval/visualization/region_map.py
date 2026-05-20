@@ -79,8 +79,7 @@ def plot_region_map(
 
     if score_variable not in ds_scores:
         raise ValueError(
-            f"'{score_variable}' not found in ds_scores. "
-            f"Available: {list(ds_scores.data_vars)}"
+            f"'{score_variable}' not found in ds_scores. Available: {list(ds_scores.data_vars)}"
         )
 
     da = ds_scores[score_variable]
@@ -117,6 +116,7 @@ def plot_region_map(
 # ---------------------------------------------------------------------------
 # Choropleth (geopandas path)
 # ---------------------------------------------------------------------------
+
 
 def _try_geopandas(shapefile_path: str | Path | None) -> bool:
     """Return True if geopandas is available and the shapefile exists."""
@@ -215,6 +215,7 @@ def _plot_choropleth(
 # ---------------------------------------------------------------------------
 # Bar chart fallback
 # ---------------------------------------------------------------------------
+
 
 def _plot_bar_fallback(
     da: xr.DataArray,

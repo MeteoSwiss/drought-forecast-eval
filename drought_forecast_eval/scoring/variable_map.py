@@ -24,8 +24,8 @@ from typing import Literal, TypedDict
 class VariableEntry(TypedDict):
     """Type definition for a single VARIABLE_MAP entry."""
 
-    obs: str              # observation column name in the merged dataset
-    fcst: list[str]       # forecast column name(s) in the merged dataset
+    obs: str  # observation column name in the merged dataset
+    fcst: list[str]  # forecast column name(s) in the merged dataset
     mode: Literal["deterministic", "quantile"]
 
 
@@ -128,10 +128,19 @@ VARIABLE_MAP: dict[str, VariableEntry] = {
 # Convenience groupings for the ``variables`` argument of ``compute_scores``
 VARIABLE_GROUPS: dict[str, list[str]] = {
     "precipitation": [
-        "precip_sum_1m", "precip_sum_3m", "precip_sum_6m",
-        "precip_sum_12m", "precip_sum_24m",
-        "spi_1m", "spi_3m", "spi_6m", "spi_12m", "spi_24m",
-        "precip_1m_index", "precip_3m_index", "precip_24m_index",
+        "precip_sum_1m",
+        "precip_sum_3m",
+        "precip_sum_6m",
+        "precip_sum_12m",
+        "precip_sum_24m",
+        "spi_1m",
+        "spi_3m",
+        "spi_6m",
+        "spi_12m",
+        "spi_24m",
+        "precip_1m_index",
+        "precip_3m_index",
+        "precip_24m_index",
     ],
     "streamflow": ["hydro_index"],
     "soil_moisture": ["soil_moisture_ufc", "soil_moisture_index"],

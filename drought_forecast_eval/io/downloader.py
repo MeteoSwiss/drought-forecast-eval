@@ -151,6 +151,7 @@ def download_historic(
 # Internal helpers
 # ---------------------------------------------------------------------------
 
+
 def _to_date(value: str | date | datetime) -> date:
     """Coerce various date representations to ``datetime.date``."""
     if isinstance(value, datetime):

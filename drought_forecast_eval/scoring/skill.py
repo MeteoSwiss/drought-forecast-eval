@@ -37,6 +37,7 @@ import xarray as xr
 
 try:
     import scores.continuous as _scores_cont
+
     _SCORES_AVAILABLE = True
 except ImportError:
     _SCORES_AVAILABLE = False
@@ -45,6 +46,7 @@ except ImportError:
 # ---------------------------------------------------------------------------
 # MAE skill score
 # ---------------------------------------------------------------------------
+
 
 def mae_skill(
     fcst: xr.DataArray,
@@ -96,6 +98,7 @@ def mae_skill(
 # ---------------------------------------------------------------------------
 # RPS / RPSS
 # ---------------------------------------------------------------------------
+
 
 def rps_from_quantiles(
     obs: xr.DataArray,
@@ -174,15 +177,20 @@ def _interp_quantile_cdf(
     # Extend anchors: [−∞→0, p10→0.10, p50→0.50, p90→0.90, +∞→1]
     result = np.interp(
         threshold,
-        xp=np.array([float(p10_vals.flat[0]) - 1e6,
-                     float(p10_vals.flat[0]),
-                     float(  # noqa: E501
-                         fcst_quantiles.sel(quantile_level=0.50, method="nearest").values.flat[0]
-                     ),
-                     float(p90_vals.flat[0]),
-                     float(p90_vals.flat[0]) + 1e6]),
+        xp=np.array(
+            [
+                float(p10_vals.flat[0]) - 1e6,
+                float(p10_vals.flat[0]),
+                float(  # noqa: E501
+                    fcst_quantiles.sel(quantile_level=0.50, method="nearest").values.flat[0]
+                ),
+                float(p90_vals.flat[0]),
+                float(p90_vals.flat[0]) + 1e6,
+            ]
+        ),
         fp=np.array([0.0, 0.10, 0.50, 0.90, 1.0]),
-        left=0.0, right=1.0,
+        left=0.0,
+        right=1.0,
     )
     # This scalar result needs to be broadcast; for DataArray inputs build a
     # same-shaped array
@@ -241,6 +249,7 @@ def rpss(
 # Interval score
 # ---------------------------------------------------------------------------
 
+
 def interval_score_xr(
     obs: xr.DataArray,
     lower: xr.DataArray,
@@ -281,6 +290,7 @@ def interval_score_xr(
 # Pinball loss
 # ---------------------------------------------------------------------------
 
+
 def pinball_loss_xr(
     obs: xr.DataArray,
     fcst: xr.DataArray,
@@ -314,6 +324,7 @@ def pinball_loss_xr(
 # ---------------------------------------------------------------------------
 # ROC-AUC (binary event)
 # ---------------------------------------------------------------------------
+
 
 def roc_auc_xr(
     obs: xr.DataArray,

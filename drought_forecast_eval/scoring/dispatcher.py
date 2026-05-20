@@ -34,6 +34,7 @@ logger = logging.getLogger(__name__)
 # Reduce over these dims to obtain (lead_week, drought_region_id) output
 _REDUCE_DIMS = ["forecast_reference_time"]
 
+
 # Lazy resolver: string sentinels in the registry → actual callables
 def _resolve(name: str):  # noqa: ANN202
     """Resolve a registry entry that may be a string sentinel."""
@@ -41,6 +42,7 @@ def _resolve(name: str):  # noqa: ANN202
     if isinstance(entry, str):
         # Import from skill module
         from drought_forecast_eval.scoring import skill as _skill
+
         return getattr(_skill, entry)
     return entry
 
@@ -48,6 +50,7 @@ def _resolve(name: str):  # noqa: ANN202
 # ---------------------------------------------------------------------------
 # Public API
 # ---------------------------------------------------------------------------
+
 
 def compute_scores(
     ds: xr.Dataset,
@@ -214,6 +217,7 @@ def compute_scores(
 # Internal helpers
 # ---------------------------------------------------------------------------
 
+
 def _resolve_variables(
     variables: list[str] | Literal["all"],
     vmap: dict,
@@ -272,11 +276,14 @@ def _compute_deterministic_score(
             if ref_col is None:
                 return None
             from drought_forecast_eval.scoring.skill import mae_skill
+
             da = mae_skill(fcst_p50, obs, ds_ref[ref_col], reduce_dims=_REDUCE_DIMS)
         elif score_name == "roc_auc":
             from drought_forecast_eval.scoring.skill import roc_auc_xr
+
             da = roc_auc_xr(
-                obs, fcst_p50,
+                obs,
+                fcst_p50,
                 threshold=cdi_threshold,
                 reduce_dims=_REDUCE_DIMS,
             )
@@ -304,6 +311,7 @@ def _compute_quantile_score(
     try:
         if score_name == "pinball":
             from drought_forecast_eval.scoring.skill import pinball_loss_xr
+
             # Average pinball over three quantile levels
             pb10 = pinball_loss_xr(obs, fcst_p10, 0.10).mean(dim=_REDUCE_DIMS)
             pb50 = pinball_loss_xr(obs, fcst_p50, 0.50).mean(dim=_REDUCE_DIMS)
@@ -312,6 +320,7 @@ def _compute_quantile_score(
             da.attrs["long_name"] = f"{var_key} mean pinball loss"
         elif score_name == "interval_score":
             from drought_forecast_eval.scoring.skill import interval_score_xr
+
             da = interval_score_xr(obs, fcst_p10, fcst_p90).mean(dim=_REDUCE_DIMS)
             da.attrs["long_name"] = f"{var_key} interval score (80%)"
         elif score_name == "rpss":
@@ -325,14 +334,21 @@ def _compute_quantile_score(
                     return None
                 ref_p = ds_ref[ref_p50_col]
                 from drought_forecast_eval.scoring.skill import rpss
-                da = rpss(obs, fcst_p10, fcst_p50, fcst_p90, ref_p, ref_p, ref_p,
-                          reduce_dims=_REDUCE_DIMS)
+
+                da = rpss(
+                    obs, fcst_p10, fcst_p50, fcst_p90, ref_p, ref_p, ref_p, reduce_dims=_REDUCE_DIMS
+                )
             else:
                 from drought_forecast_eval.scoring.skill import rpss
+
                 da = rpss(
                     obs,
-                    fcst_p10, fcst_p50, fcst_p90,
-                    ds_ref[ref_p10_col], ds_ref[ref_p50_col], ds_ref[ref_p90_col],
+                    fcst_p10,
+                    fcst_p50,
+                    fcst_p90,
+                    ds_ref[ref_p10_col],
+                    ds_ref[ref_p50_col],
+                    ds_ref[ref_p90_col],
                     reduce_dims=_REDUCE_DIMS,
                 )
             da.attrs["long_name"] = f"{var_key} RPSS"

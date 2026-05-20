@@ -22,8 +22,14 @@ logger = logging.getLogger(__name__)
 
 # Colorblind-friendly palette (Paul Tol's bright)
 _PALETTE = [
-    "#4477AA", "#EE6677", "#228833", "#CCBB44",
-    "#66CCEE", "#AA3377", "#BBBBBB", "#000000",
+    "#4477AA",
+    "#EE6677",
+    "#228833",
+    "#CCBB44",
+    "#66CCEE",
+    "#AA3377",
+    "#BBBBBB",
+    "#000000",
 ]
 
 _LEAD_LABELS = {0: "Week 0\n(current)", 1: "Week 1", 2: "Week 2", 3: "Week 3"}
