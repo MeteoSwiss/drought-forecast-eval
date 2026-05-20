@@ -335,7 +335,7 @@ Package Contents
    :raises ValueError: If none of the requested variables are present in the dataset.
 
 
-.. py:function:: register_score(name: str, fn: Union[collections.abc.Callable, str]) -> None
+.. py:function:: register_score(name: str, fn: collections.abc.Callable | str) -> None
 
    Register a custom scoring function under ``name``.
 

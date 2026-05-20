@@ -72,9 +72,9 @@ Package Contents
 
 
 .. py:data:: SCORE_REGISTRY
-   :type:  dict[str, Union[collections.abc.Callable, str]]
+   :type:  dict[str, collections.abc.Callable | str]
 
-.. py:function:: register_score(name: str, fn: Union[collections.abc.Callable, str]) -> None
+.. py:function:: register_score(name: str, fn: collections.abc.Callable | str) -> None
 
    Register a custom scoring function under ``name``.
 
