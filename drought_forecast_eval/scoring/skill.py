@@ -37,7 +37,6 @@ import xarray as xr
 
 try:
     import scores.continuous as _scores_cont
-    import scores.probability as _scores_prob
     _SCORES_AVAILABLE = True
 except ImportError:
     _SCORES_AVAILABLE = False
@@ -168,7 +167,6 @@ def _interp_quantile_cdf(
     """
     # Build a piecewise linear CDF: (value, prob) anchor points
     # Anchor below p10: prob=0; above p90: prob=1
-    q_values = fcst_quantiles.values  # shape (..., 3)
     p10_vals = fcst_quantiles.sel(quantile_level=0.10, method="nearest").values
     p90_vals = fcst_quantiles.sel(quantile_level=0.90, method="nearest").values
 
@@ -178,7 +176,9 @@ def _interp_quantile_cdf(
         threshold,
         xp=np.array([float(p10_vals.flat[0]) - 1e6,
                      float(p10_vals.flat[0]),
-                     float(fcst_quantiles.sel(quantile_level=0.50, method="nearest").values.flat[0]),
+                     float(  # noqa: E501
+                         fcst_quantiles.sel(quantile_level=0.50, method="nearest").values.flat[0]
+                     ),
                      float(p90_vals.flat[0]),
                      float(p90_vals.flat[0]) + 1e6]),
         fp=np.array([0.0, 0.10, 0.50, 0.90, 1.0]),

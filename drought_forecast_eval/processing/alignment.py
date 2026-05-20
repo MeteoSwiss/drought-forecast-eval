@@ -89,7 +89,10 @@ def align_obs_to_forecast(
     obs_df = ds_obs.to_dataframe().reset_index()
     obs_df["obs_day"] = pd.to_datetime(obs_df["valid_at"]).dt.floor("D")
     obs_lookup: dict[tuple, dict] = {}
-    obs_var_names = [c for c in obs_df.columns if c not in ["drought_region_id", "valid_at", "obs_day"]]
+    obs_var_names = [
+        c for c in obs_df.columns
+        if c not in ["drought_region_id", "valid_at", "obs_day"]
+    ]
     for _, row in obs_df.iterrows():
         key = (int(row["drought_region_id"]), row["obs_day"])
         obs_lookup[key] = {v: row[v] for v in obs_var_names}

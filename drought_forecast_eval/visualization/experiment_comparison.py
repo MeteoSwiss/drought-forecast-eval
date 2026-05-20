@@ -90,7 +90,9 @@ def plot_experiment_diff(
         # Difference panel (B − A)
         if col_name in ds_scores_a and col_name in ds_scores_b:
             diff = ds_scores_b[col_name] - ds_scores_a[col_name]
-            _plot_lead_line(ax_diff, diff, aggregate_regions, _PALETTE_DIFF, f"{label_b} − {label_a}")
+            _plot_lead_line(
+                ax_diff, diff, aggregate_regions, _PALETTE_DIFF, f"{label_b} − {label_a}"
+            )
             ax_diff.axhline(0, color="black", linestyle=":", linewidth=0.8)
             ax_diff.set_title(f"{var_key} — Difference (B−A)")
             ax_diff.set_xlabel("Lead week")

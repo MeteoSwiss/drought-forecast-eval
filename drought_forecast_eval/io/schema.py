@@ -173,7 +173,7 @@ def _validate(
     date_col: str,
     context: str,
 ) -> pd.DataFrame:
-    """Internal validation runner shared by forecast and observation paths."""
+    """Run internal validation shared by forecast and observation paths."""
     df = df.copy()
 
     # --- Check for missing required columns ---

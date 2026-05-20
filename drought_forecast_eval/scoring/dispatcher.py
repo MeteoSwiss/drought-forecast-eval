@@ -20,7 +20,6 @@ import logging
 from pathlib import Path
 from typing import Literal
 
-import numpy as np
 import xarray as xr
 
 from drought_forecast_eval.scoring.registry import (
@@ -28,7 +27,7 @@ from drought_forecast_eval.scoring.registry import (
     QUANTILE_METRICS,
     SCORE_REGISTRY,
 )
-from drought_forecast_eval.scoring.variable_map import VARIABLE_MAP, VARIABLE_GROUPS
+from drought_forecast_eval.scoring.variable_map import VARIABLE_GROUPS, VARIABLE_MAP
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +63,8 @@ def compute_scores(
     Parameters
     ----------
     ds:
-        Merged dataset from :func:`~drought_forecast_eval.processing.alignment.align_obs_to_forecast`.
+        Merged dataset from
+        :func:`~drought_forecast_eval.processing.alignment.align_obs_to_forecast`.
         Must contain both forecast and observation variables.
     variables:
         List of variable keys from ``VARIABLE_MAP`` (e.g. ``["spi_1m", "cdi"]``),
@@ -113,7 +113,9 @@ def compute_scores(
 
         # Check required columns are present
         if obs_col not in ds:
-            logger.warning("Skipping '%s': observation column '%s' not in dataset.", var_key, obs_col)
+            logger.warning(
+                "Skipping '%s': observation column '%s' not in dataset.", var_key, obs_col
+            )
             continue
         missing_fcst = [c for c in fcst_cols if c not in ds]
         if missing_fcst:
@@ -123,7 +125,8 @@ def compute_scores(
             continue
 
         obs = ds[obs_col]
-        fcst_p50 = ds[fcst_cols[-1] if mode == "deterministic" else _pick_quantile(fcst_cols, "p50")]
+        p50_col = fcst_cols[-1] if mode == "deterministic" else _pick_quantile(fcst_cols, "p50")
+        fcst_p50 = ds[p50_col]
 
         # --- Deterministic scores (applied to p50) ---
         for score_name in score_names:
@@ -183,7 +186,9 @@ def compute_scores(
             "expected observation and forecast variables."
         )
 
-    logger.info("Computed %d score variable(s) for %d variable key(s).", computed_count, len(var_keys))
+    logger.info(
+        "Computed %d score variable(s) for %d variable key(s).", computed_count, len(var_keys)
+    )
 
     ds_scores = xr.Dataset(result_vars)
     ds_scores.attrs.update(
@@ -349,8 +354,6 @@ def _find_ref_col(
     if ds_ref is None:
         return None
     candidate = f"{var_key}_ref_{quantile}"
-    # Strip _obs suffix from obs column name to get base variable
-    base = var_key  # var_key is the map key, not the obs column
     if candidate in ds_ref:
         return candidate
     # Try without quantile suffix (persistence stores only _ref_p50)

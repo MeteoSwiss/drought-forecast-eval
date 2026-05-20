@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import Literal
 
 import matplotlib
+
 matplotlib.use("Agg")  # non-interactive backend — safe in report/notebook contexts
 import matplotlib.pyplot as plt
 import xarray as xr
@@ -31,7 +32,6 @@ from drought_forecast_eval.config.settings import (
     DEFAULT_CDI_THRESHOLD,
     DEFAULT_SCORES,
     DEFAULT_SHAPEFILE,
-    DEFAULT_SHAPEFILE_REGION_COL,
     DEFAULT_VARIABLES,
     DEFAULT_WEEK_WINDOW,
     LEAD_WEEKS,
@@ -43,7 +43,6 @@ from drought_forecast_eval.processing.reference import (
     persistence_reference,
 )
 from drought_forecast_eval.scoring.dispatcher import compute_scores
-from drought_forecast_eval.visualization.experiment_comparison import plot_experiment_diff
 from drought_forecast_eval.visualization.region_map import plot_region_map
 from drought_forecast_eval.visualization.skill_curves import plot_skill_vs_lead
 
@@ -270,7 +269,9 @@ class ReportBuilder:
                 "reference_type": self._ds_ref.attrs.get("reference_type", "none")
                 if self._ds_ref else "none",
                 "cdi_threshold": self.cdi_threshold,
-                "variables": self.variables if isinstance(self.variables, list) else DEFAULT_VARIABLES,
+                "variables": (
+                    self.variables if isinstance(self.variables, list) else DEFAULT_VARIABLES
+                ),
                 "scores": self.scores if isinstance(self.scores, list) else DEFAULT_SCORES,
                 "generated_at": datetime.now().strftime("%Y-%m-%d %H:%M UTC"),
                 "library_version": __version__,

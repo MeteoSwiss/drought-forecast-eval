@@ -20,7 +20,6 @@ import zipfile
 from datetime import datetime
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import xarray as xr
 
@@ -156,7 +155,7 @@ def load_forecasts(
 
     if not frames:
         raise RuntimeError(
-            f"All ZIP files failed to load. Errors:\n" + "\n".join(errors)
+            "All ZIP files failed to load. Errors:\n" + "\n".join(errors)
         )
 
     if errors:
@@ -303,9 +302,9 @@ def _load_obs_from_zip(path: Path) -> pd.DataFrame:
 
 def _load_obs_from_csv(path: Path) -> pd.DataFrame:
     """Read the observation CSV from a plain (unzipped) file."""
-    with open(path, "r", encoding="utf-8", errors="replace") as f:
+    with open(path, encoding="utf-8", errors="replace") as f:
         lines = f.readlines()
-    data_lines = [l for l in lines if not l.startswith("#")]
+    data_lines = [line for line in lines if not line.startswith("#")]
     csv_blob = "".join(data_lines)
     sep = ";" if data_lines and ";" in data_lines[0] else ","
     df = pd.read_csv(io.StringIO(csv_blob), sep=sep, skipinitialspace=True)
@@ -316,7 +315,6 @@ def _load_obs_from_csv(path: Path) -> pd.DataFrame:
 def _obs_df_to_xarray(df: pd.DataFrame) -> xr.Dataset:
     """Convert the observation DataFrame to an xr.Dataset."""
     index_cols = ["drought_region_id", "valid_at"]
-    value_cols = [c for c in df.columns if c not in index_cols]
 
     df = df.sort_values(index_cols)
     ds = df.set_index(index_cols).to_xarray()

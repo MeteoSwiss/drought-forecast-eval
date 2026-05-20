@@ -37,9 +37,9 @@ from drought_forecast_eval.processing.reference import (
     climatology_reference,
     persistence_reference,
 )
+from drought_forecast_eval.report.builder import ReportBuilder
 from drought_forecast_eval.scoring.dispatcher import compute_scores
 from drought_forecast_eval.scoring.registry import register_score
-from drought_forecast_eval.report.builder import ReportBuilder
 
 __all__ = [
     "load_forecasts",
