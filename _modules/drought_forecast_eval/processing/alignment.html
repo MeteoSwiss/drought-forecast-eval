@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=a7a76f23"></script>
+    <script src="../../../_static/documentation_options.js?v=8eb447cf"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/drought_forecast_eval/processing/alignment';</script>
@@ -461,8 +461,7 @@
     <span class="n">obs_df</span><span class="p">[</span><span class="s2">&quot;obs_day&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">obs_df</span><span class="p">[</span><span class="s2">&quot;valid_at&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="s2">&quot;D&quot;</span><span class="p">)</span>
     <span class="n">obs_lookup</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">tuple</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">obs_var_names</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">obs_df</span><span class="o">.</span><span class="n">columns</span>
-        <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;drought_region_id&quot;</span><span class="p">,</span> <span class="s2">&quot;valid_at&quot;</span><span class="p">,</span> <span class="s2">&quot;obs_day&quot;</span><span class="p">]</span>
+        <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">obs_df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;drought_region_id&quot;</span><span class="p">,</span> <span class="s2">&quot;valid_at&quot;</span><span class="p">,</span> <span class="s2">&quot;obs_day&quot;</span><span class="p">]</span>
     <span class="p">]</span>
     <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">obs_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
         <span class="n">key</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s2">&quot;drought_region_id&quot;</span><span class="p">]),</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;obs_day&quot;</span><span class="p">])</span>
@@ -483,8 +482,9 @@
             <span class="k">for</span> <span class="n">i_r</span><span class="p">,</span> <span class="n">region_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">region_vals</span><span class="p">):</span>
                 <span class="k">for</span> <span class="n">i_l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_lead</span><span class="p">):</span>
                     <span class="n">raw_ts</span> <span class="o">=</span> <span class="n">valid_at_np</span><span class="p">[</span><span class="n">i_f</span><span class="p">,</span> <span class="n">i_r</span><span class="p">,</span> <span class="n">i_l</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="n">raw_ts</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="n">raw_ts</span><span class="p">,</span> <span class="s1">&#39;__class__&#39;</span><span class="p">)</span> <span class="ow">and</span>
-                                          <span class="n">raw_ts</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;NaTType&#39;</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">raw_ts</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="p">(</span>
+                        <span class="nb">hasattr</span><span class="p">(</span><span class="n">raw_ts</span><span class="p">,</span> <span class="s2">&quot;__class__&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">raw_ts</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;NaTType&quot;</span>
+                    <span class="p">):</span>
                         <span class="k">continue</span>
                     <span class="n">day</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">raw_ts</span><span class="p">)</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="s2">&quot;D&quot;</span><span class="p">)</span>
                     <span class="n">val_dict</span> <span class="o">=</span> <span class="n">obs_lookup</span><span class="o">.</span><span class="n">get</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">region_id</span><span class="p">),</span> <span class="n">day</span><span class="p">))</span>
@@ -560,7 +560,7 @@
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-Drought Forecast Eval, version: dev-cbb9cfb</div>
+Drought Forecast Eval, version: dev-ecb28d6</div>
       
         <div class="footer-item"><p class="last-updated">
   Last updated on 20.05.2026.

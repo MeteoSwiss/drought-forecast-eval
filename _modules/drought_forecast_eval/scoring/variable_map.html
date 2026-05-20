@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=a7a76f23"></script>
+    <script src="../../../_static/documentation_options.js?v=8eb447cf"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/drought_forecast_eval/scoring/variable_map';</script>
@@ -395,8 +395,8 @@
 <span class="k">class</span><span class="w"> </span><span class="nc">VariableEntry</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Type definition for a single VARIABLE_MAP entry.&quot;&quot;&quot;</span>
 
-    <span class="n">obs</span><span class="p">:</span> <span class="nb">str</span>              <span class="c1"># observation column name in the merged dataset</span>
-    <span class="n">fcst</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>       <span class="c1"># forecast column name(s) in the merged dataset</span>
+    <span class="n">obs</span><span class="p">:</span> <span class="nb">str</span>  <span class="c1"># observation column name in the merged dataset</span>
+    <span class="n">fcst</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>  <span class="c1"># forecast column name(s) in the merged dataset</span>
     <span class="n">mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;deterministic&quot;</span><span class="p">,</span> <span class="s2">&quot;quantile&quot;</span><span class="p">]</span></div>
 
 
@@ -500,10 +500,19 @@
 <span class="c1"># Convenience groupings for the ``variables`` argument of ``compute_scores``</span>
 <span class="n">VARIABLE_GROUPS</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;precipitation&quot;</span><span class="p">:</span> <span class="p">[</span>
-        <span class="s2">&quot;precip_sum_1m&quot;</span><span class="p">,</span> <span class="s2">&quot;precip_sum_3m&quot;</span><span class="p">,</span> <span class="s2">&quot;precip_sum_6m&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;precip_sum_12m&quot;</span><span class="p">,</span> <span class="s2">&quot;precip_sum_24m&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;spi_1m&quot;</span><span class="p">,</span> <span class="s2">&quot;spi_3m&quot;</span><span class="p">,</span> <span class="s2">&quot;spi_6m&quot;</span><span class="p">,</span> <span class="s2">&quot;spi_12m&quot;</span><span class="p">,</span> <span class="s2">&quot;spi_24m&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;precip_1m_index&quot;</span><span class="p">,</span> <span class="s2">&quot;precip_3m_index&quot;</span><span class="p">,</span> <span class="s2">&quot;precip_24m_index&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;precip_sum_1m&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;precip_sum_3m&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;precip_sum_6m&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;precip_sum_12m&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;precip_sum_24m&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;spi_1m&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;spi_3m&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;spi_6m&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;spi_12m&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;spi_24m&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;precip_1m_index&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;precip_3m_index&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;precip_24m_index&quot;</span><span class="p">,</span>
     <span class="p">],</span>
     <span class="s2">&quot;streamflow&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;hydro_index&quot;</span><span class="p">],</span>
     <span class="s2">&quot;soil_moisture&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;soil_moisture_ufc&quot;</span><span class="p">,</span> <span class="s2">&quot;soil_moisture_index&quot;</span><span class="p">],</span>
@@ -548,7 +557,7 @@
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-Drought Forecast Eval, version: dev-cbb9cfb</div>
+Drought Forecast Eval, version: dev-ecb28d6</div>
       
         <div class="footer-item"><p class="last-updated">
   Last updated on 20.05.2026.

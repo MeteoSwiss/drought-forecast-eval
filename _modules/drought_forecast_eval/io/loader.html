@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=a7a76f23"></script>
+    <script src="../../../_static/documentation_options.js?v=8eb447cf"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/drought_forecast_eval/io/loader';</script>
@@ -415,6 +415,7 @@
 <span class="c1"># Internal helpers</span>
 <span class="c1"># ---------------------------------------------------------------------------</span>
 
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_read_csv_from_zip</span><span class="p">(</span><span class="n">zf</span><span class="p">:</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">,</span> <span class="n">csv_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Read a named CSV from an open ZipFile, stripping comment lines.</span>
 
@@ -460,6 +461,7 @@
 <span class="c1"># ---------------------------------------------------------------------------</span>
 <span class="c1"># load_forecasts</span>
 <span class="c1"># ---------------------------------------------------------------------------</span>
+
 
 <div class="viewcode-block" id="load_forecasts">
 <a class="viewcode-back" href="../../../autoapi/drought_forecast_eval/io/loader/index.html#drought_forecast_eval.load_forecasts">[docs]</a>
@@ -525,9 +527,7 @@
         <span class="n">frames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">frames</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-            <span class="s2">&quot;All ZIP files failed to load. Errors:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;All ZIP files failed to load. Errors:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">errors</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2"> ZIP(s) had errors and were skipped.&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">errors</span><span class="p">))</span>
@@ -551,8 +551,7 @@
             <span class="n">header_frt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">header_date</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">.%m.%Y&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">header_frt</span><span class="o">.</span><span class="n">date</span><span class="p">()</span> <span class="o">!=</span> <span class="n">frt</span><span class="o">.</span><span class="n">date</span><span class="p">():</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: filename date (</span><span class="si">%s</span><span class="s2">) differs from header date (</span><span class="si">%s</span><span class="s2">); &quot;</span>
-                    <span class="s2">&quot;using filename date.&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: filename date (</span><span class="si">%s</span><span class="s2">) differs from header date (</span><span class="si">%s</span><span class="s2">); using filename date.&quot;</span><span class="p">,</span>
                     <span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
                     <span class="n">frt</span><span class="o">.</span><span class="n">date</span><span class="p">(),</span>
                     <span class="n">header_frt</span><span class="o">.</span><span class="n">date</span><span class="p">(),</span>
@@ -574,22 +573,12 @@
     <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">index_cols</span><span class="p">)</span>
 
     <span class="c1"># Store valid_at as a coordinate variable before pivoting</span>
-    <span class="n">valid_at_map</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">index_cols</span><span class="p">)[</span><span class="s2">&quot;valid_at&quot;</span><span class="p">]</span>
-        <span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span>
-    <span class="p">)</span>
+    <span class="n">valid_at_map</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">index_cols</span><span class="p">)[</span><span class="s2">&quot;valid_at&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span>
 
     <span class="c1"># Build the dataset from all numeric forecast variables</span>
-    <span class="n">value_cols</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
-        <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="o">*</span><span class="n">index_cols</span><span class="p">,</span> <span class="s2">&quot;valid_at&quot;</span><span class="p">]</span>
-    <span class="p">]</span>
+    <span class="n">value_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="o">*</span><span class="n">index_cols</span><span class="p">,</span> <span class="s2">&quot;valid_at&quot;</span><span class="p">]]</span>
 
-    <span class="n">ds</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">df</span><span class="p">[</span><span class="n">index_cols</span> <span class="o">+</span> <span class="n">value_cols</span><span class="p">]</span>
-        <span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">index_cols</span><span class="p">)</span>
-        <span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span>
-    <span class="p">)</span>
+    <span class="n">ds</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">index_cols</span> <span class="o">+</span> <span class="n">value_cols</span><span class="p">]</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="n">index_cols</span><span class="p">)</span><span class="o">.</span><span class="n">to_xarray</span><span class="p">()</span>
     <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="o">.</span><span class="n">assign_coords</span><span class="p">(</span><span class="n">valid_at</span><span class="o">=</span><span class="n">valid_at_map</span><span class="p">)</span>
     <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;forecast_reference_time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;long_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Forecast reference time&quot;</span>
     <span class="n">ds</span><span class="p">[</span><span class="s2">&quot;lead_week&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;long_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Lead time (weeks)&quot;</span>
@@ -602,6 +591,7 @@
 <span class="c1"># ---------------------------------------------------------------------------</span>
 <span class="c1"># load_observations</span>
 <span class="c1"># ---------------------------------------------------------------------------</span>
+
 
 <div class="viewcode-block" id="load_observations">
 <a class="viewcode-back" href="../../../autoapi/drought_forecast_eval/io/loader/index.html#drought_forecast_eval.load_observations">[docs]</a>
@@ -641,10 +631,7 @@
     <span class="k">elif</span> <span class="n">historic_path</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;.csv&quot;</span><span class="p">:</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">_load_obs_from_csv</span><span class="p">(</span><span class="n">historic_path</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Unsupported file type &#39;</span><span class="si">{</span><span class="n">historic_path</span><span class="o">.</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
-            <span class="s2">&quot;Expected .zip or .csv.&quot;</span>
-        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported file type &#39;</span><span class="si">{</span><span class="n">historic_path</span><span class="o">.</span><span class="n">suffix</span><span class="si">}</span><span class="s2">&#39;. Expected .zip or .csv.&quot;</span><span class="p">)</span>
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">validate_observation</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
     <span class="c1"># Rename measured_at → valid_at for a unified time coordinate</span>
@@ -669,7 +656,9 @@
             <span class="n">csv_name</span> <span class="o">=</span> <span class="n">candidates</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="s2">&quot;Expected &#39;</span><span class="si">%s</span><span class="s2">&#39; inside </span><span class="si">%s</span><span class="s2">; using &#39;</span><span class="si">%s</span><span class="s2">&#39; as fallback.&quot;</span><span class="p">,</span>
-                <span class="n">_HISTORIC_CSV</span><span class="p">,</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">csv_name</span><span class="p">,</span>
+                <span class="n">_HISTORIC_CSV</span><span class="p">,</span>
+                <span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">csv_name</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="n">df</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_read_csv_from_zip</span><span class="p">(</span><span class="n">zf</span><span class="p">,</span> <span class="n">csv_name</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">df</span>
@@ -734,7 +723,7 @@
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-Drought Forecast Eval, version: dev-cbb9cfb</div>
+Drought Forecast Eval, version: dev-ecb28d6</div>
       
         <div class="footer-item"><p class="last-updated">
   Last updated on 20.05.2026.

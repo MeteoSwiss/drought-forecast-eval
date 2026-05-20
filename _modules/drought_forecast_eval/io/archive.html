@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=a7a76f23"></script>
+    <script src="../../../_static/documentation_options.js?v=8eb447cf"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/drought_forecast_eval/io/archive';</script>
@@ -487,9 +487,7 @@
     <span class="k">if</span> <span class="n">date_range</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">start</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">end</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_range</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">date_to_path</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">dt</span><span class="p">:</span> <span class="n">p</span> <span class="k">for</span> <span class="n">dt</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">date_to_path</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">start</span> <span class="o">&lt;=</span> <span class="n">dt</span> <span class="o">&lt;=</span> <span class="n">end</span>
-        <span class="p">}</span>
+        <span class="n">date_to_path</span> <span class="o">=</span> <span class="p">{</span><span class="n">dt</span><span class="p">:</span> <span class="n">p</span> <span class="k">for</span> <span class="n">dt</span><span class="p">,</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">date_to_path</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">start</span> <span class="o">&lt;=</span> <span class="n">dt</span> <span class="o">&lt;=</span> <span class="n">end</span><span class="p">}</span>
 
     <span class="n">entries</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">date_to_path</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
@@ -538,7 +536,7 @@
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-Drought Forecast Eval, version: dev-cbb9cfb</div>
+Drought Forecast Eval, version: dev-ecb28d6</div>
       
         <div class="footer-item"><p class="last-updated">
   Last updated on 20.05.2026.

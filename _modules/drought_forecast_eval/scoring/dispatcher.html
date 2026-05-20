@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=a7a76f23"></script>
+    <script src="../../../_static/documentation_options.js?v=8eb447cf"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/drought_forecast_eval/scoring/dispatcher';</script>
@@ -403,6 +403,7 @@
 <span class="c1"># Reduce over these dims to obtain (lead_week, drought_region_id) output</span>
 <span class="n">_REDUCE_DIMS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;forecast_reference_time&quot;</span><span class="p">]</span>
 
+
 <span class="c1"># Lazy resolver: string sentinels in the registry → actual callables</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">_resolve</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>  <span class="c1"># noqa: ANN202</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve a registry entry that may be a string sentinel.&quot;&quot;&quot;</span>
@@ -410,6 +411,7 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">entry</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="c1"># Import from skill module</span>
         <span class="kn">from</span><span class="w"> </span><span class="nn">drought_forecast_eval.scoring</span><span class="w"> </span><span class="kn">import</span> <span class="n">skill</span> <span class="k">as</span> <span class="n">_skill</span>
+
         <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">_skill</span><span class="p">,</span> <span class="n">entry</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">entry</span>
 
@@ -417,6 +419,7 @@
 <span class="c1"># ---------------------------------------------------------------------------</span>
 <span class="c1"># Public API</span>
 <span class="c1"># ---------------------------------------------------------------------------</span>
+
 
 <div class="viewcode-block" id="compute_scores">
 <a class="viewcode-back" href="../../../autoapi/drought_forecast_eval/scoring/index.html#drought_forecast_eval.compute_scores">[docs]</a>
@@ -586,6 +589,7 @@
 <span class="c1"># Internal helpers</span>
 <span class="c1"># ---------------------------------------------------------------------------</span>
 
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_variables</span><span class="p">(</span>
     <span class="n">variables</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">],</span>
     <span class="n">vmap</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
@@ -644,11 +648,14 @@
             <span class="k">if</span> <span class="n">ref_col</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">None</span>
             <span class="kn">from</span><span class="w"> </span><span class="nn">drought_forecast_eval.scoring.skill</span><span class="w"> </span><span class="kn">import</span> <span class="n">mae_skill</span>
+
             <span class="n">da</span> <span class="o">=</span> <span class="n">mae_skill</span><span class="p">(</span><span class="n">fcst_p50</span><span class="p">,</span> <span class="n">obs</span><span class="p">,</span> <span class="n">ds_ref</span><span class="p">[</span><span class="n">ref_col</span><span class="p">],</span> <span class="n">reduce_dims</span><span class="o">=</span><span class="n">_REDUCE_DIMS</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">score_name</span> <span class="o">==</span> <span class="s2">&quot;roc_auc&quot;</span><span class="p">:</span>
             <span class="kn">from</span><span class="w"> </span><span class="nn">drought_forecast_eval.scoring.skill</span><span class="w"> </span><span class="kn">import</span> <span class="n">roc_auc_xr</span>
+
             <span class="n">da</span> <span class="o">=</span> <span class="n">roc_auc_xr</span><span class="p">(</span>
-                <span class="n">obs</span><span class="p">,</span> <span class="n">fcst_p50</span><span class="p">,</span>
+                <span class="n">obs</span><span class="p">,</span>
+                <span class="n">fcst_p50</span><span class="p">,</span>
                 <span class="n">threshold</span><span class="o">=</span><span class="n">cdi_threshold</span><span class="p">,</span>
                 <span class="n">reduce_dims</span><span class="o">=</span><span class="n">_REDUCE_DIMS</span><span class="p">,</span>
             <span class="p">)</span>
@@ -676,6 +683,7 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">score_name</span> <span class="o">==</span> <span class="s2">&quot;pinball&quot;</span><span class="p">:</span>
             <span class="kn">from</span><span class="w"> </span><span class="nn">drought_forecast_eval.scoring.skill</span><span class="w"> </span><span class="kn">import</span> <span class="n">pinball_loss_xr</span>
+
             <span class="c1"># Average pinball over three quantile levels</span>
             <span class="n">pb10</span> <span class="o">=</span> <span class="n">pinball_loss_xr</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">fcst_p10</span><span class="p">,</span> <span class="mf">0.10</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">_REDUCE_DIMS</span><span class="p">)</span>
             <span class="n">pb50</span> <span class="o">=</span> <span class="n">pinball_loss_xr</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">fcst_p50</span><span class="p">,</span> <span class="mf">0.50</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">_REDUCE_DIMS</span><span class="p">)</span>
@@ -684,6 +692,7 @@
             <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;long_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var_key</span><span class="si">}</span><span class="s2"> mean pinball loss&quot;</span>
         <span class="k">elif</span> <span class="n">score_name</span> <span class="o">==</span> <span class="s2">&quot;interval_score&quot;</span><span class="p">:</span>
             <span class="kn">from</span><span class="w"> </span><span class="nn">drought_forecast_eval.scoring.skill</span><span class="w"> </span><span class="kn">import</span> <span class="n">interval_score_xr</span>
+
             <span class="n">da</span> <span class="o">=</span> <span class="n">interval_score_xr</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">fcst_p10</span><span class="p">,</span> <span class="n">fcst_p90</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">dim</span><span class="o">=</span><span class="n">_REDUCE_DIMS</span><span class="p">)</span>
             <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;long_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var_key</span><span class="si">}</span><span class="s2"> interval score (80%)&quot;</span>
         <span class="k">elif</span> <span class="n">score_name</span> <span class="o">==</span> <span class="s2">&quot;rpss&quot;</span><span class="p">:</span>
@@ -697,14 +706,21 @@
                     <span class="k">return</span> <span class="kc">None</span>
                 <span class="n">ref_p</span> <span class="o">=</span> <span class="n">ds_ref</span><span class="p">[</span><span class="n">ref_p50_col</span><span class="p">]</span>
                 <span class="kn">from</span><span class="w"> </span><span class="nn">drought_forecast_eval.scoring.skill</span><span class="w"> </span><span class="kn">import</span> <span class="n">rpss</span>
-                <span class="n">da</span> <span class="o">=</span> <span class="n">rpss</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">fcst_p10</span><span class="p">,</span> <span class="n">fcst_p50</span><span class="p">,</span> <span class="n">fcst_p90</span><span class="p">,</span> <span class="n">ref_p</span><span class="p">,</span> <span class="n">ref_p</span><span class="p">,</span> <span class="n">ref_p</span><span class="p">,</span>
-                          <span class="n">reduce_dims</span><span class="o">=</span><span class="n">_REDUCE_DIMS</span><span class="p">)</span>
+
+                <span class="n">da</span> <span class="o">=</span> <span class="n">rpss</span><span class="p">(</span>
+                    <span class="n">obs</span><span class="p">,</span> <span class="n">fcst_p10</span><span class="p">,</span> <span class="n">fcst_p50</span><span class="p">,</span> <span class="n">fcst_p90</span><span class="p">,</span> <span class="n">ref_p</span><span class="p">,</span> <span class="n">ref_p</span><span class="p">,</span> <span class="n">ref_p</span><span class="p">,</span> <span class="n">reduce_dims</span><span class="o">=</span><span class="n">_REDUCE_DIMS</span>
+                <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="kn">from</span><span class="w"> </span><span class="nn">drought_forecast_eval.scoring.skill</span><span class="w"> </span><span class="kn">import</span> <span class="n">rpss</span>
+
                 <span class="n">da</span> <span class="o">=</span> <span class="n">rpss</span><span class="p">(</span>
                     <span class="n">obs</span><span class="p">,</span>
-                    <span class="n">fcst_p10</span><span class="p">,</span> <span class="n">fcst_p50</span><span class="p">,</span> <span class="n">fcst_p90</span><span class="p">,</span>
-                    <span class="n">ds_ref</span><span class="p">[</span><span class="n">ref_p10_col</span><span class="p">],</span> <span class="n">ds_ref</span><span class="p">[</span><span class="n">ref_p50_col</span><span class="p">],</span> <span class="n">ds_ref</span><span class="p">[</span><span class="n">ref_p90_col</span><span class="p">],</span>
+                    <span class="n">fcst_p10</span><span class="p">,</span>
+                    <span class="n">fcst_p50</span><span class="p">,</span>
+                    <span class="n">fcst_p90</span><span class="p">,</span>
+                    <span class="n">ds_ref</span><span class="p">[</span><span class="n">ref_p10_col</span><span class="p">],</span>
+                    <span class="n">ds_ref</span><span class="p">[</span><span class="n">ref_p50_col</span><span class="p">],</span>
+                    <span class="n">ds_ref</span><span class="p">[</span><span class="n">ref_p90_col</span><span class="p">],</span>
                     <span class="n">reduce_dims</span><span class="o">=</span><span class="n">_REDUCE_DIMS</span><span class="p">,</span>
                 <span class="p">)</span>
             <span class="n">da</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;long_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var_key</span><span class="si">}</span><span class="s2"> RPSS&quot;</span>
@@ -772,7 +788,7 @@
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-Drought Forecast Eval, version: dev-cbb9cfb</div>
+Drought Forecast Eval, version: dev-ecb28d6</div>
       
         <div class="footer-item"><p class="last-updated">
   Last updated on 20.05.2026.

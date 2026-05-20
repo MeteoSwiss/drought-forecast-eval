@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=a7a76f23"></script>
+    <script src="../../../_static/documentation_options.js?v=8eb447cf"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/drought_forecast_eval/scoring/skill';</script>
@@ -406,6 +406,7 @@
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">import</span><span class="w"> </span><span class="nn">scores.continuous</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">_scores_cont</span>
+
     <span class="n">_SCORES_AVAILABLE</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
     <span class="n">_SCORES_AVAILABLE</span> <span class="o">=</span> <span class="kc">False</span>
@@ -414,6 +415,7 @@
 <span class="c1"># ---------------------------------------------------------------------------</span>
 <span class="c1"># MAE skill score</span>
 <span class="c1"># ---------------------------------------------------------------------------</span>
+
 
 <div class="viewcode-block" id="mae_skill">
 <a class="viewcode-back" href="../../../autoapi/drought_forecast_eval/scoring/skill/index.html#drought_forecast_eval.scoring.skill.mae_skill">[docs]</a>
@@ -468,6 +470,7 @@
 <span class="c1"># ---------------------------------------------------------------------------</span>
 <span class="c1"># RPS / RPSS</span>
 <span class="c1"># ---------------------------------------------------------------------------</span>
+
 
 <div class="viewcode-block" id="rps_from_quantiles">
 <a class="viewcode-back" href="../../../autoapi/drought_forecast_eval/scoring/skill/index.html#drought_forecast_eval.scoring.skill.rps_from_quantiles">[docs]</a>
@@ -549,15 +552,20 @@
     <span class="c1"># Extend anchors: [−∞→0, p10→0.10, p50→0.50, p90→0.90, +∞→1]</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span>
         <span class="n">threshold</span><span class="p">,</span>
-        <span class="n">xp</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">float</span><span class="p">(</span><span class="n">p10_vals</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="mf">1e6</span><span class="p">,</span>
-                     <span class="nb">float</span><span class="p">(</span><span class="n">p10_vals</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
-                     <span class="nb">float</span><span class="p">(</span>  <span class="c1"># noqa: E501</span>
-                         <span class="n">fcst_quantiles</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">quantile_level</span><span class="o">=</span><span class="mf">0.50</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                     <span class="p">),</span>
-                     <span class="nb">float</span><span class="p">(</span><span class="n">p90_vals</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
-                     <span class="nb">float</span><span class="p">(</span><span class="n">p90_vals</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="mf">1e6</span><span class="p">]),</span>
+        <span class="n">xp</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">p10_vals</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="mf">1e6</span><span class="p">,</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">p10_vals</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                <span class="nb">float</span><span class="p">(</span>  <span class="c1"># noqa: E501</span>
+                    <span class="n">fcst_quantiles</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">quantile_level</span><span class="o">=</span><span class="mf">0.50</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;nearest&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="p">),</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">p90_vals</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">p90_vals</span><span class="o">.</span><span class="n">flat</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="mf">1e6</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">),</span>
         <span class="n">fp</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.10</span><span class="p">,</span> <span class="mf">0.50</span><span class="p">,</span> <span class="mf">0.90</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]),</span>
-        <span class="n">left</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+        <span class="n">left</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">right</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
     <span class="p">)</span>
     <span class="c1"># This scalar result needs to be broadcast; for DataArray inputs build a</span>
     <span class="c1"># same-shaped array</span>
@@ -619,6 +627,7 @@
 <span class="c1"># Interval score</span>
 <span class="c1"># ---------------------------------------------------------------------------</span>
 
+
 <div class="viewcode-block" id="interval_score_xr">
 <a class="viewcode-back" href="../../../autoapi/drought_forecast_eval/scoring/skill/index.html#drought_forecast_eval.scoring.skill.interval_score_xr">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">interval_score_xr</span><span class="p">(</span>
@@ -662,6 +671,7 @@
 <span class="c1"># Pinball loss</span>
 <span class="c1"># ---------------------------------------------------------------------------</span>
 
+
 <div class="viewcode-block" id="pinball_loss_xr">
 <a class="viewcode-back" href="../../../autoapi/drought_forecast_eval/scoring/skill/index.html#drought_forecast_eval.scoring.skill.pinball_loss_xr">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">pinball_loss_xr</span><span class="p">(</span>
@@ -698,6 +708,7 @@
 <span class="c1"># ---------------------------------------------------------------------------</span>
 <span class="c1"># ROC-AUC (binary event)</span>
 <span class="c1"># ---------------------------------------------------------------------------</span>
+
 
 <div class="viewcode-block" id="roc_auc_xr">
 <a class="viewcode-back" href="../../../autoapi/drought_forecast_eval/scoring/skill/index.html#drought_forecast_eval.scoring.skill.roc_auc_xr">[docs]</a>
@@ -813,7 +824,7 @@
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-Drought Forecast Eval, version: dev-cbb9cfb</div>
+Drought Forecast Eval, version: dev-ecb28d6</div>
       
         <div class="footer-item"><p class="last-updated">
   Last updated on 20.05.2026.

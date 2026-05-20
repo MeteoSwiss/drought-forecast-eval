@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=a7a76f23"></script>
+    <script src="../../../_static/documentation_options.js?v=8eb447cf"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/drought_forecast_eval/visualization/region_map';</script>
@@ -450,8 +450,7 @@
 
     <span class="k">if</span> <span class="n">score_variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ds_scores</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">score_variable</span><span class="si">}</span><span class="s2">&#39; not found in ds_scores. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Available: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">ds_scores</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">score_variable</span><span class="si">}</span><span class="s2">&#39; not found in ds_scores. Available: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">ds_scores</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
     <span class="n">da</span> <span class="o">=</span> <span class="n">ds_scores</span><span class="p">[</span><span class="n">score_variable</span><span class="p">]</span>
@@ -489,6 +488,7 @@
 <span class="c1"># ---------------------------------------------------------------------------</span>
 <span class="c1"># Choropleth (geopandas path)</span>
 <span class="c1"># ---------------------------------------------------------------------------</span>
+
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_try_geopandas</span><span class="p">(</span><span class="n">shapefile_path</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Path</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return True if geopandas is available and the shapefile exists.&quot;&quot;&quot;</span>
@@ -588,6 +588,7 @@
 <span class="c1"># Bar chart fallback</span>
 <span class="c1"># ---------------------------------------------------------------------------</span>
 
+
 <span class="k">def</span><span class="w"> </span><span class="nf">_plot_bar_fallback</span><span class="p">(</span>
     <span class="n">da</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">,</span>
     <span class="n">lead_weeks</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
@@ -664,7 +665,7 @@
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-Drought Forecast Eval, version: dev-cbb9cfb</div>
+Drought Forecast Eval, version: dev-ecb28d6</div>
       
         <div class="footer-item"><p class="last-updated">
   Last updated on 20.05.2026.
