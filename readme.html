@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>&lt;no title&gt; &#8212; Drought Forecast Eval</title>
+    <title>drought-forecast-eval &#8212; Drought Forecast Eval</title>
   
   
   
@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="_static/documentation_options.js?v=823515f2"></script>
+    <script src="_static/documentation_options.js?v=b645e8ce"></script>
     <script src="_static/doctools.js?v=9bcbadda"></script>
     <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'readme';</script>
@@ -143,7 +143,7 @@
     
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="#">
-    <no title>
+    drought-forecast-eval
   </a>
 </li>
 
@@ -256,7 +256,7 @@
     
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="#">
-    <no title>
+    drought-forecast-eval
   </a>
 </li>
 
@@ -351,7 +351,7 @@
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">&lt;no title&gt;</span></li>
+    <li class="breadcrumb-item active" aria-current="page"><span class="ellipsis">drought-forecast-eval</span></li>
   </ul>
 </nav>
 </div>
@@ -368,37 +368,50 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <p># drought-forecast-eval</p>
+  <section id="drought-forecast-eval">
+<h1>drought-forecast-eval<a class="headerlink" href="#drought-forecast-eval" title="Link to this heading">#</a></h1>
+<a class="reference external image-reference" href="https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/github-code-scanning/codeql"><img alt="https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/github-code-scanning/codeql/badge.svg" src="https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/github-code-scanning/codeql/badge.svg" />
+</a>
+<a class="reference external image-reference" href="https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/CI_test.yaml"><img alt="https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/CI_test.yaml/badge.svg" src="https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/CI_test.yaml/badge.svg" />
+</a>
+<a class="reference external image-reference" href="https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/CI_publish_dev_documentation.yaml"><img alt="https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/CI_publish_dev_documentation.yaml/badge.svg" src="https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/CI_publish_dev_documentation.yaml/badge.svg" />
+</a>
 <p><strong>Verification and evaluation library for Swiss drought forecasts.</strong></p>
 <p>Quantifies the quality of operational drought forecasts issued by the Swiss
-drought monitoring system ([drought.admin.ch](<a class="reference external" href="https://drought.admin.ch">https://drought.admin.ch</a>)) across
+drought monitoring system (<a class="reference external" href="https://drought.admin.ch">drought.admin.ch</a>) across
 the 38 official drought warning regions, for all forecast variables (SPI,
 precipitation, streamflow, soil moisture, CDI) and all lead times (week 0–3).</p>
-<p>—</p>
-<p>## Features</p>
+<hr class="docutils" />
+<section id="features">
+<h2>Features<a class="headerlink" href="#features" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p><strong>Data loading</strong> — parse flat archives of daily BGDI ZIP dumps into <cite>xr.Dataset</cite></p></li>
+<li><p><strong>Data loading</strong> — parse flat archives of daily BGDI ZIP dumps into <code class="docutils literal notranslate"><span class="pre">xr.Dataset</span></code></p></li>
 <li><p><strong>Observation loading</strong> — read the full historic observation archive</p></li>
-<li><p><strong>Alignment</strong> — merge forecast and observation grids on <cite>(region, valid_at)</cite></p></li>
+<li><p><strong>Alignment</strong> — merge forecast and observation grids on <code class="docutils literal notranslate"><span class="pre">(region,</span> <span class="pre">valid_at)</span></code></p></li>
 <li><p><strong>Reference forecasts</strong> — climatology (week-of-year ± window) and persistence</p></li>
 <li><p><strong>Scoring</strong> — MAE, RMSE, Bias, Correlation, Pinball loss, Interval score, RPSS, ROC-AUC</p></li>
-<li><p><strong>Extensible registry</strong> — add custom metrics with <cite>register_score()</cite></p></li>
+<li><p><strong>Extensible registry</strong> — add custom metrics with <code class="docutils literal notranslate"><span class="pre">register_score()</span></code></p></li>
 <li><p><strong>Visualisation</strong> — skill-vs-lead curves, 4-panel regional maps, experiment diffs</p></li>
 <li><p><strong>Report generation</strong> — HTML report with embedded plots, CSV/NetCDF export</p></li>
 <li><p><strong>Experiment comparison</strong> — compare two time periods or data sources side-by-side</p></li>
 </ul>
-<p>—</p>
-<p>## Quick start</p>
-<p><code class="docutils literal notranslate"><span class="pre">`bash</span>
-<span class="pre">poetry</span> <span class="pre">install</span> <span class="pre">--with</span> <span class="pre">dev,report,notebook</span>
-<span class="pre">`</span></code></p>
-<p><a href="#id1"><span class="problematic" id="id2">``</span></a><a href="#id3"><span class="problematic" id="id4">`</span></a>python
-from drought_forecast_eval import (</p>
-<blockquote>
-<div><p>load_forecasts, load_observations,
+</section>
+<hr class="docutils" />
+<section id="quick-start">
+<h2>Quick start<a class="headerlink" href="#quick-start" title="Link to this heading">#</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+<p>poetry install –with dev,report,notebook</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+<dl class="simple">
+<dt>from drought_forecast_eval import (</dt><dd><p>load_forecasts, load_observations,
 align_obs_to_forecast, climatology_reference,
 compute_scores, ReportBuilder,</p>
-</div></blockquote>
+</dd>
+</dl>
 <p>)</p>
 <p># Load data
 ds_fcst = load_forecasts(“/data/zips”, date_range=(“2025-01-01”, “2025-12-31”))
@@ -418,129 +431,156 @@ output_dir=”./output”,</p>
 </div></blockquote>
 <p>)
 builder.run()   # → output/scores.nc, output/report.html, output/scores_summary.csv
-<a href="#id5"><span class="problematic" id="id6">``</span></a><a href="#id7"><span class="problematic" id="id8">`</span></a></p>
-<p>—</p>
-<p>## CLI</p>
-<p>After installation the <cite>drought-eval</cite> command is available via the Poetry
+—-</p>
+</section>
+<section id="cli">
+<h2>CLI<a class="headerlink" href="#cli" title="Link to this heading">#</a></h2>
+<p>After installation the <code class="docutils literal notranslate"><span class="pre">drought-eval</span></code> command is available via the Poetry
 environment.</p>
-<p><a href="#id9"><span class="problematic" id="id10">``</span></a><a href="#id11"><span class="problematic" id="id12">`</span></a>bash
-# Run with all defaults — uses every ZIP in data/zipfiles/
-poetry run drought-eval</p>
-<p># Restrict to a specific date window
-poetry run drought-eval –start 2025-07-04 –end 2025-12-31</p>
-<p># Persistence reference, only SPI variables, MAE + RPSS
-poetry run drought-eval </p>
-<blockquote>
-<div><p>–reference persistence –variables spi_1m,spi_3m,spi_6m –scores mae,rpss</p>
-</div></blockquote>
-<p># Full run including an HTML report (requires: poetry install –with report)
-poetry run drought-eval –html</p>
-<p># Custom archive and output directory, with verbose logging
-poetry run drought-eval </p>
-<blockquote>
-<div><p>–archive-dir /data/zipfiles –output-dir  /results/2025 –verbose</p>
-</div></blockquote>
-<p><a href="#id13"><span class="problematic" id="id14">``</span></a><a href="#id15"><span class="problematic" id="id16">`</span></a></p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># Run with all defaults — uses every ZIP in data/zipfiles/</span>
+poetry<span class="w"> </span>run<span class="w"> </span>drought-eval
+
+<span class="c1"># Restrict to a specific date window</span>
+poetry<span class="w"> </span>run<span class="w"> </span>drought-eval<span class="w"> </span>--start<span class="w"> </span><span class="m">2025</span>-07-04<span class="w"> </span>--end<span class="w"> </span><span class="m">2025</span>-12-31
+
+<span class="c1"># Persistence reference, only SPI variables, MAE + RPSS</span>
+poetry<span class="w"> </span>run<span class="w"> </span>drought-eval<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--reference<span class="w"> </span>persistence<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--variables<span class="w"> </span>spi_1m,spi_3m,spi_6m<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--scores<span class="w"> </span>mae,rpss
+
+<span class="c1"># Full run including an HTML report (requires: poetry install --with report)</span>
+poetry<span class="w"> </span>run<span class="w"> </span>drought-eval<span class="w"> </span>--html
+
+<span class="c1"># Custom archive and output directory, with verbose logging</span>
+poetry<span class="w"> </span>run<span class="w"> </span>drought-eval<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--archive-dir<span class="w"> </span>/data/zipfiles<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--output-dir<span class="w">  </span>/results/2025<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--verbose
+</pre></div>
+</div>
 <p>Full option reference:</p>
-<p><a href="#id17"><span class="problematic" id="id18">``</span></a>`
-Options:</p>
-<blockquote>
-<div><dl class="option-list">
-<dt><kbd><span class="option">--archive-dir</span></kbd></dt>
-<dd><p>DIRECTORY        Flat directory of daily forecast ZIPs.
-[default: data/zipfiles]</p>
-</dd>
-<dt><kbd><span class="option">--historic-path <var>FILE</var></span></kbd></dt>
-<dd><p>Historic observations ZIP from BGDI.
-[default: data/historic/trockenheitsdaten-
-numerisch_historic.csv.zip]</p>
-</dd>
-<dt><kbd><span class="option">--output-dir</span></kbd></dt>
-<dd><p>DIRECTORY        Directory for scores .nc and summary .csv.
-[default: output]</p>
-</dd>
-<dt><kbd><span class="option">--start</span></kbd></dt>
-<dd><p>YYYY-MM-DD        Start date (inclusive).</p>
-</dd>
-<dt><kbd><span class="option">--end</span></kbd></dt>
-<dd><p>YYYY-MM-DD        End date (inclusive).</p>
-</dd>
-<dt><kbd><span class="option">--reference</span></kbd></dt>
-<dd><p>[climatology|persistence|both]
-Reference forecast strategy.
-[default: climatology]</p>
-</dd>
-<dt><kbd><span class="option">--variables</span></kbd></dt>
-<dd><p>TEXT              ‘all’, a group (cdi/spi/precip), or
-comma-separated variable keys.</p>
-</dd>
-<dt><kbd><span class="option">--scores</span></kbd></dt>
-<dd><p>TEXT              ‘default’ or comma-separated metric names.</p>
-</dd>
-<dt><kbd><span class="option">--html</span></kbd></dt>
-<dd><p>Render an HTML report to OUTPUT_DIR/report.html
-(requires poetry install –with report).</p>
-</dd>
-<dt><kbd><span class="option">-v</span>, <span class="option">--verbose</span></kbd></dt>
-<dd><p>Enable DEBUG logging.</p>
-</dd>
-<dt><kbd><span class="option">--help</span></kbd></dt>
-<dd><p>Show this message and exit.</p>
-</dd>
-</dl>
-</div></blockquote>
-<p><a href="#id19"><span class="problematic" id="id20">``</span></a><a href="#id21"><span class="problematic" id="id22">`</span></a></p>
-<p>—</p>
-<p>## Installation</p>
-<div class="line-block">
-<div class="line">Use case | Command |</div>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Options:
+  --archive-dir  DIRECTORY        Flat directory of daily forecast ZIPs.
+                                  [default: data/zipfiles]
+  --historic-path FILE            Historic observations ZIP from BGDI.
+                                  [default: data/historic/trockenheitsdaten-
+                                  numerisch_historic.csv.zip]
+  --output-dir   DIRECTORY        Directory for scores .nc and summary .csv.
+                                  [default: output]
+  --start       YYYY-MM-DD        Start date (inclusive).
+  --end         YYYY-MM-DD        End date (inclusive).
+  --reference   [climatology|persistence|both]
+                                  Reference forecast strategy.
+                                  [default: climatology]
+  --variables   TEXT              &#39;all&#39;, a group (cdi/spi/precip), or
+                                  comma-separated variable keys.
+  --scores      TEXT              &#39;default&#39; or comma-separated metric names.
+  --html                          Render an HTML report to OUTPUT_DIR/report.html
+                                  (requires poetry install --with report).
+  -v, --verbose                   Enable DEBUG logging.
+  --help                          Show this message and exit.
+</pre></div>
 </div>
-<p><a href="#id25"><span class="problematic" id="id26">|----------|</span></a>———|
-| Core library | <cite>poetry install</cite> |
-| + HTML reports | <cite>poetry install –with report</cite> |
-| + Jupyter notebook | <cite>poetry install –with notebook</cite> |
-| Everything | <cite>poetry install –with dev,report,notebook</cite> |</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<colgroup>
+<col style="width: 40.0%" />
+<col style="width: 60.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Use case</p></th>
+<th class="head"><p>Command</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Core library</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">install</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>+ HTML reports</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">install</span> <span class="pre">--with</span> <span class="pre">report</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>+ Jupyter notebook</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">install</span> <span class="pre">--with</span> <span class="pre">notebook</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Everything</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">install</span> <span class="pre">--with</span> <span class="pre">dev,report,notebook</span></code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <p>Python ≥ 3.11 required.</p>
-<p>—</p>
-<p>## Project layout</p>
-<p><code class="docutils literal notranslate"><span class="pre">`</span>
-<span class="pre">drought_forecast_eval/</span>
-<span class="pre">├──</span> <span class="pre">io/</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">#</span> <span class="pre">archive</span> <span class="pre">scanning,</span> <span class="pre">ZIP</span> <span class="pre">loading,</span> <span class="pre">schema</span> <span class="pre">validation,</span> <span class="pre">downloader</span>
-<span class="pre">├──</span> <span class="pre">processing/</span>&#160;&#160;&#160; <span class="pre">#</span> <span class="pre">lead-time</span> <span class="pre">computation,</span> <span class="pre">obs/fcst</span> <span class="pre">alignment,</span> <span class="pre">reference</span> <span class="pre">forecasts</span>
-<span class="pre">├──</span> <span class="pre">scoring/</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">#</span> <span class="pre">variable</span> <span class="pre">map,</span> <span class="pre">score</span> <span class="pre">registry,</span> <span class="pre">dispatcher,</span> <span class="pre">skill</span> <span class="pre">functions</span>
-<span class="pre">├──</span> <span class="pre">visualization/</span> <span class="pre">#</span> <span class="pre">skill</span> <span class="pre">curves,</span> <span class="pre">regional</span> <span class="pre">maps,</span> <span class="pre">experiment</span> <span class="pre">comparisons</span>
-<span class="pre">├──</span> <span class="pre">report/</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">#</span> <span class="pre">ReportBuilder</span> <span class="pre">+</span> <span class="pre">Jinja2</span> <span class="pre">HTML</span> <span class="pre">template</span>
-<span class="pre">└──</span> <span class="pre">config/</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">#</span> <span class="pre">defaults</span> <span class="pre">and</span> <span class="pre">constants</span>
-<span class="pre">notebooks/</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">#</span> <span class="pre">template_verification.ipynb</span>
-<span class="pre">tests/</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">#</span> <span class="pre">pytest</span> <span class="pre">suite</span> <span class="pre">with</span> <span class="pre">synthetic</span> <span class="pre">fixtures</span>
-<span class="pre">docs/</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">#</span> <span class="pre">data_access.md,</span> <span class="pre">methodology.md,</span> <span class="pre">reproducibility.md</span>
-<span class="pre">`</span></code></p>
-<p>—</p>
-<p>## Variables and scoring modes</p>
-<div class="line-block">
-<div class="line">Variable group | Mode | Metrics |</div>
+</section>
+<hr class="docutils" />
+<section id="project-layout">
+<h2>Project layout<a class="headerlink" href="#project-layout" title="Link to this heading">#</a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
 </div>
-<p><a href="#id27"><span class="problematic" id="id28">|----------------|</span></a>——<a href="#id29"><span class="problematic" id="id30">|---------|</span></a>
-| CDI, hydro/soil/precip indices | Deterministic | MAE, RMSE, Bias, Correlation, MAE-Skill, ROC-AUC |
-| SPI-1/3/6/12/24, precip sums, soil_moisture_ufc | Quantile (p10/p50/p90) | + Pinball loss, Interval score, RPSS |</p>
-<p>—</p>
-<p>## Documentation</p>
+<p>drought_forecast_eval/
+├── io/            # archive scanning, ZIP loading, schema validation, downloader
+├── processing/    # lead-time computation, obs/fcst alignment, reference forecasts
+├── scoring/       # variable map, score registry, dispatcher, skill functions
+├── visualization/ # skill curves, regional maps, experiment comparisons
+├── report/        # ReportBuilder + Jinja2 HTML template
+└── config/        # defaults and constants
+notebooks/         # template_verification.ipynb
+tests/             # pytest suite with synthetic fixtures
+docs/              # data_access.md, methodology.md, reproducibility.md
+—-</p>
+</section>
+<section id="variables-and-scoring-modes">
+<h2>Variables and scoring modes<a class="headerlink" href="#variables-and-scoring-modes" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<colgroup>
+<col style="width: 40.0%" />
+<col style="width: 20.0%" />
+<col style="width: 40.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Variable group</p></th>
+<th class="head"><p>Mode</p></th>
+<th class="head"><p>Metrics</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>CDI, hydro/soil/precip indices</p></td>
+<td><p>Deterministic</p></td>
+<td><p>MAE, RMSE, Bias, Correlation, MAE-Skill, ROC-AUC</p></td>
+</tr>
+<tr class="row-odd"><td><p>SPI-1/3/6/12/24, precip sums, soil_moisture_ufc</p></td>
+<td><p>Quantile (p10/p50/p90)</p></td>
+<td><p>+ Pinball loss, Interval score, RPSS</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<hr class="docutils" />
+<section id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Link to this heading">#</a></h2>
 <ul class="simple">
-<li><p>[Data access](docs/data_access.md) — BGDI URLs, download scripts, CSV column reference</p></li>
-<li><p>[Methodology](docs/methodology.md) — scoring formulas, RPS approximation, skill score convention</p></li>
-<li><p>[Reproducibility](docs/reproducibility.md) — environment setup, pinning, error handling, custom experiments</p></li>
+<li><p><a class="reference external" href="docs/data_access.md">Data access</a> — BGDI URLs, download scripts, CSV column reference</p></li>
+<li><p><a class="reference external" href="docs/methodology.md">Methodology</a> — scoring formulas, RPS approximation, skill score convention</p></li>
+<li><p><a class="reference external" href="docs/reproducibility.md">Reproducibility</a> — environment setup, pinning, error handling, custom experiments</p></li>
 </ul>
-<p>—</p>
-<p>## Contributing</p>
-<p>See [CONTRIBUTING.md](CONTRIBUTING.md).</p>
-<p>—</p>
-<p>## License</p>
+</section>
+<hr class="docutils" />
+<section id="contributing">
+<h2>Contributing<a class="headerlink" href="#contributing" title="Link to this heading">#</a></h2>
+<p>See <a class="reference external" href="CONTRIBUTING.md">CONTRIBUTING.md</a>.</p>
+</section>
+<hr class="docutils" />
+<section id="license">
+<h2>License<a class="headerlink" href="#license" title="Link to this heading">#</a></h2>
 <p>MIT — see LICENSE.</p>
-<p>## Citation</p>
-<p>If you use this library in a publication, please cite the <cite>scores</cite> library it depends on:</p>
-<p>&gt; Leeuwenburg et al. (2024). scores: A Python package for verifying and evaluating models
-&gt; and predictions with xarray. <a href="#id23"><span class="problematic" id="id24">*</span></a>Journal of Open Source Software, 9*(99), 6889.
-&gt; <a class="reference external" href="https://doi.org/10.21105/joss.06889">https://doi.org/10.21105/joss.06889</a></p>
+<p>If you use this library in a publication, please cite the <code class="docutils literal notranslate"><span class="pre">scores</span></code> library it depends on:</p>
+<blockquote>
+<div><p>Leeuwenburg et al. (2024). scores: A Python package for verifying and evaluating models
+and predictions with xarray. <em>Journal of Open Source Software, 9</em>(99), 6889.
+<a class="reference external" href="https://doi.org/10.21105/joss.06889">https://doi.org/10.21105/joss.06889</a></p>
+</div></blockquote>
+</section>
+</section>
 
 
                 </article>
@@ -588,9 +628,16 @@ comma-separated variable keys.</p>
     <i class="fa-solid fa-list"></i> On this page
   </div>
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="simple visible nav section-nav flex-column">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#features">Features</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#quick-start">Quick start</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#cli">CLI</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#project-layout">Project layout</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#variables-and-scoring-modes">Variables and scoring modes</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#documentation">Documentation</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#contributing">Contributing</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#license">License</a></li>
 </ul>
-
   </nav></div>
 
 </div></div>
@@ -615,7 +662,7 @@ comma-separated variable keys.</p>
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-Drought Forecast Eval, version: dev-4ecb38a</div>
+Drought Forecast Eval, version: dev-0fae97e</div>
       
         <div class="footer-item"><p class="last-updated">
   Last updated on 20.05.2026.
