@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=059572ed"></script>
+    <script src="../../../_static/documentation_options.js?v=a7a76f23"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/drought_forecast_eval/visualization/experiment_comparison';</script>
@@ -461,7 +461,9 @@
         <span class="c1"># Difference panel (B − A)</span>
         <span class="k">if</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="n">ds_scores_a</span> <span class="ow">and</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="n">ds_scores_b</span><span class="p">:</span>
             <span class="n">diff</span> <span class="o">=</span> <span class="n">ds_scores_b</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span> <span class="o">-</span> <span class="n">ds_scores_a</span><span class="p">[</span><span class="n">col_name</span><span class="p">]</span>
-            <span class="n">_plot_lead_line</span><span class="p">(</span><span class="n">ax_diff</span><span class="p">,</span> <span class="n">diff</span><span class="p">,</span> <span class="n">aggregate_regions</span><span class="p">,</span> <span class="n">_PALETTE_DIFF</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label_b</span><span class="si">}</span><span class="s2"> − </span><span class="si">{</span><span class="n">label_a</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">_plot_lead_line</span><span class="p">(</span>
+                <span class="n">ax_diff</span><span class="p">,</span> <span class="n">diff</span><span class="p">,</span> <span class="n">aggregate_regions</span><span class="p">,</span> <span class="n">_PALETTE_DIFF</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">label_b</span><span class="si">}</span><span class="s2"> − </span><span class="si">{</span><span class="n">label_a</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
             <span class="n">ax_diff</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
             <span class="n">ax_diff</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var_key</span><span class="si">}</span><span class="s2"> — Difference (B−A)&quot;</span><span class="p">)</span>
             <span class="n">ax_diff</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Lead week&quot;</span><span class="p">)</span>
@@ -547,7 +549,7 @@
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-Drought Forecast Eval, version: dev-bdde267</div>
+Drought Forecast Eval, version: dev-cbb9cfb</div>
       
         <div class="footer-item"><p class="last-updated">
   Last updated on 20.05.2026.

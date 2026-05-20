@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=059572ed"></script>
+    <script src="../../../_static/documentation_options.js?v=a7a76f23"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/drought_forecast_eval/report/builder';</script>
@@ -391,6 +391,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Literal</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib</span>
+
 <span class="n">matplotlib</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;Agg&quot;</span><span class="p">)</span>  <span class="c1"># non-interactive backend — safe in report/notebook contexts</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
@@ -400,7 +401,6 @@
     <span class="n">DEFAULT_CDI_THRESHOLD</span><span class="p">,</span>
     <span class="n">DEFAULT_SCORES</span><span class="p">,</span>
     <span class="n">DEFAULT_SHAPEFILE</span><span class="p">,</span>
-    <span class="n">DEFAULT_SHAPEFILE_REGION_COL</span><span class="p">,</span>
     <span class="n">DEFAULT_VARIABLES</span><span class="p">,</span>
     <span class="n">DEFAULT_WEEK_WINDOW</span><span class="p">,</span>
     <span class="n">LEAD_WEEKS</span><span class="p">,</span>
@@ -412,7 +412,6 @@
     <span class="n">persistence_reference</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">drought_forecast_eval.scoring.dispatcher</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_scores</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">drought_forecast_eval.visualization.experiment_comparison</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_experiment_diff</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">drought_forecast_eval.visualization.region_map</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_region_map</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">drought_forecast_eval.visualization.skill_curves</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_skill_vs_lead</span>
 
@@ -667,7 +666,9 @@
                 <span class="s2">&quot;reference_type&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ds_ref</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reference_type&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ds_ref</span> <span class="k">else</span> <span class="s2">&quot;none&quot;</span><span class="p">,</span>
                 <span class="s2">&quot;cdi_threshold&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">cdi_threshold</span><span class="p">,</span>
-                <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="n">DEFAULT_VARIABLES</span><span class="p">,</span>
+                <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="n">DEFAULT_VARIABLES</span>
+                <span class="p">),</span>
                 <span class="s2">&quot;scores&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">scores</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scores</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="n">DEFAULT_SCORES</span><span class="p">,</span>
                 <span class="s2">&quot;generated_at&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M UTC&quot;</span><span class="p">),</span>
                 <span class="s2">&quot;library_version&quot;</span><span class="p">:</span> <span class="n">__version__</span><span class="p">,</span>
@@ -835,7 +836,7 @@
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-Drought Forecast Eval, version: dev-bdde267</div>
+Drought Forecast Eval, version: dev-cbb9cfb</div>
       
         <div class="footer-item"><p class="last-updated">
   Last updated on 20.05.2026.

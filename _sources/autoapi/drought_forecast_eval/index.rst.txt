@@ -173,46 +173,6 @@ Package Contents
    :rtype: xr.Dataset
 
 
-.. py:function:: compute_scores(ds: xarray.Dataset, variables: list[str] | Literal['all'] = 'all', scores: list[str] | Literal['default'] = 'default', ds_ref: xarray.Dataset | None = None, cdi_threshold: float = 2.0, output_path: str | pathlib.Path | None = None, variable_map: dict | None = None) -> xarray.Dataset
-
-   Compute verification scores for all requested variables.
-
-   :Parameters: * **ds** -- Merged dataset from :func:`~drought_forecast_eval.processing.alignment.align_obs_to_forecast`.
-                  Must contain both forecast and observation variables.
-                * **variables** -- List of variable keys from ``VARIABLE_MAP`` (e.g. ``["spi_1m", "cdi"]``),
-                  a group name (``"precipitation"``, ``"streamflow"``, ``"soil_moisture"``,
-                  ``"cdi"``), or ``"all"`` to score everything.
-                * **scores** -- List of metric names from ``SCORE_REGISTRY``, or ``"default"`` which
-                  expands to ``["mae", "rmse", "bias", "correlation"]`` plus quantile
-                  metrics for quantile-mode variables.
-                * **ds_ref** -- Optional reference forecast dataset (from
-                  :func:`~drought_forecast_eval.processing.reference.climatology_reference`
-                  or :func:`~drought_forecast_eval.processing.reference.persistence_reference`).
-                  Required for ``"mae_skill"`` and ``"rpss"``.
-                * **cdi_threshold** -- Threshold for binary drought event used in ROC-AUC.  Default 2.
-                * **output_path** -- If provided, the result dataset is written to this NetCDF4 path.
-                * **variable_map** -- Override the global ``VARIABLE_MAP``.  Useful for custom experiments.
-
-   :returns: Dimensions: ``(lead_week, drought_region_id)``.
-             Variables: ``{var_key}_{metric}`` for every computed score.
-             Global attributes record the computation parameters.
-   :rtype: xr.Dataset
-
-   :raises ValueError: If none of the requested variables are present in the dataset.
-
-
-.. py:function:: register_score(name: str, fn: Callable) -> None
-
-   Register a custom scoring function under ``name``.
-
-   :Parameters: * **name** -- Short identifier for the metric (e.g. ``"my_crps"``).
-                * **fn** -- Callable with signature
-                  ``fn(fcst: xr.DataArray, obs: xr.DataArray, **kwargs) -> xr.DataArray``.
-
-   :raises ValueError: If ``name`` is already registered and ``fn`` differs from the
-       existing entry.
-
-
 .. py:class:: ReportBuilder(archive_dir: str | pathlib.Path, historic_path: str | pathlib.Path, date_range: tuple[str, str], regions: list[int] | Literal['all'] = 'all', variables: list[str] | Literal['all'] = 'all', scores: list[str] | Literal['default'] = 'default', reference: Literal['climatology', 'persistence', 'both'] = 'climatology', cdi_threshold: float = DEFAULT_CDI_THRESHOLD, shapefile_path: str | pathlib.Path | None = DEFAULT_SHAPEFILE, output_dir: str | pathlib.Path = './output', week_window: int = DEFAULT_WEEK_WINDOW, variable_map: dict | None = None)
 
    Orchestrate the full verification pipeline.
@@ -344,5 +304,46 @@ Package Contents
 
       :rtype: dict mapping output type to file path.
 
+
+
+.. py:function:: compute_scores(ds: xarray.Dataset, variables: list[str] | Literal['all'] = 'all', scores: list[str] | Literal['default'] = 'default', ds_ref: xarray.Dataset | None = None, cdi_threshold: float = 2.0, output_path: str | pathlib.Path | None = None, variable_map: dict | None = None) -> xarray.Dataset
+
+   Compute verification scores for all requested variables.
+
+   :Parameters: * **ds** -- Merged dataset from
+                  :func:`~drought_forecast_eval.processing.alignment.align_obs_to_forecast`.
+                  Must contain both forecast and observation variables.
+                * **variables** -- List of variable keys from ``VARIABLE_MAP`` (e.g. ``["spi_1m", "cdi"]``),
+                  a group name (``"precipitation"``, ``"streamflow"``, ``"soil_moisture"``,
+                  ``"cdi"``), or ``"all"`` to score everything.
+                * **scores** -- List of metric names from ``SCORE_REGISTRY``, or ``"default"`` which
+                  expands to ``["mae", "rmse", "bias", "correlation"]`` plus quantile
+                  metrics for quantile-mode variables.
+                * **ds_ref** -- Optional reference forecast dataset (from
+                  :func:`~drought_forecast_eval.processing.reference.climatology_reference`
+                  or :func:`~drought_forecast_eval.processing.reference.persistence_reference`).
+                  Required for ``"mae_skill"`` and ``"rpss"``.
+                * **cdi_threshold** -- Threshold for binary drought event used in ROC-AUC.  Default 2.
+                * **output_path** -- If provided, the result dataset is written to this NetCDF4 path.
+                * **variable_map** -- Override the global ``VARIABLE_MAP``.  Useful for custom experiments.
+
+   :returns: Dimensions: ``(lead_week, drought_region_id)``.
+             Variables: ``{var_key}_{metric}`` for every computed score.
+             Global attributes record the computation parameters.
+   :rtype: xr.Dataset
+
+   :raises ValueError: If none of the requested variables are present in the dataset.
+
+
+.. py:function:: register_score(name: str, fn: collections.abc.Callable) -> None
+
+   Register a custom scoring function under ``name``.
+
+   :Parameters: * **name** -- Short identifier for the metric (e.g. ``"my_crps"``).
+                * **fn** -- Callable with signature
+                  ``fn(fcst: xr.DataArray, obs: xr.DataArray, **kwargs) -> xr.DataArray``.
+
+   :raises ValueError: If ``name`` is already registered and ``fn`` differs from the
+       existing entry.
 
 

@@ -50,7 +50,7 @@ Module Contents
 .. py:data:: logger
 
 .. py:data:: SCORE_REGISTRY
-   :type:  dict[str, Callable]
+   :type:  dict[str, collections.abc.Callable]
 
 .. py:data:: DETERMINISTIC_METRICS
    :type:  frozenset[str]
@@ -58,7 +58,7 @@ Module Contents
 .. py:data:: QUANTILE_METRICS
    :type:  frozenset[str]
 
-.. py:function:: register_score(name: str, fn: Callable) -> None
+.. py:function:: register_score(name: str, fn: collections.abc.Callable) -> None
 
    Register a custom scoring function under ``name``.
 

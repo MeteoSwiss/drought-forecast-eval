@@ -46,7 +46,8 @@ Package Contents
 
    Compute verification scores for all requested variables.
 
-   :Parameters: * **ds** -- Merged dataset from :func:`~drought_forecast_eval.processing.alignment.align_obs_to_forecast`.
+   :Parameters: * **ds** -- Merged dataset from
+                  :func:`~drought_forecast_eval.processing.alignment.align_obs_to_forecast`.
                   Must contain both forecast and observation variables.
                 * **variables** -- List of variable keys from ``VARIABLE_MAP`` (e.g. ``["spi_1m", "cdi"]``),
                   a group name (``"precipitation"``, ``"streamflow"``, ``"soil_moisture"``,
@@ -71,9 +72,9 @@ Package Contents
 
 
 .. py:data:: SCORE_REGISTRY
-   :type:  dict[str, Callable]
+   :type:  dict[str, collections.abc.Callable]
 
-.. py:function:: register_score(name: str, fn: Callable) -> None
+.. py:function:: register_score(name: str, fn: collections.abc.Callable) -> None
 
    Register a custom scoring function under ``name``.
 

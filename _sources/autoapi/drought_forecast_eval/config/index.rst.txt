@@ -24,10 +24,10 @@ Attributes
 .. autoapisummary::
 
    drought_forecast_eval.config.ALL_REGION_IDS
-   drought_forecast_eval.config.DEFAULT_SCORES
-   drought_forecast_eval.config.DEFAULT_VARIABLES
    drought_forecast_eval.config.BGDI_ARCHIVE_URL_TEMPLATE
    drought_forecast_eval.config.BGDI_HISTORIC_URL
+   drought_forecast_eval.config.DEFAULT_SCORES
+   drought_forecast_eval.config.DEFAULT_VARIABLES
 
 
 Package Contents
@@ -35,16 +35,6 @@ Package Contents
 
 .. py:data:: ALL_REGION_IDS
    :type:  list[int]
-
-.. py:data:: DEFAULT_SCORES
-   :type:  list[str]
-   :value: ['mae', 'rmse', 'bias', 'correlation', 'pinball', 'interval_score']
-
-
-.. py:data:: DEFAULT_VARIABLES
-   :type:  list[str]
-   :value: ['cdi', 'precip_1m_index', 'precip_3m_index', 'precip_24m_index', 'hydro_index',...
-
 
 .. py:data:: BGDI_ARCHIVE_URL_TEMPLATE
    :type:  str
@@ -54,5 +44,15 @@ Package Contents
 .. py:data:: BGDI_HISTORIC_URL
    :type:  str
    :value: 'https://data.geo.admin.ch/ch.bafu.trockenheitsdaten-numerisch/trockenheitsdaten-numerisch_histor...
+
+
+.. py:data:: DEFAULT_SCORES
+   :type:  list[str]
+   :value: ['mae', 'rmse', 'bias', 'correlation', 'pinball', 'interval_score']
+
+
+.. py:data:: DEFAULT_VARIABLES
+   :type:  list[str]
+   :value: ['cdi', 'precip_1m_index', 'precip_3m_index', 'precip_24m_index', 'hydro_index',...
 
 

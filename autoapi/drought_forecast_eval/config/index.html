@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=059572ed"></script>
+    <script src="../../../_static/documentation_options.js?v=a7a76f23"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'autoapi/drought_forecast_eval/config/index';</script>
@@ -440,16 +440,16 @@
 <tr class="row-odd"><td><p><a class="reference internal" href="#drought_forecast_eval.config.ALL_REGION_IDS" title="drought_forecast_eval.config.ALL_REGION_IDS"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ALL_REGION_IDS</span></code></a></p></td>
 <td><p></p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference internal" href="#drought_forecast_eval.config.DEFAULT_SCORES" title="drought_forecast_eval.config.DEFAULT_SCORES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DEFAULT_SCORES</span></code></a></p></td>
-<td><p></p></td>
-</tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#drought_forecast_eval.config.DEFAULT_VARIABLES" title="drought_forecast_eval.config.DEFAULT_VARIABLES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DEFAULT_VARIABLES</span></code></a></p></td>
-<td><p></p></td>
-</tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#drought_forecast_eval.config.BGDI_ARCHIVE_URL_TEMPLATE" title="drought_forecast_eval.config.BGDI_ARCHIVE_URL_TEMPLATE"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BGDI_ARCHIVE_URL_TEMPLATE</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#drought_forecast_eval.config.BGDI_HISTORIC_URL" title="drought_forecast_eval.config.BGDI_HISTORIC_URL"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BGDI_HISTORIC_URL</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#drought_forecast_eval.config.DEFAULT_SCORES" title="drought_forecast_eval.config.DEFAULT_SCORES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DEFAULT_SCORES</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#drought_forecast_eval.config.DEFAULT_VARIABLES" title="drought_forecast_eval.config.DEFAULT_VARIABLES"><code class="xref py py-obj docutils literal notranslate"><span class="pre">DEFAULT_VARIABLES</span></code></a></p></td>
 <td><p></p></td>
 </tr>
 </tbody>
@@ -464,16 +464,6 @@
 <dd></dd></dl>
 
 <dl class="py data">
-<dt class="sig sig-object py" id="drought_forecast_eval.config.DEFAULT_SCORES">
-<span class="sig-name descname"><span class="pre">DEFAULT_SCORES</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['mae',</span> <span class="pre">'rmse',</span> <span class="pre">'bias',</span> <span class="pre">'correlation',</span> <span class="pre">'pinball',</span> <span class="pre">'interval_score']</span></em><a class="headerlink" href="#drought_forecast_eval.config.DEFAULT_SCORES" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py data">
-<dt class="sig sig-object py" id="drought_forecast_eval.config.DEFAULT_VARIABLES">
-<span class="sig-name descname"><span class="pre">DEFAULT_VARIABLES</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['cdi',</span> <span class="pre">'precip_1m_index',</span> <span class="pre">'precip_3m_index',</span> <span class="pre">'precip_24m_index',</span> <span class="pre">'hydro_index',...</span></em><a class="headerlink" href="#drought_forecast_eval.config.DEFAULT_VARIABLES" title="Link to this definition">#</a></dt>
-<dd></dd></dl>
-
-<dl class="py data">
 <dt class="sig sig-object py" id="drought_forecast_eval.config.BGDI_ARCHIVE_URL_TEMPLATE">
 <span class="sig-name descname"><span class="pre">BGDI_ARCHIVE_URL_TEMPLATE</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'https://data.geo.admin.ch/ch.bafu.trockenheitsdaten-numerisch/trockenheitsdaten-numerisch_curren...</span></em><a class="headerlink" href="#drought_forecast_eval.config.BGDI_ARCHIVE_URL_TEMPLATE" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
@@ -481,6 +471,16 @@
 <dl class="py data">
 <dt class="sig sig-object py" id="drought_forecast_eval.config.BGDI_HISTORIC_URL">
 <span class="sig-name descname"><span class="pre">BGDI_HISTORIC_URL</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'https://data.geo.admin.ch/ch.bafu.trockenheitsdaten-numerisch/trockenheitsdaten-numerisch_histor...</span></em><a class="headerlink" href="#drought_forecast_eval.config.BGDI_HISTORIC_URL" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="drought_forecast_eval.config.DEFAULT_SCORES">
+<span class="sig-name descname"><span class="pre">DEFAULT_SCORES</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['mae',</span> <span class="pre">'rmse',</span> <span class="pre">'bias',</span> <span class="pre">'correlation',</span> <span class="pre">'pinball',</span> <span class="pre">'interval_score']</span></em><a class="headerlink" href="#drought_forecast_eval.config.DEFAULT_SCORES" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="drought_forecast_eval.config.DEFAULT_VARIABLES">
+<span class="sig-name descname"><span class="pre">DEFAULT_VARIABLES</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['cdi',</span> <span class="pre">'precip_1m_index',</span> <span class="pre">'precip_3m_index',</span> <span class="pre">'precip_24m_index',</span> <span class="pre">'hydro_index',...</span></em><a class="headerlink" href="#drought_forecast_eval.config.DEFAULT_VARIABLES" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -537,10 +537,10 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#attributes">Attributes</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#package-contents">Package Contents</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.config.ALL_REGION_IDS"><code class="docutils literal notranslate"><span class="pre">ALL_REGION_IDS</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.config.DEFAULT_SCORES"><code class="docutils literal notranslate"><span class="pre">DEFAULT_SCORES</span></code></a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.config.DEFAULT_VARIABLES"><code class="docutils literal notranslate"><span class="pre">DEFAULT_VARIABLES</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.config.BGDI_ARCHIVE_URL_TEMPLATE"><code class="docutils literal notranslate"><span class="pre">BGDI_ARCHIVE_URL_TEMPLATE</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.config.BGDI_HISTORIC_URL"><code class="docutils literal notranslate"><span class="pre">BGDI_HISTORIC_URL</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.config.DEFAULT_SCORES"><code class="docutils literal notranslate"><span class="pre">DEFAULT_SCORES</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.config.DEFAULT_VARIABLES"><code class="docutils literal notranslate"><span class="pre">DEFAULT_VARIABLES</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -568,7 +568,7 @@
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-Drought Forecast Eval, version: dev-bdde267</div>
+Drought Forecast Eval, version: dev-cbb9cfb</div>
       
         <div class="footer-item"><p class="last-updated">
   Last updated on 20.05.2026.
