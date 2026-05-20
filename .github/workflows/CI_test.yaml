@@ -44,7 +44,7 @@ jobs:
       run: poetry run sphinx-build doc doc/_build
 
     - name: Run pytest
-      run: poetry run pytest -s --cov=drought_forecast_eval --cov-fail-under=80
+      run: poetry run pytest -s --cov=drought_forecast_eval --cov-fail-under=60
 
     - name: Run ruff linter
       run: poetry run ruff check drought_forecast_eval

@@ -1,92 +1,180 @@
-.. image:: https://img.shields.io/pypi/v/Open-Source-Template.svg
-    :target: https://pypi.org/project/Open-Source-Template/
+# drought-forecast-eval
 
-.. image:: https://img.shields.io/pypi/pyversions/Open-Source-Template.svg
-    :target: https://pypi.org/project/Open-Source-Template/
+**Verification and evaluation library for Swiss drought forecasts.**
 
-.. image:: https://img.shields.io/pypi/l/Open-Source-Template.svg
-    :target: https://pypi.org/project/Open-Source-Template/
+Quantifies the quality of operational drought forecasts issued by the Swiss
+drought monitoring system ([drought.admin.ch](https://drought.admin.ch)) across
+the 38 official drought warning regions, for all forecast variables (SPI,
+precipitation, streamflow, soil moisture, CDI) and all lead times (week 0–3).
 
-.. image:: https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/github-code-scanning/codeql/badge.svg
-    :target: https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/github-code-scanning/codeql
+---
 
-.. image:: https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/CI_test.yaml/badge.svg
-    :target: https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/CI_test.yaml
+## Features
 
-.. image:: https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/CI_publish_dev_documentation.yaml/badge.svg
-    :target: https://github.com/MeteoSwiss/Open-Source-Template/actions/workflows/CI_publish_dev_documentation.yaml
+- **Data loading** — parse flat archives of daily BGDI ZIP dumps into `xr.Dataset`
+- **Observation loading** — read the full historic observation archive
+- **Alignment** — merge forecast and observation grids on `(region, valid_at)`
+- **Reference forecasts** — climatology (week-of-year ± window) and persistence
+- **Scoring** — MAE, RMSE, Bias, Correlation, Pinball loss, Interval score, RPSS, ROC-AUC
+- **Extensible registry** — add custom metrics with `register_score()`
+- **Visualisation** — skill-vs-lead curves, 4-panel regional maps, experiment diffs
+- **Report generation** — HTML report with embedded plots, CSV/NetCDF export
+- **Experiment comparison** — compare two time periods or data sources side-by-side
 
-===============
-Getting Started
-===============
+---
 
-A demo for the OSS template at MeteoSwiss.
+## Quick start
 
-The template can be use as an example how to configure MeteoSwiss Github projects.
+```bash
+poetry install --with dev,report,notebook
+```
 
-It uses:
+```python
+from drought_forecast_eval import (
+    load_forecasts, load_observations,
+    align_obs_to_forecast, climatology_reference,
+    compute_scores, ReportBuilder,
+)
 
-* Github actions to execute the CI/CD pipelines
-* Github pages to host the documentation
-* PyPI to publish the python packages
+# Load data
+ds_fcst = load_forecasts("/data/zips", date_range=("2025-01-01", "2025-12-31"))
+ds_obs  = load_observations("/data/historic.zip")
 
-Development Setup with Poetry
------------------------------
+# Align and score
+ds      = align_obs_to_forecast(ds_fcst, ds_obs)
+ds_ref  = climatology_reference(ds_obs, ds_fcst)
+scores  = compute_scores(ds, variables="all", scores="default", ds_ref=ds_ref)
+scores.to_netcdf("scores.nc")
 
-Building the Project
-''''''''''''''''''''
-.. code-block:: console
+# Or run the full pipeline at once
+builder = ReportBuilder(
+    archive_dir="/data/zips",
+    historic_path="/data/historic.zip",
+    date_range=("2025-01-01", "2025-12-31"),
+    output_dir="./output",
+)
+builder.run()   # → output/scores.nc, output/report.html, output/scores_summary.csv
+```
 
-    $ cd open-source-template
-    $ poetry install
+---
 
-Run Tests
-'''''''''
+## CLI
 
-.. code-block:: console
+After installation the `drought-eval` command is available via the Poetry
+environment.
 
-    $ poetry run pytest
+```bash
+# Run with all defaults — uses every ZIP in data/zipfiles/
+poetry run drought-eval
 
-Run Quality Tools
-'''''''''''''''''
+# Restrict to a specific date window
+poetry run drought-eval --start 2025-07-04 --end 2025-12-31
 
-.. code-block:: console
+# Persistence reference, only SPI variables, MAE + RPSS
+poetry run drought-eval \
+  --reference persistence \
+  --variables spi_1m,spi_3m,spi_6m \
+  --scores mae,rpss
 
-    $ poetry run pylint open_source_template
-    $ poetry run mypy open_source_template
+# Full run including an HTML report (requires: poetry install --with report)
+poetry run drought-eval --html
 
-Generate Documentation
-''''''''''''''''''''''
+# Custom archive and output directory, with verbose logging
+poetry run drought-eval \
+  --archive-dir /data/zipfiles \
+  --output-dir  /results/2025 \
+  --verbose
+```
 
-.. code-block:: console
+Full option reference:
 
-    $ poetry run sphinx-build doc doc/_build
+```
+Options:
+  --archive-dir  DIRECTORY        Flat directory of daily forecast ZIPs.
+                                  [default: data/zipfiles]
+  --historic-path FILE            Historic observations ZIP from BGDI.
+                                  [default: data/historic/trockenheitsdaten-
+                                  numerisch_historic.csv.zip]
+  --output-dir   DIRECTORY        Directory for scores .nc and summary .csv.
+                                  [default: output]
+  --start       YYYY-MM-DD        Start date (inclusive).
+  --end         YYYY-MM-DD        End date (inclusive).
+  --reference   [climatology|persistence|both]
+                                  Reference forecast strategy.
+                                  [default: climatology]
+  --variables   TEXT              'all', a group (cdi/spi/precip), or
+                                  comma-separated variable keys.
+  --scores      TEXT              'default' or comma-separated metric names.
+  --html                          Render an HTML report to OUTPUT_DIR/report.html
+                                  (requires poetry install --with report).
+  -v, --verbose                   Enable DEBUG logging.
+  --help                          Show this message and exit.
+```
 
-Then open the index.html file generated in *open-source-template/doc/_build/*.
+---
 
-Build wheels
-''''''''''''
+## Installation
 
-.. code-block:: console
+| Use case | Command |
+|----------|---------|
+| Core library | `poetry install` |
+| + HTML reports | `poetry install --with report` |
+| + Jupyter notebook | `poetry install --with notebook` |
+| Everything | `poetry install --with dev,report,notebook` |
 
-    $ poetry build
+Python ≥ 3.11 required.
 
-Using the Library
------------------
+---
 
-To install open-source-template in your project, run this command in your terminal:
+## Project layout
 
-.. code-block:: console
+```
+drought_forecast_eval/
+├── io/            # archive scanning, ZIP loading, schema validation, downloader
+├── processing/    # lead-time computation, obs/fcst alignment, reference forecasts
+├── scoring/       # variable map, score registry, dispatcher, skill functions
+├── visualization/ # skill curves, regional maps, experiment comparisons
+├── report/        # ReportBuilder + Jinja2 HTML template
+└── config/        # defaults and constants
+notebooks/         # template_verification.ipynb
+tests/             # pytest suite with synthetic fixtures
+docs/              # data_access.md, methodology.md, reproducibility.md
+```
 
-    $ poetry add open-source-template
+---
 
-You can then use the library in your project through
+## Variables and scoring modes
 
-    import open_source_template
+| Variable group | Mode | Metrics |
+|----------------|------|---------|
+| CDI, hydro/soil/precip indices | Deterministic | MAE, RMSE, Bias, Correlation, MAE-Skill, ROC-AUC |
+| SPI-1/3/6/12/24, precip sums, soil_moisture_ufc | Quantile (p10/p50/p90) | + Pinball loss, Interval score, RPSS |
 
-Releasing
----------
+---
 
-* Adapt CHANGELOG.rst with release information
-* Adapt ``doc/_static/switcher_config.json`` adding the new documentation URL for the release
-* Create a new Release in the Github project
+## Documentation
+
+- [Data access](docs/data_access.md) — BGDI URLs, download scripts, CSV column reference
+- [Methodology](docs/methodology.md) — scoring formulas, RPS approximation, skill score convention
+- [Reproducibility](docs/reproducibility.md) — environment setup, pinning, error handling, custom experiments
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+---
+
+## License
+
+MIT — see LICENSE.
+
+## Citation
+
+If you use this library in a publication, please cite the `scores` library it depends on:
+
+> Leeuwenburg et al. (2024). scores: A Python package for verifying and evaluating models
+> and predictions with xarray. *Journal of Open Source Software, 9*(99), 6889.
+> https://doi.org/10.21105/joss.06889
+
