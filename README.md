@@ -6,6 +6,8 @@
 
 **Verification and evaluation library for Swiss drought forecasts.**
 
+> ⚠️  This is still a sharp tool, it is not fully tested yet ⚠️
+
 Quantifies the quality of operational drought forecasts issued by the Swiss
 drought monitoring system ([drought.admin.ch](https://drought.admin.ch)) across
 the 38 official drought warning regions, for all forecast variables (SPI,
