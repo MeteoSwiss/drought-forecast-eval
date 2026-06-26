@@ -9,6 +9,14 @@
     Reads the single historic ZIP (``weekly_historic_regions.csv``), validates
     against ``OBSERVATION_SCHEMA``, and returns an observation dataset indexed
     by ``(drought_region_id, valid_at)``.
+
+``load_observations_combined``
+    Merges the historic ZIP with the *latest* current ZIP from the rolling
+    archive.  The latest current ZIP contains a 52-week rolling window of
+    actuals (``weekly_current_regions.csv``), covering dates that are not yet
+    in the historic file (e.g. the current calendar year).  Historic rows take
+    precedence on any overlap; current rows fill the gap beyond the historic
+    cutoff.  This is the recommended loader for the verification pipeline.
 """
 
 from __future__ import annotations
@@ -37,6 +45,8 @@ logger = logging.getLogger(__name__)
 _FORECAST_CSV = "weekly_forecast_regions.csv"
 # Name of the observation CSV inside each rolling ZIP and in the historic ZIP
 _HISTORIC_CSV = "weekly_historic_regions.csv"
+# Name of the current-actuals CSV inside each rolling ZIP
+_CURRENT_CSV = "weekly_current_regions.csv"
 
 # Regex to find the header comment line with the update date
 _HEADER_DATE_RE = re.compile(r"letzte Aktualisierung[:\s]+(\d{2}\.\d{2}\.\d{4})")
@@ -310,3 +320,126 @@ def _obs_df_to_xarray(df: pd.DataFrame) -> xr.Dataset:
     ds.attrs["source"] = "drought_forecast_eval"
     ds.attrs["description"] = "Swiss drought observation archive"
     return ds
+
+
+# ---------------------------------------------------------------------------
+# load_observations_combined
+# ---------------------------------------------------------------------------
+
+
+def load_observations_combined(
+    historic_path: str | Path,
+    archive_dir: str | Path,
+    region_ids: list[int] | None = None,
+) -> xr.Dataset:
+    """Load observations from the historic ZIP, extended with the latest current ZIP.
+
+    The historic ZIP (``weekly_historic_regions.csv``) provides the deep
+    climate baseline back to ~1990.  The most-recent ZIP in ``archive_dir``
+    contains ``weekly_current_regions.csv`` — a rolling 52-week window of
+    actuals that covers dates not yet present in the historic file (typically
+    the current calendar year).
+
+    Merging strategy
+    ----------------
+    1. Parse both sources into DataFrames on the ``(drought_region_id,
+       measured_at)`` index.
+    2. Concatenate historic first, then current.
+    3. Drop duplicates keeping the *first* occurrence — historic rows win on
+       any overlap, current rows fill the gap beyond the historic cutoff.
+
+    Parameters
+    ----------
+    historic_path:
+        Path to the historic ZIP file
+        (``trockenheitsdaten-numerisch_historic.csv.zip``).
+    archive_dir:
+        Flat directory of daily rolling ZIP files.  Only the lexicographically
+        last file (= most-recent date) is read.
+    region_ids:
+        Optional list of ``drought_region_id`` integers to keep.
+
+    Returns
+    -------
+    xr.Dataset
+        Dimensions: ``(drought_region_id, valid_at)``
+        Variables: all observation columns from ``OBSERVATION_SCHEMA``.
+
+    Raises
+    ------
+    FileNotFoundError
+        If ``historic_path`` or ``archive_dir`` does not exist.
+    RuntimeError
+        If no current ZIP files are found in ``archive_dir``.
+    SchemaError
+        If either CSV is structurally invalid.
+    """
+    historic_path = Path(historic_path)
+    archive_dir = Path(archive_dir)
+
+    if not historic_path.exists():
+        raise FileNotFoundError(f"Historic archive not found: {historic_path}")
+    if not archive_dir.exists():
+        raise FileNotFoundError(f"Archive directory not found: {archive_dir}")
+
+    # ── 1. Load historic baseline ─────────────────────────────────────────
+    df_hist = _load_obs_from_zip(historic_path)
+    df_hist = validate_observation(df_hist)
+    # historic uses 'measured_at'; normalise to that name for the merge
+    logger.info(
+        "Historic observations: %d rows, up to %s",
+        len(df_hist),
+        df_hist["measured_at"].max(),
+    )
+
+    # ── 2. Load the latest current ZIP ───────────────────────────────────
+    entries = scan_archive(archive_dir)
+    if not entries:
+        raise RuntimeError(f"No valid ZIP files found in '{archive_dir}'")
+
+    _frt, latest_path = entries[-1]  # scan_archive returns sorted ascending
+    logger.info("Using latest current ZIP for recent observations: %s", latest_path.name)
+
+    df_current = _load_current_obs_from_zip(latest_path)
+    df_current = validate_observation(df_current)
+
+    # ── 3. Merge: historic first so it wins on any overlap ────────────────
+    combined = (
+        pd.concat([df_hist, df_current], ignore_index=True)
+        .drop_duplicates(subset=["drought_region_id", "measured_at"], keep="first")
+        .sort_values(["drought_region_id", "measured_at"])
+        .reset_index(drop=True)
+    )
+
+    hist_max = df_hist["measured_at"].max()
+    new_rows = (combined["measured_at"] > hist_max).sum()
+    logger.info(
+        "Combined observations: %d rows (%d new beyond historic cutoff of %s)",
+        len(combined),
+        new_rows,
+        hist_max.date() if hasattr(hist_max, "date") else hist_max,
+    )
+
+    # Rename measured_at → valid_at for the unified time coordinate
+    combined = combined.rename(columns={"measured_at": "valid_at"})
+
+    if region_ids is not None:
+        combined = combined[combined["drought_region_id"].isin(region_ids)]
+
+    ds = _obs_df_to_xarray(combined)
+    ds.attrs["description"] = "Swiss drought observation archive (historic + current)"
+    return ds
+
+
+def _load_current_obs_from_zip(path: Path) -> pd.DataFrame:
+    """Read ``weekly_current_regions.csv`` from a rolling archive ZIP.
+
+    The current CSV uses ``measured_at`` as its date column, identical to the
+    historic schema, so it is directly compatible with ``validate_observation``.
+    """
+    with zipfile.ZipFile(path, "r") as zf:
+        csv_name = _find_csv_in_zip(zf, _CURRENT_CSV)
+        if csv_name is None:
+            raise KeyError(f"'{_CURRENT_CSV}' not found inside {path.name}")
+        df, _ = _read_csv_from_zip(zf, csv_name)
+    return df

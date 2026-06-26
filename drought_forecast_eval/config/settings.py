@@ -27,9 +27,9 @@ BGDI_HISTORIC_URL: str = (
 # Drought regions
 # ---------------------------------------------------------------------------
 
-#: The 38 official drought warning regions (IDs 1–38).
+#: The 38 official drought warning regions (IDs 31–68).
 #: Source: http://drought.admin.ch
-ALL_REGION_IDS: list[int] = list(range(1, 39))
+ALL_REGION_IDS: list[int] = list(range(31, 69))
 
 # ---------------------------------------------------------------------------
 # Default variable selection

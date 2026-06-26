@@ -73,9 +73,9 @@ class TestAlignObsToForecast:
         for dim in ["forecast_reference_time", "drought_region_id", "lead_week"]:
             assert dim in ds_merged.dims
 
-    def test_missing_valid_at_raises(self, ds_fcst, ds_obs):
+    def test_missing_valid_at_raises(self, ds_fcst, ds_obs_combined):
         from drought_forecast_eval.processing.alignment import align_obs_to_forecast
         # Drop the valid_at coordinate to trigger the error
         ds_no_valid_at = ds_fcst.drop_vars("valid_at")
         with pytest.raises(ValueError, match="valid_at"):
-            align_obs_to_forecast(ds_no_valid_at, ds_obs)
+            align_obs_to_forecast(ds_no_valid_at, ds_obs_combined)

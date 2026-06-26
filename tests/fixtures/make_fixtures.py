@@ -19,12 +19,15 @@ import pandas as pd
 
 RNG = np.random.default_rng(42)
 
-REGIONS = [1, 5, 12, 31]   # 4 representative regions
+REGIONS = [31, 35, 50, 68]   # 4 representative regions (real IDs 31–68)
 LEAD_WEEKS_OFFSET = [0, 7, 14, 21]  # days → week 0/1/2/3
 FIXTURE_DIR = Path(__file__).parent
 
 # Forecast reference time used in the fixture filename
 FRT = pd.Timestamp("2026-03-24")  # Tuesday
+
+# The historic fixture ends here; current fixture adds rows beyond this date
+_HISTORIC_CUTOFF = pd.Timestamp("2026-03-09")  # last Monday in historic
 
 # ---------------------------------------------------------------------------
 # Forecast fixture
@@ -86,13 +89,13 @@ def make_forecast_df() -> pd.DataFrame:
 
 
 # ---------------------------------------------------------------------------
-# Historic (observation) fixture – 3 years of weekly obs
+# Historic (observation) fixture – 3 years of weekly obs up to _HISTORIC_CUTOFF
 # ---------------------------------------------------------------------------
 
 def make_historic_df() -> pd.DataFrame:
     rows = []
     start = pd.Timestamp("2023-01-02")  # first Monday
-    end = pd.Timestamp("2026-03-30")
+    end = _HISTORIC_CUTOFF
     monday = start
     while monday <= end:
         for region in REGIONS:
@@ -100,6 +103,53 @@ def make_historic_df() -> pd.DataFrame:
             rows.append({
                 "drought_region_id": region,
                 "measured_at": monday.strftime("%Y-%m-%d"),
+                "cdi": round(RNG.uniform(1, 4), 1),
+                "precip_1m_index": round(base, 2),
+                "precip_3m_index": round(base + RNG.normal(0, 0.2), 2),
+                "precip_24m_index": round(base + RNG.normal(0, 0.3), 2),
+                "hydro_index": round(RNG.uniform(-2, 2), 2),
+                "soil_moisture_index": round(RNG.uniform(-2, 2), 2),
+                "precip_sum_1m": round(max(0, 40 + RNG.normal(0, 10)), 1),
+                "precip_sum_3m": round(max(0, 120 + RNG.normal(0, 20)), 1),
+                "precip_sum_6m": round(max(0, 240 + RNG.normal(0, 30)), 1),
+                "precip_sum_12m": round(max(0, 600 + RNG.normal(0, 50)), 1),
+                "precip_sum_24m": round(max(0, 1200 + RNG.normal(0, 80)), 1),
+                "spi_1m": round(base, 2),
+                "spi_3m": round(base + RNG.normal(0, 0.2), 2),
+                "spi_6m": round(base + RNG.normal(0, 0.3), 2),
+                "spi_12m": round(base + RNG.normal(0, 0.4), 2),
+                "spi_24m": round(base + RNG.normal(0, 0.5), 2),
+                "soil_moisture_ufc": round(RNG.uniform(85, 100), 1),
+                "vhi": round(RNG.uniform(0.2, 0.9), 3),
+            })
+        monday += pd.Timedelta(weeks=1)
+    return pd.DataFrame(rows)
+
+
+# ---------------------------------------------------------------------------
+# Current (observation) fixture – 52-week rolling window ending at FRT week
+#
+# Covers _HISTORIC_CUTOFF − 51 weeks → FRT week, so it overlaps slightly with
+# the historic fixture and also extends two weeks beyond it.  This exercises
+# both the deduplication (overlap) and the gap-fill (extension) logic.
+# ---------------------------------------------------------------------------
+
+def make_current_obs_df() -> pd.DataFrame:
+    """Build a weekly_current_regions.csv-style DataFrame.
+
+    Starts 51 weeks before _HISTORIC_CUTOFF so there is deliberate overlap
+    with the historic fixture, then continues two more Mondays beyond it.
+    """
+    rows = []
+    start = _HISTORIC_CUTOFF - pd.Timedelta(weeks=51)
+    end = _HISTORIC_CUTOFF + pd.Timedelta(weeks=2)  # two weeks beyond historic
+    monday = start
+    while monday <= end:
+        for region in REGIONS:
+            base = RNG.uniform(-1.5, 1.5)
+            rows.append({
+                "drought_region_id": region,
+                "measured_at": monday.strftime("%d.%m.%Y"),  # real files use DD.MM.YYYY
                 "cdi": round(RNG.uniform(1, 4), 1),
                 "precip_1m_index": round(base, 2),
                 "precip_3m_index": round(base + RNG.normal(0, 0.2), 2),
@@ -169,10 +219,20 @@ def make_fixtures() -> None:
     # --- Historic (observation) ZIP ---
     hist_zip_path = FIXTURE_DIR / "trockenheitsdaten-numerisch_historic.csv.zip"
     hist_df = make_historic_df()
-    hist_bytes = _df_to_csv_bytes(hist_df, "19.03.2026")
+    hist_bytes = _df_to_csv_bytes(hist_df, _HISTORIC_CUTOFF.strftime("%d.%m.%Y"))
     with zipfile.ZipFile(hist_zip_path, "w", compression=zipfile.ZIP_DEFLATED) as zf:
         zf.writestr("weekly_historic_regions.csv", hist_bytes.decode("utf-8"))
     print(f"Written: {hist_zip_path}")
+
+    # --- Current (observation) ZIP bundled inside the latest forecast ZIP ---
+    # The latest forecast ZIP (FRT) also contains weekly_current_regions.csv.
+    # Re-open it and add the current obs CSV alongside the forecast CSV.
+    curr_obs_df = make_current_obs_df()
+    curr_obs_bytes = _df_to_csv_bytes(curr_obs_df, FRT.strftime("%d.%m.%Y"))
+    # Append to the already-written latest forecast ZIP
+    with zipfile.ZipFile(fcst_zip_path, "a", compression=zipfile.ZIP_DEFLATED) as zf:
+        zf.writestr("weekly_current_regions.csv", curr_obs_bytes.decode("utf-8"))
+    print(f"Updated with current obs: {fcst_zip_path}")
 
     print("Fixtures generated successfully.")
 
