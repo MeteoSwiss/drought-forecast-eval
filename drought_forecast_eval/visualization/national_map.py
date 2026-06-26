@@ -200,8 +200,7 @@ def _plot_national_choropleth(
         axes[row][col].set_visible(False)
 
     fig.colorbar(
-        sm, ax=axes.ravel(), shrink=0.8, label=da_national.attrs.get("long_name", "score"),
-        pad=0.02
+        sm, ax=axes.ravel(), shrink=0.8, label=da_national.attrs.get("long_name", "score"), pad=0.02
     )
     fig.suptitle(title, fontsize=13, fontweight="bold")
     fig.tight_layout()
