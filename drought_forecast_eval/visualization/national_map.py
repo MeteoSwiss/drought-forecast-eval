@@ -222,7 +222,7 @@ def _plot_national_bars(
     title: str,
     figsize: tuple[float, float],
 ) -> plt.Figure:
-    """Simple bar chart showing national average per lead week."""
+    """Plot average score per lead week in a bar chart."""
     fig, ax = plt.subplots(figsize=figsize, squeeze=True)
 
     colormap = plt.get_cmap(cmap)
