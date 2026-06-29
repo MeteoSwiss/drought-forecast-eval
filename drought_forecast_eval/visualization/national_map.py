@@ -34,9 +34,7 @@ def plot_national_map(
 ) -> plt.Figure:
     """Plot 4-panel visualization of national-level (averaged) score per lead week.
 
-    Creates one panel per lead week, showing the national average score.
-    If a shapefile is available, displays as unified choropleth; otherwise
-    uses a bar-chart representation.
+    Creates one choropleth panel per lead week, showing the national average score.
 
     Parameters
     ----------
@@ -46,8 +44,6 @@ def plot_national_map(
         Name of the score variable to plot (e.g. ``"spi_1m_mae"``).
     shapefile_path:
         Path to the ``.shp`` / ``.geojson`` file of Switzerland regions.
-        If provided and geopandas is available, uses choropleth;
-        otherwise falls back to bar chart.
     lead_weeks:
         Subset of lead weeks to plot. Defaults to ``[0, 1, 2, 3]``.
     cmap:
@@ -79,48 +75,21 @@ def plot_national_map(
     else:
         da_national = da
 
-    # Try geo path for choropleth
-    geo_ok = _try_geopandas(shapefile_path)
-    if geo_ok:
-        return _plot_national_choropleth(
-            da_national=da_national,
-            shapefile_path=Path(shapefile_path),  # type: ignore[arg-type]
-            lead_weeks=lead_weeks,
-            cmap=cmap,
-            vmin=vmin,
-            vmax=vmax,
-            title=title or f"{score_variable} (National)",
-            figsize=figsize,
-        )
-    else:
-        logger.warning(
-            "Falling back to bar chart: shapefile not available or geopandas not installed."
-        )
-        return _plot_national_bars(
-            da_national=da_national,
-            lead_weeks=lead_weeks,
-            cmap=cmap,
-            vmin=vmin,
-            vmax=vmax,
-            title=title or f"{score_variable} (National)",
-            figsize=figsize,
-        )
+    return _plot_national_choropleth(
+        da_national=da_national,
+        shapefile_path=Path(shapefile_path),  # type: ignore[arg-type]
+        lead_weeks=lead_weeks,
+        cmap=cmap,
+        vmin=vmin,
+        vmax=vmax,
+        title=title or f"{score_variable} (National)",
+        figsize=figsize,
+    )
 
 
 # ---------------------------------------------------------------------------
 # Choropleth (geopandas path)
 # ---------------------------------------------------------------------------
-
-
-def _try_geopandas(shapefile_path: str | Path | None) -> bool:
-    """Return True if geopandas is available and the shapefile exists."""
-    if shapefile_path is None:
-        return False
-    try:
-        import geopandas  # noqa: F401
-    except ImportError:
-        return False
-    return Path(shapefile_path).exists()
 
 
 def _plot_national_choropleth(
@@ -203,67 +172,5 @@ def _plot_national_choropleth(
         sm, ax=axes.ravel(), shrink=0.8, label=da_national.attrs.get("long_name", "score"), pad=0.02
     )
     fig.suptitle(title, fontsize=13, fontweight="bold")
-    fig.tight_layout()
-    return fig
-
-
-# ---------------------------------------------------------------------------
-# Bar chart fallback
-# ---------------------------------------------------------------------------
-
-
-def _plot_national_bars(
-    da_national: xr.DataArray,
-    lead_weeks: list[int],
-    cmap: str,
-    vmin: float | None,
-    vmax: float | None,
-    title: str,
-    figsize: tuple[float, float],
-) -> plt.Figure:
-    """Plot average score per lead week in a bar chart."""
-    fig, ax = plt.subplots(figsize=figsize, squeeze=True)
-
-    colormap = plt.get_cmap(cmap)
-    all_vals = (
-        da_national.values[np.isfinite(da_national.values)]
-        if da_national.values.size
-        else np.array([0.0, 1.0])
-    )
-    _vmin = float(all_vals.min()) if vmin is None else vmin
-    _vmax = float(all_vals.max()) if vmax is None else vmax
-
-    values = []
-    labels = []
-    for lw in lead_weeks:
-        if "lead_week" in da_national.dims:
-            score_val = float(da_national.sel(lead_week=lw).values)
-        else:
-            score_val = float(da_national.values)
-        values.append(score_val)
-        labels.append(_LEAD_LABELS.get(lw, f"Week {lw}"))
-
-    norm_vals = np.clip((np.array(values) - _vmin) / (_vmax - _vmin + 1e-12), 0, 1)
-    colors = [colormap(v) for v in norm_vals]
-
-    bars = ax.bar(labels, values, color=colors, edgecolor="black", linewidth=0.8)
-
-    # Add value labels on bars
-    for bar, val in zip(bars, values):
-        height = bar.get_height()
-        ax.text(
-            bar.get_x() + bar.get_width() / 2.0,
-            height,
-            f"{val:.3f}",
-            ha="center",
-            va="bottom",
-            fontsize=9,
-        )
-
-    ax.set_ylabel(da_national.attrs.get("long_name", "score"))
-    ax.set_ylim(_vmin, _vmax * 1.1)
-    ax.grid(axis="y", alpha=0.3, linestyle="--")
-
-    fig.suptitle(title, fontsize=12, fontweight="bold")
     fig.tight_layout()
     return fig
