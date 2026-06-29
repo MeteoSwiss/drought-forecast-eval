@@ -156,7 +156,7 @@ def _plot_choropleth(
             )
 
     n_panels = len(lead_weeks)
-    ncols = min(n_panels, 2)
+    ncols = min(n_panels, 4)
     nrows = int(np.ceil(n_panels / ncols))
     fig, axes = plt.subplots(nrows, ncols, figsize=figsize, squeeze=False)
 
@@ -206,9 +206,10 @@ def _plot_choropleth(
         row, col = divmod(panel_idx, ncols)
         axes[row][col].set_visible(False)
 
-    fig.colorbar(sm, ax=axes, shrink=0.6, label=da.attrs.get("long_name", da.name or "score"))
+    cbar_ax = fig.add_axes([0.94, 0.15, 0.02, 0.7])
+    fig.colorbar(sm, cax=cbar_ax, label=da.attrs.get("long_name", da.name or "score"))
     fig.suptitle(title, fontsize=13, fontweight="bold")
-    fig.tight_layout()
+    fig.tight_layout(rect=[0, 0, 0.94, 1])
     return fig
 
 

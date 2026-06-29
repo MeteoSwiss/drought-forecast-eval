@@ -92,3 +92,45 @@ class TestLoadObservations:
         from drought_forecast_eval.io.loader import load_observations
         with pytest.raises(FileNotFoundError):
             load_observations("/nonexistent/file.zip")
+
+
+class TestLoadObservationsCombined:
+    def test_returns_dataset(self, ds_obs_combined):
+        assert isinstance(ds_obs_combined, xr.Dataset)
+
+    def test_expected_dimensions(self, ds_obs_combined):
+        assert "drought_region_id" in ds_obs_combined.dims
+        assert "valid_at" in ds_obs_combined.dims
+
+    def test_extends_beyond_historic_cutoff(self, ds_obs_combined, ds_obs):
+        """Combined dataset must contain dates that the historic-only dataset lacks."""
+        hist_max = ds_obs["valid_at"].values.max()
+        combined_max = ds_obs_combined["valid_at"].values.max()
+        assert combined_max > hist_max, (
+            f"Combined max ({combined_max}) should exceed historic max ({hist_max})"
+        )
+
+    def test_historic_rows_preserved(self, ds_obs_combined, ds_obs):
+        """All dates present in the historic dataset must still be present."""
+        import numpy as np
+        hist_dates = set(ds_obs["valid_at"].values.tolist())
+        combined_dates = set(ds_obs_combined["valid_at"].values.tolist())
+        assert hist_dates.issubset(combined_dates), (
+            f"{len(hist_dates - combined_dates)} historic dates missing from combined dataset"
+        )
+
+    def test_no_duplicate_dates_per_region(self, ds_obs_combined):
+        """After merging, each (region, date) pair must appear exactly once."""
+        df = ds_obs_combined.to_dataframe().reset_index()
+        dupes = df.duplicated(subset=["drought_region_id", "valid_at"]).sum()
+        assert dupes == 0, f"{dupes} duplicate (region, date) pairs found"
+
+    def test_missing_historic_raises(self, tmp_path):
+        from drought_forecast_eval.io.loader import load_observations_combined
+        with pytest.raises(FileNotFoundError, match="Historic archive not found"):
+            load_observations_combined("/nonexistent/historic.zip", tmp_path)
+
+    def test_missing_archive_dir_raises(self):
+        from drought_forecast_eval.io.loader import load_observations_combined
+        with pytest.raises(FileNotFoundError, match="Archive directory not found"):
+            load_observations_combined(HISTORIC_ZIP, "/nonexistent/dir")

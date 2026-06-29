@@ -50,30 +50,37 @@ def ds_fcst():
 
 @pytest.fixture(scope="session")
 def ds_obs():
-    """Load the fixture observation dataset."""
+    """Load the fixture observation dataset (historic only)."""
     from drought_forecast_eval.io.loader import load_observations
     return load_observations(HISTORIC_ZIP)
 
 
 @pytest.fixture(scope="session")
-def ds_merged(ds_fcst, ds_obs):
-    """Merged forecast+observation dataset."""
-    from drought_forecast_eval.processing.alignment import align_obs_to_forecast
-    return align_obs_to_forecast(ds_fcst, ds_obs)
+def ds_obs_combined():
+    """Combined observation dataset: historic ZIP merged with latest current ZIP."""
+    from drought_forecast_eval.io.loader import load_observations_combined
+    return load_observations_combined(HISTORIC_ZIP, ARCHIVE_DIR)
 
 
 @pytest.fixture(scope="session")
-def ds_clim_ref(ds_obs, ds_fcst):
+def ds_merged(ds_fcst, ds_obs_combined):
+    """Merged forecast+observation dataset (uses combined obs for full coverage)."""
+    from drought_forecast_eval.processing.alignment import align_obs_to_forecast
+    return align_obs_to_forecast(ds_fcst, ds_obs_combined)
+
+
+@pytest.fixture(scope="session")
+def ds_clim_ref(ds_obs_combined, ds_fcst):
     """Climatology reference dataset."""
     from drought_forecast_eval.processing.reference import climatology_reference
-    return climatology_reference(ds_obs, ds_fcst, week_window=2)
+    return climatology_reference(ds_obs_combined, ds_fcst, week_window=2)
 
 
 @pytest.fixture(scope="session")
-def ds_pers_ref(ds_obs, ds_fcst):
+def ds_pers_ref(ds_obs_combined, ds_fcst):
     """Persistence reference dataset."""
     from drought_forecast_eval.processing.reference import persistence_reference
-    return persistence_reference(ds_obs, ds_fcst)
+    return persistence_reference(ds_obs_combined, ds_fcst)
 
 
 @pytest.fixture(scope="session")
