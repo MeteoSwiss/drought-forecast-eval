@@ -137,3 +137,78 @@ def plot_skill_vs_lead(
     ax.grid(True, linestyle="--", alpha=0.4)
     fig.tight_layout()
     return fig
+
+
+def plot_forecast_plume(
+    ds_merged: xr.Dataset,
+    ds_ref_clim: xr.Dataset,
+    ds_ref_pers: xr.Dataset,
+    var: str,
+    rid: int,
+    ax: plt.Axes | None = None,
+) -> tuple[plt.Figure, np.ndarray]:
+    """Plot forecast plume for a given variable and region.
+
+    Parameters
+    ----------
+    ds_merged:
+        Merged dataset containing forecast and observation data.
+    ds_ref_clim:
+        Reference climatology dataset.
+    ds_ref_pers:
+        Reference persistence dataset.
+    var:
+        Variable name (e.g., "spi_1m").
+    rid:
+        Drought region ID.
+    ax:
+        Matplotlib Axes object to plot on. If None, a new figure and axes are
+        created.
+
+    Returns
+    -------
+    tuple[matplotlib.figure.Figure, numpy.ndarray]
+        A tuple of (fig, axes) where fig is the matplotlib Figure and axes is
+        an array of Axes objects, one per lead week.
+
+    """
+    n_lead_weeks = ds_merged.sizes["lead_week"]
+
+    fig, axes = plt.subplots(nrows=4, ncols=1, figsize=(12, 16))
+    axes = axes.flatten()
+
+    d_style = "steps-mid"
+
+    for lw in range(n_lead_weeks):
+        ax = axes[lw]
+        series_p10 = ds_merged.isel(drought_region_id=rid, lead_week=lw)[f"{var}_p10"]
+        series_p50 = ds_merged.isel(drought_region_id=rid, lead_week=lw)[f"{var}_p50"]
+        series_p90 = ds_merged.isel(drought_region_id=rid, lead_week=lw)[f"{var}_p90"]
+        series_obs = ds_merged.isel(drought_region_id=rid, lead_week=lw)[f"{var}_obs"]
+
+        series_ref_clim = ds_ref_clim.isel(drought_region_id=rid, lead_week=lw)[f"{var}_ref_p50"]
+        # series_ref_pers = ds_ref_pers.isel(drought_region_id=rid, lead_week=lw)[f"{var}_ref_p50"]
+
+        x = series_p50["forecast_reference_time"].values
+        ax.fill_between(  # type: ignore[call-arg]
+            x, series_p10.values, series_p90.values, color="red", alpha=0.2, label="p10-p90 plume"
+        )
+        series_p50.plot(  # type: ignore[call-arg]
+            x="forecast_reference_time", ax=ax, color="red", label="p50", drawstyle=d_style
+        )
+        series_obs.plot(  # type: ignore[call-arg]
+            x="forecast_reference_time", ax=ax, color="green", label="obs", drawstyle=d_style
+        )
+        series_ref_clim.plot(  # type: ignore[call-arg]
+            x="forecast_reference_time", ax=ax, color="blue", label="clim", drawstyle=d_style
+        )
+        ax.legend()
+        ax.set_title(f"{var} forecast plume for region {rid}, lead week {lw}")
+        ax.set_ylabel(var)
+
+    for lw in range(n_lead_weeks, len(axes)):
+        axes[lw].set_visible(False)
+    plt.tight_layout()
+    plt.show()
+
+    return fig, axes
