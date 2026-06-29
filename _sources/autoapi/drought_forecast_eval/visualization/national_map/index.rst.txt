@@ -1,0 +1,55 @@
+drought_forecast_eval.visualization.national_map
+================================================
+
+.. py:module:: drought_forecast_eval.visualization.national_map
+
+.. autoapi-nested-parse::
+
+   National-level score visualization for entire Switzerland.
+
+   ``plot_national_map``
+       Creates a 4-panel figure (one panel per lead week) showing the national
+       average score as a simplified representation (using Switzerland's full
+       geographic extent if shapefile is available, or a simple bar chart).
+
+
+
+Attributes
+----------
+
+.. autoapisummary::
+
+   drought_forecast_eval.visualization.national_map.logger
+
+
+Functions
+---------
+
+.. autoapisummary::
+
+   drought_forecast_eval.visualization.national_map.plot_national_map
+
+
+Module Contents
+---------------
+
+.. py:data:: logger
+
+.. py:function:: plot_national_map(ds_scores: xarray.Dataset, score_variable: str, shapefile_path: str | pathlib.Path | None = None, lead_weeks: list[int] | None = None, cmap: str = 'RdYlGn', vmin: float | None = None, vmax: float | None = None, title: str | None = None, figsize: tuple[float, float] = (14, 5)) -> matplotlib.pyplot.Figure
+
+   Plot 4-panel visualization of national-level (averaged) score per lead week.
+
+   Creates one choropleth panel per lead week, showing the national average score.
+
+   :Parameters: * **ds_scores** -- Scores dataset with dimensions ``(lead_week, drought_region_id)``.
+                * **score_variable** -- Name of the score variable to plot (e.g. ``"spi_1m_mae"``).
+                * **shapefile_path** -- Path to the ``.shp`` / ``.geojson`` file of Switzerland regions.
+                * **lead_weeks** -- Subset of lead weeks to plot. Defaults to ``[0, 1, 2, 3]``.
+                * **cmap** -- Matplotlib colormap name.
+                * **vmin, vmax** -- Colour scale limits. If ``None``, derived from the data.
+                * **title** -- Figure suptitle.
+                * **figsize** -- Figure size in inches.
+
+   :rtype: matplotlib.figure.Figure
+
+

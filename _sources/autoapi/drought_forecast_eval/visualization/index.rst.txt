@@ -16,6 +16,7 @@ Submodules
    :maxdepth: 1
 
    /autoapi/drought_forecast_eval/visualization/experiment_comparison/index
+   /autoapi/drought_forecast_eval/visualization/national_map/index
    /autoapi/drought_forecast_eval/visualization/region_map/index
    /autoapi/drought_forecast_eval/visualization/skill_curves/index
 

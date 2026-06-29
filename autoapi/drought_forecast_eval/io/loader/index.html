@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=00b300d8"></script>
+    <script src="../../../../_static/documentation_options.js?v=848d8c36"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'autoapi/drought_forecast_eval/io/loader/index';</script>
@@ -57,7 +57,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="dev" />
-    <meta name="docbuild:last-update" content="21.05.2026"/>
+    <meta name="docbuild:last-update" content="29.06.2026"/>
   </head>
   
   
@@ -353,6 +353,7 @@
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../visualization/index.html">drought_forecast_eval.visualization</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../visualization/experiment_comparison/index.html">drought_forecast_eval.visualization.experiment_comparison</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../visualization/national_map/index.html">drought_forecast_eval.visualization.national_map</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../visualization/region_map/index.html">drought_forecast_eval.visualization.region_map</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../visualization/skill_curves/index.html">drought_forecast_eval.visualization.skill_curves</a></li>
 </ul>
@@ -437,6 +438,13 @@ concatenates along the <code class="docutils literal notranslate"><span class="p
 against <code class="docutils literal notranslate"><span class="pre">OBSERVATION_SCHEMA</span></code>, and returns an observation dataset indexed
 by <code class="docutils literal notranslate"><span class="pre">(drought_region_id,</span> <span class="pre">valid_at)</span></code>.</p>
 </dd>
+<dt><code class="docutils literal notranslate"><span class="pre">load_observations_combined</span></code></dt><dd><p>Merges the historic ZIP with the <em>latest</em> current ZIP from the rolling
+archive.  The latest current ZIP contains a 52-week rolling window of
+actuals (<code class="docutils literal notranslate"><span class="pre">weekly_current_regions.csv</span></code>), covering dates that are not yet
+in the historic file (e.g. the current calendar year).  Historic rows take
+precedence on any overlap; current rows fill the gap beyond the historic
+cutoff.  This is the recommended loader for the verification pipeline.</p>
+</dd>
 </dl>
 <section id="attributes">
 <h2>Attributes<a class="headerlink" href="#attributes" title="Link to this heading">#</a></h2>
@@ -458,6 +466,9 @@ by <code class="docutils literal notranslate"><span class="pre">(drought_region_
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#drought_forecast_eval.io.loader.load_observations" title="drought_forecast_eval.io.loader.load_observations"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_observations</span></code></a>(→ xarray.Dataset)</p></td>
 <td><p>Load the full observation archive from the historic ZIP.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#drought_forecast_eval.io.loader.load_observations_combined" title="drought_forecast_eval.io.loader.load_observations_combined"><code class="xref py py-obj docutils literal notranslate"><span class="pre">load_observations_combined</span></code></a>(→ xarray.Dataset)</p></td>
+<td><p>Load observations from the historic ZIP, extended with the latest current ZIP.</p></td>
 </tr>
 </tbody>
 </table>
@@ -536,6 +547,54 @@ Variables: all observation columns from <code class="docutils literal notranslat
 </dl>
 </dd></dl>
 
+<dl class="py function">
+<dt class="sig sig-object py" id="drought_forecast_eval.io.loader.load_observations_combined">
+<span class="sig-name descname"><span class="pre">load_observations_combined</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">historic_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">archive_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">region_ids</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">xarray.Dataset</span></span></span><a class="reference internal" href="../../../../_modules/drought_forecast_eval/io/loader.html#load_observations_combined"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drought_forecast_eval.io.loader.load_observations_combined" title="Link to this definition">#</a></dt>
+<dd><p>Load observations from the historic ZIP, extended with the latest current ZIP.</p>
+<p>The historic ZIP (<code class="docutils literal notranslate"><span class="pre">weekly_historic_regions.csv</span></code>) provides the deep
+climate baseline back to ~1990.  The most-recent ZIP in <code class="docutils literal notranslate"><span class="pre">archive_dir</span></code>
+contains <code class="docutils literal notranslate"><span class="pre">weekly_current_regions.csv</span></code> — a rolling 52-week window of
+actuals that covers dates not yet present in the historic file (typically
+the current calendar year).</p>
+<section id="merging-strategy">
+<h3>Merging strategy<a class="headerlink" href="#merging-strategy" title="Link to this heading">#</a></h3>
+<ol class="arabic simple">
+<li><p>Parse both sources into DataFrames on the <code class="docutils literal notranslate"><span class="pre">(drought_region_id,</span>
+<span class="pre">measured_at)</span></code> index.</p></li>
+<li><p>Concatenate historic first, then current.</p></li>
+<li><p>Drop duplicates keeping the <em>first</em> occurrence — historic rows win on
+any overlap, current rows fill the gap beyond the historic cutoff.</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>historic_path</strong> – Path to the historic ZIP file
+(<code class="docutils literal notranslate"><span class="pre">trockenheitsdaten-numerisch_historic.csv.zip</span></code>).</p></li>
+<li><p><strong>archive_dir</strong> – Flat directory of daily rolling ZIP files.  Only the lexicographically
+last file (= most-recent date) is read.</p></li>
+<li><p><strong>region_ids</strong> – Optional list of <code class="docutils literal notranslate"><span class="pre">drought_region_id</span></code> integers to keep.</p></li>
+</ul>
+</dd>
+<dt class="field-even">returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dimensions: <code class="docutils literal notranslate"><span class="pre">(drought_region_id,</span> <span class="pre">valid_at)</span></code>
+Variables: all observation columns from <code class="docutils literal notranslate"><span class="pre">OBSERVATION_SCHEMA</span></code>.</p>
+</dd>
+<dt class="field-odd">rtype<span class="colon">:</span></dt>
+<dd class="field-odd"><p>xr.Dataset</p>
+</dd>
+<dt class="field-even">raises FileNotFoundError<span class="colon">:</span></dt>
+<dd class="field-even"><p>If <code class="docutils literal notranslate"><span class="pre">historic_path</span></code> or <code class="docutils literal notranslate"><span class="pre">archive_dir</span></code> does not exist.</p>
+</dd>
+<dt class="field-odd">raises RuntimeError<span class="colon">:</span></dt>
+<dd class="field-odd"><p>If no current ZIP files are found in <code class="docutils literal notranslate"><span class="pre">archive_dir</span></code>.</p>
+</dd>
+<dt class="field-even">raises SchemaError<span class="colon">:</span></dt>
+<dd class="field-even"><p>If either CSV is structurally invalid.</p>
+</dd>
+</dl>
+</section>
+</dd></dl>
+
 </section>
 </section>
 
@@ -592,6 +651,7 @@ Variables: all observation columns from <code class="docutils literal notranslat
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.io.loader.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.io.loader.load_forecasts"><code class="docutils literal notranslate"><span class="pre">load_forecasts()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.io.loader.load_observations"><code class="docutils literal notranslate"><span class="pre">load_observations()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.io.loader.load_observations_combined"><code class="docutils literal notranslate"><span class="pre">load_observations_combined()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -619,10 +679,10 @@ Variables: all observation columns from <code class="docutils literal notranslat
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-Drought Forecast Eval, version: dev-962af4c</div>
+Drought Forecast Eval, version: dev-0bff5fc</div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on 21.05.2026.
+  Last updated on 29.06.2026.
   <br/>
 </p></div>
       

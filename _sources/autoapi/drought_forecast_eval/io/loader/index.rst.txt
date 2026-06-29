@@ -17,6 +17,14 @@ drought_forecast_eval.io.loader
        against ``OBSERVATION_SCHEMA``, and returns an observation dataset indexed
        by ``(drought_region_id, valid_at)``.
 
+   ``load_observations_combined``
+       Merges the historic ZIP with the *latest* current ZIP from the rolling
+       archive.  The latest current ZIP contains a 52-week rolling window of
+       actuals (``weekly_current_regions.csv``), covering dates that are not yet
+       in the historic file (e.g. the current calendar year).  Historic rows take
+       precedence on any overlap; current rows fill the gap beyond the historic
+       cutoff.  This is the recommended loader for the verification pipeline.
+
 
 
 Attributes
@@ -34,6 +42,7 @@ Functions
 
    drought_forecast_eval.io.loader.load_forecasts
    drought_forecast_eval.io.loader.load_observations
+   drought_forecast_eval.io.loader.load_observations_combined
 
 
 Module Contents
@@ -79,5 +88,38 @@ Module Contents
 
    :raises FileNotFoundError: If the path does not exist.
    :raises SchemaError: If the CSV is structurally invalid.
+
+
+.. py:function:: load_observations_combined(historic_path: str | pathlib.Path, archive_dir: str | pathlib.Path, region_ids: list[int] | None = None) -> xarray.Dataset
+
+   Load observations from the historic ZIP, extended with the latest current ZIP.
+
+   The historic ZIP (``weekly_historic_regions.csv``) provides the deep
+   climate baseline back to ~1990.  The most-recent ZIP in ``archive_dir``
+   contains ``weekly_current_regions.csv`` — a rolling 52-week window of
+   actuals that covers dates not yet present in the historic file (typically
+   the current calendar year).
+
+   Merging strategy
+   ----------------
+   1. Parse both sources into DataFrames on the ``(drought_region_id,
+      measured_at)`` index.
+   2. Concatenate historic first, then current.
+   3. Drop duplicates keeping the *first* occurrence — historic rows win on
+      any overlap, current rows fill the gap beyond the historic cutoff.
+
+   :Parameters: * **historic_path** -- Path to the historic ZIP file
+                  (``trockenheitsdaten-numerisch_historic.csv.zip``).
+                * **archive_dir** -- Flat directory of daily rolling ZIP files.  Only the lexicographically
+                  last file (= most-recent date) is read.
+                * **region_ids** -- Optional list of ``drought_region_id`` integers to keep.
+
+   :returns: Dimensions: ``(drought_region_id, valid_at)``
+             Variables: all observation columns from ``OBSERVATION_SCHEMA``.
+   :rtype: xr.Dataset
+
+   :raises FileNotFoundError: If ``historic_path`` or ``archive_dir`` does not exist.
+   :raises RuntimeError: If no current ZIP files are found in ``archive_dir``.
+   :raises SchemaError: If either CSV is structurally invalid.
 
 
