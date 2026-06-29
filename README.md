@@ -35,6 +35,16 @@ precipitation, streamflow, soil moisture, CDI) and all lead times (week 0–3).
 poetry install --with dev,report,notebook
 ```
 
+## jupyter lab
+
+```bash
+poetry run jupyter lab
+```
+
+Open the template notebook under `notebooks/template_verification.ipynb`
+
+### SDK
+
 ```python
 from drought_forecast_eval import (
     load_forecasts, load_observations,
