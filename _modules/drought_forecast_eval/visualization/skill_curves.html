@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=848d8c36"></script>
+    <script src="../../../_static/documentation_options.js?v=5c8967e1"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/drought_forecast_eval/visualization/skill_curves';</script>
@@ -509,6 +509,84 @@
     <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">fig</span></div>
 
+
+
+<div class="viewcode-block" id="plot_forecast_plume">
+<a class="viewcode-back" href="../../../autoapi/drought_forecast_eval/visualization/skill_curves/index.html#drought_forecast_eval.visualization.plot_forecast_plume">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_forecast_plume</span><span class="p">(</span>
+    <span class="n">ds_merged</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">ds_ref_clim</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">ds_ref_pers</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
+    <span class="n">var</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">rid</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">ax</span><span class="p">:</span> <span class="n">plt</span><span class="o">.</span><span class="n">Axes</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">plt</span><span class="o">.</span><span class="n">Figure</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Plot forecast plume for a given variable and region.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ds_merged:</span>
+<span class="sd">        Merged dataset containing forecast and observation data.</span>
+<span class="sd">    ds_ref_clim:</span>
+<span class="sd">        Reference climatology dataset.</span>
+<span class="sd">    ds_ref_pers:</span>
+<span class="sd">        Reference persistence dataset.</span>
+<span class="sd">    var:</span>
+<span class="sd">        Variable name (e.g., &quot;spi_1m&quot;).</span>
+<span class="sd">    rid:</span>
+<span class="sd">        Drought region ID.</span>
+<span class="sd">    ax:</span>
+<span class="sd">        Matplotlib Axes object to plot on. If None, a new figure and axes are</span>
+<span class="sd">        created.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    tuple[matplotlib.figure.Figure, numpy.ndarray]</span>
+<span class="sd">        A tuple of (fig, axes) where fig is the matplotlib Figure and axes is</span>
+<span class="sd">        an array of Axes objects, one per lead week.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_lead_weeks</span> <span class="o">=</span> <span class="n">ds_merged</span><span class="o">.</span><span class="n">sizes</span><span class="p">[</span><span class="s2">&quot;lead_week&quot;</span><span class="p">]</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">16</span><span class="p">))</span>
+    <span class="n">axes</span> <span class="o">=</span> <span class="n">axes</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+    <span class="n">d_style</span> <span class="o">=</span> <span class="s2">&quot;steps-mid&quot;</span>
+
+    <span class="k">for</span> <span class="n">lw</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_lead_weeks</span><span class="p">):</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">axes</span><span class="p">[</span><span class="n">lw</span><span class="p">]</span>
+        <span class="n">series_p10</span> <span class="o">=</span> <span class="n">ds_merged</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">drought_region_id</span><span class="o">=</span><span class="n">rid</span><span class="p">,</span> <span class="n">lead_week</span><span class="o">=</span><span class="n">lw</span><span class="p">)[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">_p10&quot;</span><span class="p">]</span>
+        <span class="n">series_p50</span> <span class="o">=</span> <span class="n">ds_merged</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">drought_region_id</span><span class="o">=</span><span class="n">rid</span><span class="p">,</span> <span class="n">lead_week</span><span class="o">=</span><span class="n">lw</span><span class="p">)[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">_p50&quot;</span><span class="p">]</span>
+        <span class="n">series_p90</span> <span class="o">=</span> <span class="n">ds_merged</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">drought_region_id</span><span class="o">=</span><span class="n">rid</span><span class="p">,</span> <span class="n">lead_week</span><span class="o">=</span><span class="n">lw</span><span class="p">)[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">_p90&quot;</span><span class="p">]</span>
+        <span class="n">series_obs</span> <span class="o">=</span> <span class="n">ds_merged</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">drought_region_id</span><span class="o">=</span><span class="n">rid</span><span class="p">,</span> <span class="n">lead_week</span><span class="o">=</span><span class="n">lw</span><span class="p">)[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">_obs&quot;</span><span class="p">]</span>
+
+        <span class="n">series_ref_clim</span> <span class="o">=</span> <span class="n">ds_ref_clim</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">drought_region_id</span><span class="o">=</span><span class="n">rid</span><span class="p">,</span> <span class="n">lead_week</span><span class="o">=</span><span class="n">lw</span><span class="p">)[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2">_ref_p50&quot;</span><span class="p">]</span>
+        <span class="c1"># series_ref_pers = ds_ref_pers.isel(drought_region_id=rid, lead_week=lw)[f&quot;{var}_ref_p50&quot;]</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="n">series_p50</span><span class="p">[</span><span class="s2">&quot;forecast_reference_time&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span>  <span class="c1"># type: ignore[call-arg]</span>
+            <span class="n">x</span><span class="p">,</span> <span class="n">series_p10</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">series_p90</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;p10-p90 plume&quot;</span>
+        <span class="p">)</span>
+        <span class="n">series_p50</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>  <span class="c1"># type: ignore[call-arg]</span>
+            <span class="n">x</span><span class="o">=</span><span class="s2">&quot;forecast_reference_time&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;red&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;p50&quot;</span><span class="p">,</span> <span class="n">drawstyle</span><span class="o">=</span><span class="n">d_style</span>
+        <span class="p">)</span>
+        <span class="n">series_obs</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>  <span class="c1"># type: ignore[call-arg]</span>
+            <span class="n">x</span><span class="o">=</span><span class="s2">&quot;forecast_reference_time&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;obs&quot;</span><span class="p">,</span> <span class="n">drawstyle</span><span class="o">=</span><span class="n">d_style</span>
+        <span class="p">)</span>
+        <span class="n">series_ref_clim</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span>  <span class="c1"># type: ignore[call-arg]</span>
+            <span class="n">x</span><span class="o">=</span><span class="s2">&quot;forecast_reference_time&quot;</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;clim&quot;</span><span class="p">,</span> <span class="n">drawstyle</span><span class="o">=</span><span class="n">d_style</span>
+        <span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> forecast plume for region </span><span class="si">{</span><span class="n">rid</span><span class="si">}</span><span class="s2">, lead week </span><span class="si">{</span><span class="n">lw</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">lw</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_lead_weeks</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">axes</span><span class="p">)):</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">lw</span><span class="p">]</span><span class="o">.</span><span class="n">set_visible</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span></div>
+
 </pre></div>
 
                 </article>
@@ -547,7 +625,7 @@
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-Drought Forecast Eval, version: dev-0bff5fc</div>
+Drought Forecast Eval, version: dev-ceb8cbe</div>
       
         <div class="footer-item"><p class="last-updated">
   Last updated on 29.06.2026.

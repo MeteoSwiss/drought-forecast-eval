@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=848d8c36"></script>
+    <script src="../../../../_static/documentation_options.js?v=5c8967e1"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'autoapi/drought_forecast_eval/visualization/skill_curves/index';</script>
@@ -457,6 +457,9 @@ with lead_week on the x-axis.  Supports:</p>
 <tr class="row-odd"><td><p><a class="reference internal" href="#drought_forecast_eval.visualization.skill_curves.plot_skill_vs_lead" title="drought_forecast_eval.visualization.skill_curves.plot_skill_vs_lead"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_skill_vs_lead</span></code></a>() → matplotlib.pyplot.Figure)</p></td>
 <td><p>Plot score vs. lead week for multiple variables.</p></td>
 </tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#drought_forecast_eval.visualization.skill_curves.plot_forecast_plume" title="drought_forecast_eval.visualization.skill_curves.plot_forecast_plume"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_forecast_plume</span></code></a>(→ tuple[matplotlib.pyplot.Figure, ...)</p></td>
+<td><p>Plot forecast plume for a given variable and region.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -492,6 +495,32 @@ shading as ±1 std across regions.</p></li>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>matplotlib.figure.Figure</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="drought_forecast_eval.visualization.skill_curves.plot_forecast_plume">
+<span class="sig-name descname"><span class="pre">plot_forecast_plume</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ds_merged</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds_ref_clim</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ds_ref_pers</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">xarray.Dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">matplotlib.pyplot.Axes</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">matplotlib.pyplot.Figure</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">numpy.ndarray</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/drought_forecast_eval/visualization/skill_curves.html#plot_forecast_plume"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drought_forecast_eval.visualization.skill_curves.plot_forecast_plume" title="Link to this definition">#</a></dt>
+<dd><p>Plot forecast plume for a given variable and region.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ds_merged</strong> – Merged dataset containing forecast and observation data.</p></li>
+<li><p><strong>ds_ref_clim</strong> – Reference climatology dataset.</p></li>
+<li><p><strong>ds_ref_pers</strong> – Reference persistence dataset.</p></li>
+<li><p><strong>var</strong> – Variable name (e.g., “spi_1m”).</p></li>
+<li><p><strong>rid</strong> – Drought region ID.</p></li>
+<li><p><strong>ax</strong> – Matplotlib Axes object to plot on. If None, a new figure and axes are
+created.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tuple of (fig, axes) where fig is the matplotlib Figure and axes is
+an array of Axes objects, one per lead week.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>tuple[matplotlib.figure.Figure, numpy.ndarray]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -542,6 +571,7 @@ shading as ±1 std across regions.</p></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module Contents</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.visualization.skill_curves.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.visualization.skill_curves.plot_skill_vs_lead"><code class="docutils literal notranslate"><span class="pre">plot_skill_vs_lead()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.visualization.skill_curves.plot_forecast_plume"><code class="docutils literal notranslate"><span class="pre">plot_forecast_plume()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -569,7 +599,7 @@ shading as ±1 std across regions.</p></li>
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-Drought Forecast Eval, version: dev-0bff5fc</div>
+Drought Forecast Eval, version: dev-ceb8cbe</div>
       
         <div class="footer-item"><p class="last-updated">
   Last updated on 29.06.2026.

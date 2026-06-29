@@ -32,6 +32,7 @@ Functions
 .. autoapisummary::
 
    drought_forecast_eval.visualization.skill_curves.plot_skill_vs_lead
+   drought_forecast_eval.visualization.skill_curves.plot_forecast_plume
 
 
 Module Contents
@@ -58,5 +59,22 @@ Module Contents
                 * **figsize** -- Figure size in inches.
 
    :rtype: matplotlib.figure.Figure
+
+
+.. py:function:: plot_forecast_plume(ds_merged: xarray.Dataset, ds_ref_clim: xarray.Dataset, ds_ref_pers: xarray.Dataset, var: str, rid: int, ax: matplotlib.pyplot.Axes | None = None) -> tuple[matplotlib.pyplot.Figure, numpy.ndarray]
+
+   Plot forecast plume for a given variable and region.
+
+   :Parameters: * **ds_merged** -- Merged dataset containing forecast and observation data.
+                * **ds_ref_clim** -- Reference climatology dataset.
+                * **ds_ref_pers** -- Reference persistence dataset.
+                * **var** -- Variable name (e.g., "spi_1m").
+                * **rid** -- Drought region ID.
+                * **ax** -- Matplotlib Axes object to plot on. If None, a new figure and axes are
+                  created.
+
+   :returns: A tuple of (fig, axes) where fig is the matplotlib Figure and axes is
+             an array of Axes objects, one per lead week.
+   :rtype: tuple[matplotlib.figure.Figure, numpy.ndarray]
 
 
