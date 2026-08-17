@@ -141,11 +141,12 @@ def plot_skill_vs_lead(
 
 def plot_forecast_plume(
     ds_merged: xr.Dataset,
-    ds_ref_clim: xr.Dataset,
-    ds_ref_pers: xr.Dataset,
     var: str,
     rid: int,
+    ds_ref_clim: xr.Dataset | None = None,
+    ds_ref_pers: xr.Dataset | None = None,
     ax: plt.Axes | None = None,
+    time_dim: str = "forecast_reference_time"
 ) -> tuple[plt.Figure, np.ndarray]:
     """Plot forecast plume for a given variable and region.
 
@@ -181,27 +182,36 @@ def plot_forecast_plume(
 
     for lw in range(n_lead_weeks):
         ax = axes[lw]
-        series_p10 = ds_merged.isel(drought_region_id=rid, lead_week=lw)[f"{var}_p10"]
+
         series_p50 = ds_merged.isel(drought_region_id=rid, lead_week=lw)[f"{var}_p50"]
-        series_p90 = ds_merged.isel(drought_region_id=rid, lead_week=lw)[f"{var}_p90"]
+        try:
+            series_p10 = ds_merged.isel(drought_region_id=rid, lead_week=lw)[f"{var}_p10"]
+            series_p90 = ds_merged.isel(drought_region_id=rid, lead_week=lw)[f"{var}_p90"]
+        except KeyError:
+            series_p10 = None
+            series_p90 = None
         series_obs = ds_merged.isel(drought_region_id=rid, lead_week=lw)[f"{var}_obs"]
 
-        series_ref_clim = ds_ref_clim.isel(drought_region_id=rid, lead_week=lw)[f"{var}_ref_p50"]
+
         # series_ref_pers = ds_ref_pers.isel(drought_region_id=rid, lead_week=lw)[f"{var}_ref_p50"]
 
-        x = series_p50["forecast_reference_time"].values
-        ax.fill_between(  # type: ignore[call-arg]
-            x, series_p10.values, series_p90.values, color="red", alpha=0.2, label="p10-p90 plume"
-        )
+        x = series_p50[time_dim].values
+
+        if series_p10 is not None and series_p90 is not None:
+            ax.fill_between(  # type: ignore[call-arg]
+                x, series_p10.values, series_p90.values, color="red", alpha=0.2, label="p10-p90 plume"
+            )
         series_p50.plot(  # type: ignore[call-arg]
-            x="forecast_reference_time", ax=ax, color="red", label="p50", drawstyle=d_style
+            x=time_dim, ax=ax, color="red", label="p50", drawstyle=d_style
         )
         series_obs.plot(  # type: ignore[call-arg]
-            x="forecast_reference_time", ax=ax, color="green", label="obs", drawstyle=d_style
+            x=time_dim, ax=ax, color="green", label="obs", drawstyle=d_style
         )
-        series_ref_clim.plot(  # type: ignore[call-arg]
-            x="forecast_reference_time", ax=ax, color="blue", label="clim", drawstyle=d_style
-        )
+        if ds_ref_clim is not None:
+            series_ref_clim = ds_ref_clim.isel(drought_region_id=rid, lead_week=lw)[f"{var}_ref_p50"]
+            series_ref_clim.plot(  # type: ignore[call-arg]
+                x=time_dim, ax=ax, color="blue", label="clim", drawstyle=d_style
+            )
         ax.legend()
         ax.set_title(f"{var} forecast plume for region {rid}, lead week {lw}")
         ax.set_ylabel(var)

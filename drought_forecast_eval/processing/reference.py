@@ -28,7 +28,6 @@ from __future__ import annotations
 import logging
 
 import numpy as np
-import pandas as pd
 import xarray as xr
 
 logger = logging.getLogger(__name__)
@@ -69,86 +68,78 @@ def climatology_reference(
         For each observation variable ``v`` the dataset contains
         ``v_ref_p10``, ``v_ref_p50``, ``v_ref_p90``.
     """
-    # Convert observations to pandas for efficient grouped operations
-    obs_df = ds_obs.to_dataframe().reset_index()
-    obs_df["week_of_year"] = obs_df["valid_at"].dt.isocalendar().week.astype(int)
-
-    # Target grid: valid_at per (frt, region, lead_week)
-    valid_at_da = ds_fcst["valid_at"]  # dims: (frt, region, lead_week)
-    region_dim = "drought_region_id"
     frt_dim = "forecast_reference_time"
+    region_dim = "drought_region_id"
     lead_dim = "lead_week"
 
-    # Flatten the grid to iterate efficiently
+    # ISO week-of-year and year for observations — no DataFrame conversion
+    obs_cal = ds_obs.valid_at.dt.isocalendar()
+    obs_woy = obs_cal.week.values.astype(np.int32)
+    obs_year = obs_cal.year.values.astype(np.int32)
+
+    # Same quantities for every grid cell in the forecast valid_at array
+    valid_at_da = ds_fcst["valid_at"]  # (frt, region, lead)
+    fcst_cal = valid_at_da.dt.isocalendar()
+    _woy = fcst_cal.week.values
+    _year = fcst_cal.year.values
+    nat_flag = np.isnan(_woy.astype(float))
+    fcst_woy = np.where(nat_flag, -1, _woy).astype(np.int32)
+    fcst_year = np.where(nat_flag, -1, _year).astype(np.int32)
+
+    valid_flag = fcst_woy >= 0
+    unique_pairs = (
+        np.unique(np.column_stack([fcst_woy[valid_flag], fcst_year[valid_flag]]), axis=0)
+        if valid_flag.any()
+        else np.empty((0, 2), dtype=np.int32)
+    )
+
     frt_vals = ds_fcst[frt_dim].values
     region_vals = ds_fcst[region_dim].values
     lead_vals = ds_fcst[lead_dim].values
-
     obs_vars = list(ds_obs.data_vars)
-
-    # Build output arrays:  shape (n_frt, n_region, n_lead)
-    n_frt = len(frt_vals)
-    n_region = len(region_vals)
-    n_lead = len(lead_vals)
+    n_frt, n_region, n_lead = len(frt_vals), len(region_vals), len(lead_vals)
     shape = (n_frt, n_region, n_lead)
 
     results: dict[str, np.ndarray] = {
-        f"{v}_ref_{q}": np.full(shape, np.nan) for v in obs_vars for q in ("p10", "p50", "p90")
+        f"{v}_ref_{q}": np.full(shape, np.nan)
+        for v in obs_vars for q in ("p10", "p50", "p90")
     }
+    q_map = {"p10": 0.1, "p50": 0.5, "p90": 0.9}
 
-    for i_r, region in enumerate(region_vals):
-        region_obs = obs_df[obs_df[region_dim] == region]
-        for i_f, frt in enumerate(frt_vals):
-            for i_l, lead in enumerate(lead_vals):
-                target_valid_at = valid_at_da.sel(
-                    {frt_dim: frt, region_dim: region, lead_dim: lead}
-                ).values
-                if pd.isna(target_valid_at):
-                    continue
-                target_ts = pd.Timestamp(target_valid_at)
-                target_woy = target_ts.isocalendar().week
+    for woy_i, year_i in unique_pairs:
+        woy_i, year_i = int(woy_i), int(year_i)
+        lo, hi = woy_i - week_window, woy_i + week_window
+        if lo < 1:
+            in_window = (obs_woy >= lo + 52) | (obs_woy <= hi)
+        elif hi > 52:
+            in_window = (obs_woy >= lo) | (obs_woy <= hi - 52)
+        else:
+            in_window = (obs_woy >= lo) & (obs_woy <= hi)
 
-                # Weeks within window (handle wrap-around at 52/53)
-                lo = int(target_woy) - week_window
-                hi = int(target_woy) + week_window
-                if lo < 1:
-                    mask = (region_obs["week_of_year"] >= lo + 52) | (
-                        region_obs["week_of_year"] <= hi
-                    )
-                elif hi > 52:
-                    mask = (region_obs["week_of_year"] >= lo) | (
-                        region_obs["week_of_year"] <= hi - 52
-                    )
-                else:
-                    mask = (region_obs["week_of_year"] >= lo) & (region_obs["week_of_year"] <= hi)
+        sel_idx = np.nonzero(in_window & (obs_year != year_i))[0]
+        if sel_idx.size < 3:
+            logger.debug(
+                "Climatology: only %d samples for woy=%d year_excl=%d",
+                sel_idx.size, woy_i, year_i,
+            )
+            continue
 
-                # Exclude the target year itself to avoid data leakage
-                target_year = target_ts.year
-                mask = mask & (region_obs["valid_at"].dt.year != target_year)
+        # Percentiles for ALL regions at once — vectorised over region dim
+        pct_ds = ds_obs.isel(valid_at=sel_idx).quantile([0.1, 0.5, 0.9], dim="valid_at")
+        pair_mask = (fcst_woy == woy_i) & (fcst_year == year_i)  # (n_frt, n_region, n_lead)
 
-                sample = region_obs[mask]
-                if len(sample) < 3:
-                    logger.debug(
-                        "Climatology: only %d samples for region=%s woy=%s ±%d",
-                        len(sample),
-                        region,
-                        target_woy,
-                        week_window,
-                    )
+        for v in obs_vars:
+            pct_v = pct_ds[v].sel({region_dim: region_vals})
+            for q_str, q_val in q_map.items():
+                per_region = pct_v.sel(quantile=q_val).values  # (n_region,)
+                key = f"{v}_ref_{q_str}"
+                results[key] = np.where(
+                    pair_mask,
+                    np.broadcast_to(per_region[np.newaxis, :, np.newaxis], shape),
+                    results[key],
+                )
 
-                for v in obs_vars:
-                    vals = sample[v].dropna().values
-                    if len(vals) == 0:
-                        continue
-                    results[f"{v}_ref_p10"][i_f, i_r, i_l] = np.percentile(vals, 10)
-                    results[f"{v}_ref_p50"][i_f, i_r, i_l] = np.percentile(vals, 50)
-                    results[f"{v}_ref_p90"][i_f, i_r, i_l] = np.percentile(vals, 90)
-
-    coords = {
-        frt_dim: frt_vals,
-        region_dim: region_vals,
-        lead_dim: lead_vals,
-    }
+    coords = {frt_dim: frt_vals, region_dim: region_vals, lead_dim: lead_vals}
     data_vars = {k: ([frt_dim, region_dim, lead_dim], v) for k, v in results.items()}
     ds_ref = xr.Dataset(data_vars, coords=coords)
     ds_ref.attrs["reference_type"] = "climatology"
@@ -186,47 +177,46 @@ def persistence_reference(
         ``v_ref_p50`` (persistence is deterministic, stored as p50 for
         consistency with the climatology reference interface).
     """
-    obs_df = ds_obs.to_dataframe().reset_index()
-    obs_df = obs_df.sort_values("valid_at")
-
     frt_dim = "forecast_reference_time"
     region_dim = "drought_region_id"
     lead_dim = "lead_week"
 
+    ds_obs = ds_obs.sortby("valid_at")
+    obs_valid_at = ds_obs.valid_at.values  # sorted datetime64
+
     frt_vals = ds_fcst[frt_dim].values
     region_vals = ds_fcst[region_dim].values
     lead_vals = ds_fcst[lead_dim].values
-
     obs_vars = list(ds_obs.data_vars)
-    n_frt = len(frt_vals)
-    n_region = len(region_vals)
+
+    # For each frt, find the index of the last obs strictly before it
+    frt_cast = frt_vals.astype(obs_valid_at.dtype)
+    indices = np.searchsorted(obs_valid_at, frt_cast, side="left") - 1  # (n_frt,)
+    valid_frt = indices >= 0
+
+    indices_da = xr.DataArray(
+        np.where(valid_frt, indices, 0),
+        dims=[frt_dim],
+        coords={frt_dim: frt_vals},
+    )
+    valid_da = xr.DataArray(valid_frt, dims=[frt_dim], coords={frt_dim: frt_vals})
+
+    # Select last prior obs for every region simultaneously — vectorised
+    last_obs = ds_obs.isel(valid_at=indices_da).where(valid_da)  # (region, frt)
+
     n_lead = len(lead_vals)
-    shape = (n_frt, n_region, n_lead)
+    coords = {frt_dim: frt_vals, region_dim: region_vals, lead_dim: lead_vals}
+    data_vars = {}
 
-    results: dict[str, np.ndarray] = {f"{v}_ref_p50": np.full(shape, np.nan) for v in obs_vars}
+    for v in obs_vars:
+        vals_2d = (
+            last_obs[v].sel({region_dim: region_vals}).transpose(frt_dim, region_dim).values
+        )  # (n_frt, n_region)
+        data_vars[f"{v}_ref_p50"] = (
+            [frt_dim, region_dim, lead_dim],
+            np.repeat(vals_2d[:, :, np.newaxis], n_lead, axis=2),
+        )
 
-    for i_r, region in enumerate(region_vals):
-        region_obs = obs_df[obs_df[region_dim] == region].set_index("valid_at")
-        for i_f, frt in enumerate(frt_vals):
-            frt_ts = pd.Timestamp(frt)
-            # Last observation strictly before frt
-            prior = region_obs[region_obs.index < frt_ts]
-            if prior.empty:
-                logger.debug("Persistence: no prior obs for region=%s before %s", region, frt_ts)
-                continue
-            last_obs = prior.iloc[-1]
-            for v in obs_vars:
-                if v in last_obs.index:
-                    val = last_obs[v]
-                    for i_l in range(n_lead):
-                        results[f"{v}_ref_p50"][i_f, i_r, i_l] = val
-
-    coords = {
-        frt_dim: frt_vals,
-        region_dim: region_vals,
-        lead_dim: lead_vals,
-    }
-    data_vars = {k: ([frt_dim, region_dim, lead_dim], v) for k, v in results.items()}
     ds_ref = xr.Dataset(data_vars, coords=coords)
     ds_ref.attrs["reference_type"] = "persistence"
     return ds_ref
