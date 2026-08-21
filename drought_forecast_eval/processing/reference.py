@@ -42,6 +42,7 @@ def climatology_reference(
     ds_obs: xr.Dataset,
     ds_fcst: xr.Dataset,
     week_window: int = 4,
+    valid_period: tuple[str, str] | None = ("1991-01-01", "2020-12-31"),
 ) -> xr.Dataset:
     """Build a climatological reference forecast on the forecast grid.
 
@@ -60,6 +61,11 @@ def climatology_reference(
     week_window:
         Half-width of the week-of-year window (inclusive).  Default 4 means
         ±4 ISO weeks around the target week are included in the sample.
+    valid_period:
+        ``(start, end)`` ISO-date strings (inclusive) to restrict the
+        observation sample used for climatology.  Defaults to the WMO
+        standard normal period 1991-01-01 – 2020-12-31.  Pass ``None`` to
+        use all available observations.
 
     Returns
     -------
@@ -68,6 +74,10 @@ def climatology_reference(
         For each observation variable ``v`` the dataset contains
         ``v_ref_p10``, ``v_ref_p50``, ``v_ref_p90``.
     """
+    if valid_period is not None:
+        ds_obs = ds_obs.sel(valid_at=slice(*valid_period))
+        logger.debug("Climatology: filtered obs to %s – %s", *valid_period)
+
     frt_dim = "forecast_reference_time"
     region_dim = "drought_region_id"
     lead_dim = "lead_week"
