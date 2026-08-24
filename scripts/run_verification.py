@@ -6,37 +6,30 @@ Usage
     # or directly:
     poetry run python scripts/run_verification.py [OPTIONS]
 
-Each daily ZIP already contains ``weekly_current_regions.csv`` with ~52 weeks
-of observed values, so no separate historic file is required — observations are
-assembled directly from the archive.
+Observations are loaded by combining the historic ZIP (deep climate baseline
+back to 1990) with the latest current ZIP (rolling 52-week window that covers
+dates not yet in the historic file, e.g. the current calendar year).
 """
 
 from __future__ import annotations
 
-import io
 import logging
 import sys
-import zipfile
 from pathlib import Path
 
 import click
-import pandas as pd
 import xarray as xr
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from drought_forecast_eval.io.archive import scan_archive
-from drought_forecast_eval.io.loader import load_forecasts
-from drought_forecast_eval.io.schema import validate_observation
+from drought_forecast_eval.io.loader import load_forecasts, load_observations_combined
 from drought_forecast_eval.processing.alignment import align_obs_to_forecast
 from drought_forecast_eval.processing.reference import (
     climatology_reference,
     persistence_reference,
 )
 from drought_forecast_eval.scoring.dispatcher import compute_scores
-
-_OBS_CSV = "weekly_current_regions.csv"
-
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -52,77 +45,6 @@ def _configure_logging(verbose: bool) -> None:
 
 
 logger = logging.getLogger(__name__)
-
-
-# ---------------------------------------------------------------------------
-# Observation assembly
-# ---------------------------------------------------------------------------
-
-def _read_obs_csv_from_zip(zf: zipfile.ZipFile) -> pd.DataFrame | None:
-    """Read weekly_current_regions.csv from an open ZipFile, stripping # headers."""
-    if _OBS_CSV not in zf.namelist():
-        return None
-    with zf.open(_OBS_CSV) as f:
-        raw = f.read().decode("utf-8", errors="replace")
-    data_lines = [l for l in raw.splitlines() if not l.startswith("#")]
-    if not data_lines:
-        return None
-    sep = ";" if ";" in data_lines[0] else ","
-    df = pd.read_csv(io.StringIO("\n".join(data_lines)), sep=sep, skipinitialspace=True)
-    df.columns = df.columns.str.strip()
-    return df
-
-
-def load_observations_from_archive(archive_dir: Path) -> xr.Dataset:
-    """Assemble observations by reading ``weekly_current_regions.csv`` from
-    every ZIP in the archive and deduplicating on ``(region, date)``."""
-    entries = scan_archive(archive_dir)
-    frames: list[pd.DataFrame] = []
-
-    logger.info("Assembling observations from %d ZIPs …", len(entries))
-    for _frt, path in entries:
-        try:
-            with zipfile.ZipFile(path, "r") as zf:
-                df = _read_obs_csv_from_zip(zf)
-        except (zipfile.BadZipFile, KeyError) as exc:
-            logger.warning("Skipping obs from %s: %s", path.name, exc)
-            continue
-        if df is not None and not df.empty:
-            frames.append(df)
-
-    if not frames:
-        raise RuntimeError("No observation data could be read from the archive.")
-
-    combined = pd.concat(frames, ignore_index=True)
-
-    # Normalise the date column: some files use 'valid_at', others 'measured_at'
-    if "measured_at" not in combined.columns and "valid_at" in combined.columns:
-        combined = combined.rename(columns={"valid_at": "measured_at"})
-
-    combined["measured_at"] = pd.to_datetime(
-        combined["measured_at"], dayfirst=True, errors="coerce"
-    )
-    combined = (
-        combined
-        .dropna(subset=["measured_at"])
-        .drop_duplicates(subset=["drought_region_id", "measured_at"])
-        .sort_values(["drought_region_id", "measured_at"])
-        .reset_index(drop=True)
-    )
-
-    logger.info(
-        "Observations: %d rows, %s → %s, %d regions.",
-        len(combined),
-        combined["measured_at"].min().date(),
-        combined["measured_at"].max().date(),
-        combined["drought_region_id"].nunique(),
-    )
-
-    combined = validate_observation(combined)
-    combined = combined.rename(columns={"measured_at": "valid_at"})
-    ds = combined.set_index(["drought_region_id", "valid_at"]).to_xarray()
-    ds.attrs["source"] = "drought_forecast_eval (assembled from archive)"
-    return ds
 
 
 # ---------------------------------------------------------------------------
@@ -252,19 +174,13 @@ def cli(
     )
 
     # ── 2. Load observations ──────────────────────────────────────────────
-    if historic_path.exists():
-        click.echo(f"Loading observations from {historic_path} …")
-        from drought_forecast_eval.io.loader import load_observations
-        with click.progressbar(length=1, label="Loading obs          ") as bar:
-            ds_obs = load_observations(historic_path)
-            bar.update(1)
-    else:
-        click.echo(
-            click.style(f"Historic file not found at {historic_path} — assembling obs from archive.", fg="yellow")
-        )
-        with click.progressbar(length=1, label="Assembling obs       ") as bar:
-            ds_obs = load_observations_from_archive(archive_dir)
-            bar.update(1)
+    # Always merge the historic ZIP (deep climate baseline) with the latest
+    # current ZIP (rolling 52-week window covering dates the historic file
+    # does not yet contain, e.g. the current calendar year).
+    click.echo(f"Loading observations: {historic_path} + latest ZIP in {archive_dir} …")
+    with click.progressbar(length=1, label="Loading obs          ") as bar:
+        ds_obs = load_observations_combined(historic_path, archive_dir)
+        bar.update(1)
 
     # ── 3. Align ──────────────────────────────────────────────────────────
     with click.progressbar(length=1, label="Aligning             ") as bar:

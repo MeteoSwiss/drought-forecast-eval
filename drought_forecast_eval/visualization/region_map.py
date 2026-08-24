@@ -27,10 +27,47 @@ import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
+import geopandas as gpd
 
 logger = logging.getLogger(__name__)
 
 _LEAD_LABELS = {0: "Week 0 (current)", 1: "Week 1", 2: "Week 2", 3: "Week 3"}
+
+
+def read_drought_shapefile() -> gpd.GeoDataFrame:
+    """Read a shapefile or GeoJSON into a GeoDataFrame."""
+    shapefile_path = Path(__file__).parents[2] / "shapefiles" / "BAFU_Grossregionen_v3.shp"
+    if not shapefile_path.exists():
+        raise FileNotFoundError(f"Shapefile not found: {shapefile_path}")
+    gdf = gpd.read_file(shapefile_path)
+    return gdf
+
+def plot_region_polygon() -> tuple[plt.Figure, plt.Axes]:
+    """Plot the drought regions with their IDs and names."""
+
+    gdf = read_drought_shapefile()
+
+    fig, ax = plt.subplots(figsize=(12, 10))
+    gdf.plot(
+        ax=ax,
+        edgecolor="black",
+        facecolor="none",
+        linewidth=0.7,
+    )
+
+    for point, label in zip(gdf.geometry.representative_point(), gdf["REGION_NR"].astype(str) + " - " + gdf["Name"]):
+        ax.text(
+            point.x,
+            point.y,
+            label,
+            fontsize=7,
+            ha="center",
+            va="center",
+            bbox=dict(boxstyle="round,pad=0.1", fc="white", alpha=0.7, lw=0),
+        )
+
+    ax.set_axis_off()
+    return fig,ax
 
 
 def plot_region_map(
