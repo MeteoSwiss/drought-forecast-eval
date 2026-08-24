@@ -39,6 +39,8 @@ Functions
 
 .. autoapisummary::
 
+   drought_forecast_eval.visualization.region_map.read_drought_shapefile
+   drought_forecast_eval.visualization.region_map.plot_region_polygon
    drought_forecast_eval.visualization.region_map.plot_region_map
 
 
@@ -46,6 +48,16 @@ Module Contents
 ---------------
 
 .. py:data:: logger
+
+.. py:function:: read_drought_shapefile() -> geopandas.GeoDataFrame
+
+   Read a shapefile or GeoJSON into a GeoDataFrame.
+
+
+.. py:function:: plot_region_polygon() -> tuple[matplotlib.pyplot.Figure, matplotlib.pyplot.Axes]
+
+   Plot the drought regions with their IDs and names.
+
 
 .. py:function:: plot_region_map(ds_scores: xarray.Dataset, score_variable: str, shapefile_path: str | pathlib.Path | None = None, region_id_column: str = 'REGION_NR', lead_weeks: list[int] | None = None, cmap: str = 'RdYlGn', vmin: float | None = None, vmax: float | None = None, title: str | None = None, figsize: tuple[float, float] = (14, 10)) -> matplotlib.pyplot.Figure
 

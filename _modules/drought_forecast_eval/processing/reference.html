@@ -38,7 +38,7 @@
   <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../_static/documentation_options.js?v=f25bc45f"></script>
+    <script src="../../../_static/documentation_options.js?v=5cd3ae62"></script>
     <script src="../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = '_modules/drought_forecast_eval/processing/reference';</script>
@@ -54,7 +54,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="dev" />
-    <meta name="docbuild:last-update" content="14.08.2026"/>
+    <meta name="docbuild:last-update" content="24.08.2026"/>
   </head>
   
   
@@ -397,7 +397,6 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">xarray</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">xr</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -414,6 +413,7 @@
     <span class="n">ds_obs</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
     <span class="n">ds_fcst</span><span class="p">:</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">,</span>
     <span class="n">week_window</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+    <span class="n">valid_period</span><span class="p">:</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;1991-01-01&quot;</span><span class="p">,</span> <span class="s2">&quot;2020-12-31&quot;</span><span class="p">),</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Build a climatological reference forecast on the forecast grid.</span>
 
@@ -432,6 +432,11 @@
 <span class="sd">    week_window:</span>
 <span class="sd">        Half-width of the week-of-year window (inclusive).  Default 4 means</span>
 <span class="sd">        ±4 ISO weeks around the target week are included in the sample.</span>
+<span class="sd">    valid_period:</span>
+<span class="sd">        ``(start, end)`` ISO-date strings (inclusive) to restrict the</span>
+<span class="sd">        observation sample used for climatology.  Defaults to the WMO</span>
+<span class="sd">        standard normal period 1991-01-01 – 2020-12-31.  Pass ``None`` to</span>
+<span class="sd">        use all available observations.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -440,86 +445,82 @@
 <span class="sd">        For each observation variable ``v`` the dataset contains</span>
 <span class="sd">        ``v_ref_p10``, ``v_ref_p50``, ``v_ref_p90``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Convert observations to pandas for efficient grouped operations</span>
-    <span class="n">obs_df</span> <span class="o">=</span> <span class="n">ds_obs</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-    <span class="n">obs_df</span><span class="p">[</span><span class="s2">&quot;week_of_year&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">obs_df</span><span class="p">[</span><span class="s2">&quot;valid_at&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">isocalendar</span><span class="p">()</span><span class="o">.</span><span class="n">week</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">valid_period</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">ds_obs</span> <span class="o">=</span> <span class="n">ds_obs</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">valid_at</span><span class="o">=</span><span class="nb">slice</span><span class="p">(</span><span class="o">*</span><span class="n">valid_period</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Climatology: filtered obs to </span><span class="si">%s</span><span class="s2"> – </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="o">*</span><span class="n">valid_period</span><span class="p">)</span>
 
-    <span class="c1"># Target grid: valid_at per (frt, region, lead_week)</span>
-    <span class="n">valid_at_da</span> <span class="o">=</span> <span class="n">ds_fcst</span><span class="p">[</span><span class="s2">&quot;valid_at&quot;</span><span class="p">]</span>  <span class="c1"># dims: (frt, region, lead_week)</span>
-    <span class="n">region_dim</span> <span class="o">=</span> <span class="s2">&quot;drought_region_id&quot;</span>
     <span class="n">frt_dim</span> <span class="o">=</span> <span class="s2">&quot;forecast_reference_time&quot;</span>
+    <span class="n">region_dim</span> <span class="o">=</span> <span class="s2">&quot;drought_region_id&quot;</span>
     <span class="n">lead_dim</span> <span class="o">=</span> <span class="s2">&quot;lead_week&quot;</span>
 
-    <span class="c1"># Flatten the grid to iterate efficiently</span>
+    <span class="c1"># ISO week-of-year and year for observations — no DataFrame conversion</span>
+    <span class="n">obs_cal</span> <span class="o">=</span> <span class="n">ds_obs</span><span class="o">.</span><span class="n">valid_at</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">isocalendar</span><span class="p">()</span>
+    <span class="n">obs_woy</span> <span class="o">=</span> <span class="n">obs_cal</span><span class="o">.</span><span class="n">week</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">obs_year</span> <span class="o">=</span> <span class="n">obs_cal</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+
+    <span class="c1"># Same quantities for every grid cell in the forecast valid_at array</span>
+    <span class="n">valid_at_da</span> <span class="o">=</span> <span class="n">ds_fcst</span><span class="p">[</span><span class="s2">&quot;valid_at&quot;</span><span class="p">]</span>  <span class="c1"># (frt, region, lead)</span>
+    <span class="n">fcst_cal</span> <span class="o">=</span> <span class="n">valid_at_da</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">isocalendar</span><span class="p">()</span>
+    <span class="n">_woy</span> <span class="o">=</span> <span class="n">fcst_cal</span><span class="o">.</span><span class="n">week</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">_year</span> <span class="o">=</span> <span class="n">fcst_cal</span><span class="o">.</span><span class="n">year</span><span class="o">.</span><span class="n">values</span>
+    <span class="n">nat_flag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">_woy</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">))</span>
+    <span class="n">fcst_woy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">nat_flag</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">_woy</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">fcst_year</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">nat_flag</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">_year</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+
+    <span class="n">valid_flag</span> <span class="o">=</span> <span class="n">fcst_woy</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+    <span class="n">unique_pairs</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">column_stack</span><span class="p">([</span><span class="n">fcst_woy</span><span class="p">[</span><span class="n">valid_flag</span><span class="p">],</span> <span class="n">fcst_year</span><span class="p">[</span><span class="n">valid_flag</span><span class="p">]]),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">valid_flag</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
+        <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="p">)</span>
+
     <span class="n">frt_vals</span> <span class="o">=</span> <span class="n">ds_fcst</span><span class="p">[</span><span class="n">frt_dim</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
     <span class="n">region_vals</span> <span class="o">=</span> <span class="n">ds_fcst</span><span class="p">[</span><span class="n">region_dim</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
     <span class="n">lead_vals</span> <span class="o">=</span> <span class="n">ds_fcst</span><span class="p">[</span><span class="n">lead_dim</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-
     <span class="n">obs_vars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ds_obs</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
-
-    <span class="c1"># Build output arrays:  shape (n_frt, n_region, n_lead)</span>
-    <span class="n">n_frt</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">frt_vals</span><span class="p">)</span>
-    <span class="n">n_region</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">region_vals</span><span class="p">)</span>
-    <span class="n">n_lead</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lead_vals</span><span class="p">)</span>
+    <span class="n">n_frt</span><span class="p">,</span> <span class="n">n_region</span><span class="p">,</span> <span class="n">n_lead</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">frt_vals</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">region_vals</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">lead_vals</span><span class="p">)</span>
     <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_frt</span><span class="p">,</span> <span class="n">n_region</span><span class="p">,</span> <span class="n">n_lead</span><span class="p">)</span>
 
     <span class="n">results</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">_ref_</span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obs_vars</span> <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;p10&quot;</span><span class="p">,</span> <span class="s2">&quot;p50&quot;</span><span class="p">,</span> <span class="s2">&quot;p90&quot;</span><span class="p">)</span>
+        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">_ref_</span><span class="si">{</span><span class="n">q</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obs_vars</span> <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;p10&quot;</span><span class="p">,</span> <span class="s2">&quot;p50&quot;</span><span class="p">,</span> <span class="s2">&quot;p90&quot;</span><span class="p">)</span>
     <span class="p">}</span>
+    <span class="n">q_map</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;p10&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span> <span class="s2">&quot;p50&quot;</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">,</span> <span class="s2">&quot;p90&quot;</span><span class="p">:</span> <span class="mf">0.9</span><span class="p">}</span>
 
-    <span class="k">for</span> <span class="n">i_r</span><span class="p">,</span> <span class="n">region</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">region_vals</span><span class="p">):</span>
-        <span class="n">region_obs</span> <span class="o">=</span> <span class="n">obs_df</span><span class="p">[</span><span class="n">obs_df</span><span class="p">[</span><span class="n">region_dim</span><span class="p">]</span> <span class="o">==</span> <span class="n">region</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">i_f</span><span class="p">,</span> <span class="n">frt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">frt_vals</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">i_l</span><span class="p">,</span> <span class="n">lead</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lead_vals</span><span class="p">):</span>
-                <span class="n">target_valid_at</span> <span class="o">=</span> <span class="n">valid_at_da</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span>
-                    <span class="p">{</span><span class="n">frt_dim</span><span class="p">:</span> <span class="n">frt</span><span class="p">,</span> <span class="n">region_dim</span><span class="p">:</span> <span class="n">region</span><span class="p">,</span> <span class="n">lead_dim</span><span class="p">:</span> <span class="n">lead</span><span class="p">}</span>
-                <span class="p">)</span><span class="o">.</span><span class="n">values</span>
-                <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">target_valid_at</span><span class="p">):</span>
-                    <span class="k">continue</span>
-                <span class="n">target_ts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">target_valid_at</span><span class="p">)</span>
-                <span class="n">target_woy</span> <span class="o">=</span> <span class="n">target_ts</span><span class="o">.</span><span class="n">isocalendar</span><span class="p">()</span><span class="o">.</span><span class="n">week</span>
+    <span class="k">for</span> <span class="n">woy_i</span><span class="p">,</span> <span class="n">year_i</span> <span class="ow">in</span> <span class="n">unique_pairs</span><span class="p">:</span>
+        <span class="n">woy_i</span><span class="p">,</span> <span class="n">year_i</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">woy_i</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">year_i</span><span class="p">)</span>
+        <span class="n">lo</span><span class="p">,</span> <span class="n">hi</span> <span class="o">=</span> <span class="n">woy_i</span> <span class="o">-</span> <span class="n">week_window</span><span class="p">,</span> <span class="n">woy_i</span> <span class="o">+</span> <span class="n">week_window</span>
+        <span class="k">if</span> <span class="n">lo</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">in_window</span> <span class="o">=</span> <span class="p">(</span><span class="n">obs_woy</span> <span class="o">&gt;=</span> <span class="n">lo</span> <span class="o">+</span> <span class="mi">52</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">obs_woy</span> <span class="o">&lt;=</span> <span class="n">hi</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">hi</span> <span class="o">&gt;</span> <span class="mi">52</span><span class="p">:</span>
+            <span class="n">in_window</span> <span class="o">=</span> <span class="p">(</span><span class="n">obs_woy</span> <span class="o">&gt;=</span> <span class="n">lo</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">obs_woy</span> <span class="o">&lt;=</span> <span class="n">hi</span> <span class="o">-</span> <span class="mi">52</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">in_window</span> <span class="o">=</span> <span class="p">(</span><span class="n">obs_woy</span> <span class="o">&gt;=</span> <span class="n">lo</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">obs_woy</span> <span class="o">&lt;=</span> <span class="n">hi</span><span class="p">)</span>
 
-                <span class="c1"># Weeks within window (handle wrap-around at 52/53)</span>
-                <span class="n">lo</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">target_woy</span><span class="p">)</span> <span class="o">-</span> <span class="n">week_window</span>
-                <span class="n">hi</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">target_woy</span><span class="p">)</span> <span class="o">+</span> <span class="n">week_window</span>
-                <span class="k">if</span> <span class="n">lo</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">region_obs</span><span class="p">[</span><span class="s2">&quot;week_of_year&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">lo</span> <span class="o">+</span> <span class="mi">52</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span>
-                        <span class="n">region_obs</span><span class="p">[</span><span class="s2">&quot;week_of_year&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">hi</span>
-                    <span class="p">)</span>
-                <span class="k">elif</span> <span class="n">hi</span> <span class="o">&gt;</span> <span class="mi">52</span><span class="p">:</span>
-                    <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">region_obs</span><span class="p">[</span><span class="s2">&quot;week_of_year&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">lo</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span>
-                        <span class="n">region_obs</span><span class="p">[</span><span class="s2">&quot;week_of_year&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">hi</span> <span class="o">-</span> <span class="mi">52</span>
-                    <span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">region_obs</span><span class="p">[</span><span class="s2">&quot;week_of_year&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">lo</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">region_obs</span><span class="p">[</span><span class="s2">&quot;week_of_year&quot;</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">hi</span><span class="p">)</span>
+        <span class="n">sel_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">in_window</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">obs_year</span> <span class="o">!=</span> <span class="n">year_i</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">sel_idx</span><span class="o">.</span><span class="n">size</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                <span class="s2">&quot;Climatology: only </span><span class="si">%d</span><span class="s2"> samples for woy=</span><span class="si">%d</span><span class="s2"> year_excl=</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">sel_idx</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="n">woy_i</span><span class="p">,</span> <span class="n">year_i</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">continue</span>
 
-                <span class="c1"># Exclude the target year itself to avoid data leakage</span>
-                <span class="n">target_year</span> <span class="o">=</span> <span class="n">target_ts</span><span class="o">.</span><span class="n">year</span>
-                <span class="n">mask</span> <span class="o">=</span> <span class="n">mask</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">region_obs</span><span class="p">[</span><span class="s2">&quot;valid_at&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">year</span> <span class="o">!=</span> <span class="n">target_year</span><span class="p">)</span>
+        <span class="c1"># Percentiles for ALL regions at once — vectorised over region dim</span>
+        <span class="n">pct_ds</span> <span class="o">=</span> <span class="n">ds_obs</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">valid_at</span><span class="o">=</span><span class="n">sel_idx</span><span class="p">)</span><span class="o">.</span><span class="n">quantile</span><span class="p">([</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="s2">&quot;valid_at&quot;</span><span class="p">)</span>
+        <span class="n">pair_mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">fcst_woy</span> <span class="o">==</span> <span class="n">woy_i</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">fcst_year</span> <span class="o">==</span> <span class="n">year_i</span><span class="p">)</span>  <span class="c1"># (n_frt, n_region, n_lead)</span>
 
-                <span class="n">sample</span> <span class="o">=</span> <span class="n">region_obs</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                        <span class="s2">&quot;Climatology: only </span><span class="si">%d</span><span class="s2"> samples for region=</span><span class="si">%s</span><span class="s2"> woy=</span><span class="si">%s</span><span class="s2"> ±</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
-                        <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">),</span>
-                        <span class="n">region</span><span class="p">,</span>
-                        <span class="n">target_woy</span><span class="p">,</span>
-                        <span class="n">week_window</span><span class="p">,</span>
-                    <span class="p">)</span>
+        <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obs_vars</span><span class="p">:</span>
+            <span class="n">pct_v</span> <span class="o">=</span> <span class="n">pct_ds</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">sel</span><span class="p">({</span><span class="n">region_dim</span><span class="p">:</span> <span class="n">region_vals</span><span class="p">})</span>
+            <span class="k">for</span> <span class="n">q_str</span><span class="p">,</span> <span class="n">q_val</span> <span class="ow">in</span> <span class="n">q_map</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">per_region</span> <span class="o">=</span> <span class="n">pct_v</span><span class="o">.</span><span class="n">sel</span><span class="p">(</span><span class="n">quantile</span><span class="o">=</span><span class="n">q_val</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>  <span class="c1"># (n_region,)</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">_ref_</span><span class="si">{</span><span class="n">q_str</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">results</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span>
+                    <span class="n">pair_mask</span><span class="p">,</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">broadcast_to</span><span class="p">(</span><span class="n">per_region</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="n">shape</span><span class="p">),</span>
+                    <span class="n">results</span><span class="p">[</span><span class="n">key</span><span class="p">],</span>
+                <span class="p">)</span>
 
-                <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obs_vars</span><span class="p">:</span>
-                    <span class="n">vals</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">values</span>
-                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">vals</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                        <span class="k">continue</span>
-                    <span class="n">results</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">_ref_p10&quot;</span><span class="p">][</span><span class="n">i_f</span><span class="p">,</span> <span class="n">i_r</span><span class="p">,</span> <span class="n">i_l</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
-                    <span class="n">results</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">_ref_p50&quot;</span><span class="p">][</span><span class="n">i_f</span><span class="p">,</span> <span class="n">i_r</span><span class="p">,</span> <span class="n">i_l</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="mi">50</span><span class="p">)</span>
-                    <span class="n">results</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">_ref_p90&quot;</span><span class="p">][</span><span class="n">i_f</span><span class="p">,</span> <span class="n">i_r</span><span class="p">,</span> <span class="n">i_l</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="mi">90</span><span class="p">)</span>
-
-    <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">frt_dim</span><span class="p">:</span> <span class="n">frt_vals</span><span class="p">,</span>
-        <span class="n">region_dim</span><span class="p">:</span> <span class="n">region_vals</span><span class="p">,</span>
-        <span class="n">lead_dim</span><span class="p">:</span> <span class="n">lead_vals</span><span class="p">,</span>
-    <span class="p">}</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span><span class="n">frt_dim</span><span class="p">:</span> <span class="n">frt_vals</span><span class="p">,</span> <span class="n">region_dim</span><span class="p">:</span> <span class="n">region_vals</span><span class="p">,</span> <span class="n">lead_dim</span><span class="p">:</span> <span class="n">lead_vals</span><span class="p">}</span>
     <span class="n">data_vars</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">([</span><span class="n">frt_dim</span><span class="p">,</span> <span class="n">region_dim</span><span class="p">,</span> <span class="n">lead_dim</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
     <span class="n">ds_ref</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">data_vars</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span>
     <span class="n">ds_ref</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;reference_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;climatology&quot;</span>
@@ -560,47 +561,46 @@
 <span class="sd">        ``v_ref_p50`` (persistence is deterministic, stored as p50 for</span>
 <span class="sd">        consistency with the climatology reference interface).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">obs_df</span> <span class="o">=</span> <span class="n">ds_obs</span><span class="o">.</span><span class="n">to_dataframe</span><span class="p">()</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
-    <span class="n">obs_df</span> <span class="o">=</span> <span class="n">obs_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s2">&quot;valid_at&quot;</span><span class="p">)</span>
-
     <span class="n">frt_dim</span> <span class="o">=</span> <span class="s2">&quot;forecast_reference_time&quot;</span>
     <span class="n">region_dim</span> <span class="o">=</span> <span class="s2">&quot;drought_region_id&quot;</span>
     <span class="n">lead_dim</span> <span class="o">=</span> <span class="s2">&quot;lead_week&quot;</span>
 
+    <span class="n">ds_obs</span> <span class="o">=</span> <span class="n">ds_obs</span><span class="o">.</span><span class="n">sortby</span><span class="p">(</span><span class="s2">&quot;valid_at&quot;</span><span class="p">)</span>
+    <span class="n">obs_valid_at</span> <span class="o">=</span> <span class="n">ds_obs</span><span class="o">.</span><span class="n">valid_at</span><span class="o">.</span><span class="n">values</span>  <span class="c1"># sorted datetime64</span>
+
     <span class="n">frt_vals</span> <span class="o">=</span> <span class="n">ds_fcst</span><span class="p">[</span><span class="n">frt_dim</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
     <span class="n">region_vals</span> <span class="o">=</span> <span class="n">ds_fcst</span><span class="p">[</span><span class="n">region_dim</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
     <span class="n">lead_vals</span> <span class="o">=</span> <span class="n">ds_fcst</span><span class="p">[</span><span class="n">lead_dim</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
-
     <span class="n">obs_vars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ds_obs</span><span class="o">.</span><span class="n">data_vars</span><span class="p">)</span>
-    <span class="n">n_frt</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">frt_vals</span><span class="p">)</span>
-    <span class="n">n_region</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">region_vals</span><span class="p">)</span>
+
+    <span class="c1"># For each frt, find the index of the last obs strictly before it</span>
+    <span class="n">frt_cast</span> <span class="o">=</span> <span class="n">frt_vals</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">obs_valid_at</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">obs_valid_at</span><span class="p">,</span> <span class="n">frt_cast</span><span class="p">,</span> <span class="n">side</span><span class="o">=</span><span class="s2">&quot;left&quot;</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>  <span class="c1"># (n_frt,)</span>
+    <span class="n">valid_frt</span> <span class="o">=</span> <span class="n">indices</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+
+    <span class="n">indices_da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">valid_frt</span><span class="p">,</span> <span class="n">indices</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="n">frt_dim</span><span class="p">],</span>
+        <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="n">frt_dim</span><span class="p">:</span> <span class="n">frt_vals</span><span class="p">},</span>
+    <span class="p">)</span>
+    <span class="n">valid_da</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">DataArray</span><span class="p">(</span><span class="n">valid_frt</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="n">frt_dim</span><span class="p">],</span> <span class="n">coords</span><span class="o">=</span><span class="p">{</span><span class="n">frt_dim</span><span class="p">:</span> <span class="n">frt_vals</span><span class="p">})</span>
+
+    <span class="c1"># Select last prior obs for every region simultaneously — vectorised</span>
+    <span class="n">last_obs</span> <span class="o">=</span> <span class="n">ds_obs</span><span class="o">.</span><span class="n">isel</span><span class="p">(</span><span class="n">valid_at</span><span class="o">=</span><span class="n">indices_da</span><span class="p">)</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">valid_da</span><span class="p">)</span>  <span class="c1"># (region, frt)</span>
+
     <span class="n">n_lead</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lead_vals</span><span class="p">)</span>
-    <span class="n">shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_frt</span><span class="p">,</span> <span class="n">n_region</span><span class="p">,</span> <span class="n">n_lead</span><span class="p">)</span>
+    <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span><span class="n">frt_dim</span><span class="p">:</span> <span class="n">frt_vals</span><span class="p">,</span> <span class="n">region_dim</span><span class="p">:</span> <span class="n">region_vals</span><span class="p">,</span> <span class="n">lead_dim</span><span class="p">:</span> <span class="n">lead_vals</span><span class="p">}</span>
+    <span class="n">data_vars</span> <span class="o">=</span> <span class="p">{}</span>
 
-    <span class="n">results</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">_ref_p50&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obs_vars</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obs_vars</span><span class="p">:</span>
+        <span class="n">vals_2d</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">last_obs</span><span class="p">[</span><span class="n">v</span><span class="p">]</span><span class="o">.</span><span class="n">sel</span><span class="p">({</span><span class="n">region_dim</span><span class="p">:</span> <span class="n">region_vals</span><span class="p">})</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">frt_dim</span><span class="p">,</span> <span class="n">region_dim</span><span class="p">)</span><span class="o">.</span><span class="n">values</span>
+        <span class="p">)</span>  <span class="c1"># (n_frt, n_region)</span>
+        <span class="n">data_vars</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">_ref_p50&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[</span><span class="n">frt_dim</span><span class="p">,</span> <span class="n">region_dim</span><span class="p">,</span> <span class="n">lead_dim</span><span class="p">],</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">vals_2d</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">],</span> <span class="n">n_lead</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+        <span class="p">)</span>
 
-    <span class="k">for</span> <span class="n">i_r</span><span class="p">,</span> <span class="n">region</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">region_vals</span><span class="p">):</span>
-        <span class="n">region_obs</span> <span class="o">=</span> <span class="n">obs_df</span><span class="p">[</span><span class="n">obs_df</span><span class="p">[</span><span class="n">region_dim</span><span class="p">]</span> <span class="o">==</span> <span class="n">region</span><span class="p">]</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;valid_at&quot;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i_f</span><span class="p">,</span> <span class="n">frt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">frt_vals</span><span class="p">):</span>
-            <span class="n">frt_ts</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">frt</span><span class="p">)</span>
-            <span class="c1"># Last observation strictly before frt</span>
-            <span class="n">prior</span> <span class="o">=</span> <span class="n">region_obs</span><span class="p">[</span><span class="n">region_obs</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;</span> <span class="n">frt_ts</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">prior</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Persistence: no prior obs for region=</span><span class="si">%s</span><span class="s2"> before </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">region</span><span class="p">,</span> <span class="n">frt_ts</span><span class="p">)</span>
-                <span class="k">continue</span>
-            <span class="n">last_obs</span> <span class="o">=</span> <span class="n">prior</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">obs_vars</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">last_obs</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
-                    <span class="n">val</span> <span class="o">=</span> <span class="n">last_obs</span><span class="p">[</span><span class="n">v</span><span class="p">]</span>
-                    <span class="k">for</span> <span class="n">i_l</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_lead</span><span class="p">):</span>
-                        <span class="n">results</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">v</span><span class="si">}</span><span class="s2">_ref_p50&quot;</span><span class="p">][</span><span class="n">i_f</span><span class="p">,</span> <span class="n">i_r</span><span class="p">,</span> <span class="n">i_l</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
-
-    <span class="n">coords</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">frt_dim</span><span class="p">:</span> <span class="n">frt_vals</span><span class="p">,</span>
-        <span class="n">region_dim</span><span class="p">:</span> <span class="n">region_vals</span><span class="p">,</span>
-        <span class="n">lead_dim</span><span class="p">:</span> <span class="n">lead_vals</span><span class="p">,</span>
-    <span class="p">}</span>
-    <span class="n">data_vars</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="p">([</span><span class="n">frt_dim</span><span class="p">,</span> <span class="n">region_dim</span><span class="p">,</span> <span class="n">lead_dim</span><span class="p">],</span> <span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
     <span class="n">ds_ref</span> <span class="o">=</span> <span class="n">xr</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">data_vars</span><span class="p">,</span> <span class="n">coords</span><span class="o">=</span><span class="n">coords</span><span class="p">)</span>
     <span class="n">ds_ref</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s2">&quot;reference_type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;persistence&quot;</span>
     <span class="k">return</span> <span class="n">ds_ref</span></div>
@@ -643,10 +643,10 @@
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-Drought Forecast Eval, version: dev-421e049</div>
+Drought Forecast Eval, version: dev-a2f8705</div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on 14.08.2026.
+  Last updated on 24.08.2026.
   <br/>
 </p></div>
       

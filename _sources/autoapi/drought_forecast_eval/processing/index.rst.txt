@@ -65,7 +65,7 @@ Package Contents
    :rtype: pd.Series of int
 
 
-.. py:function:: climatology_reference(ds_obs: xarray.Dataset, ds_fcst: xarray.Dataset, week_window: int = 4) -> xarray.Dataset
+.. py:function:: climatology_reference(ds_obs: xarray.Dataset, ds_fcst: xarray.Dataset, week_window: int = 4, valid_period: tuple[str, str] | None = ('1991-01-01', '2020-12-31')) -> xarray.Dataset
 
    Build a climatological reference forecast on the forecast grid.
 
@@ -79,6 +79,10 @@ Package Contents
                   ``(forecast_reference_time, drought_region_id, lead_week, valid_at)``.
                 * **week_window** -- Half-width of the week-of-year window (inclusive).  Default 4 means
                   ±4 ISO weeks around the target week are included in the sample.
+                * **valid_period** -- ``(start, end)`` ISO-date strings (inclusive) to restrict the
+                  observation sample used for climatology.  Defaults to the WMO
+                  standard normal period 1991-01-01 – 2020-12-31.  Pass ``None`` to
+                  use all available observations.
 
    :returns: Dimensions ``(forecast_reference_time, drought_region_id, lead_week)``.
              For each observation variable ``v`` the dataset contains

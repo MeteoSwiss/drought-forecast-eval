@@ -39,7 +39,7 @@
   <link rel="preload" as="script" href="../../../../_static/scripts/bootstrap.js?digest=8878045cc6db502f8baf" />
 <link rel="preload" as="script" href="../../../../_static/scripts/pydata-sphinx-theme.js?digest=8878045cc6db502f8baf" />
 
-    <script src="../../../../_static/documentation_options.js?v=f25bc45f"></script>
+    <script src="../../../../_static/documentation_options.js?v=5cd3ae62"></script>
     <script src="../../../../_static/doctools.js?v=9bcbadda"></script>
     <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script>DOCUMENTATION_OPTIONS.pagename = 'autoapi/drought_forecast_eval/visualization/region_map/index';</script>
@@ -57,7 +57,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="dev" />
-    <meta name="docbuild:last-update" content="14.08.2026"/>
+    <meta name="docbuild:last-update" content="24.08.2026"/>
   </head>
   
   
@@ -461,6 +461,12 @@ if <code class="docutils literal notranslate"><span class="pre">geopandas</span>
 <h2>Functions<a class="headerlink" href="#functions" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table">
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#drought_forecast_eval.visualization.region_map.read_drought_shapefile" title="drought_forecast_eval.visualization.region_map.read_drought_shapefile"><code class="xref py py-obj docutils literal notranslate"><span class="pre">read_drought_shapefile</span></code></a>(→ geopandas.GeoDataFrame)</p></td>
+<td><p>Read a shapefile or GeoJSON into a GeoDataFrame.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#drought_forecast_eval.visualization.region_map.plot_region_polygon" title="drought_forecast_eval.visualization.region_map.plot_region_polygon"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_region_polygon</span></code></a>(→ tuple[matplotlib.pyplot.Figure, ...)</p></td>
+<td><p>Plot the drought regions with their IDs and names.</p></td>
+</tr>
 <tr class="row-odd"><td><p><a class="reference internal" href="#drought_forecast_eval.visualization.region_map.plot_region_map" title="drought_forecast_eval.visualization.region_map.plot_region_map"><code class="xref py py-obj docutils literal notranslate"><span class="pre">plot_region_map</span></code></a>() → matplotlib.pyplot.Figure)</p></td>
 <td><p>Plot a 4-panel choropleth map of score values per drought region.</p></td>
 </tr>
@@ -474,6 +480,18 @@ if <code class="docutils literal notranslate"><span class="pre">geopandas</span>
 <dt class="sig sig-object py" id="drought_forecast_eval.visualization.region_map.logger">
 <span class="sig-name descname"><span class="pre">logger</span></span><a class="headerlink" href="#drought_forecast_eval.visualization.region_map.logger" title="Link to this definition">#</a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="drought_forecast_eval.visualization.region_map.read_drought_shapefile">
+<span class="sig-name descname"><span class="pre">read_drought_shapefile</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">geopandas.GeoDataFrame</span></span></span><a class="reference internal" href="../../../../_modules/drought_forecast_eval/visualization/region_map.html#read_drought_shapefile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drought_forecast_eval.visualization.region_map.read_drought_shapefile" title="Link to this definition">#</a></dt>
+<dd><p>Read a shapefile or GeoJSON into a GeoDataFrame.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="drought_forecast_eval.visualization.region_map.plot_region_polygon">
+<span class="sig-name descname"><span class="pre">plot_region_polygon</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">matplotlib.pyplot.Figure</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">matplotlib.pyplot.Axes</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../../../../_modules/drought_forecast_eval/visualization/region_map.html#plot_region_polygon"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drought_forecast_eval.visualization.region_map.plot_region_polygon" title="Link to this definition">#</a></dt>
+<dd><p>Plot the drought regions with their IDs and names.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="drought_forecast_eval.visualization.region_map.plot_region_map">
@@ -556,6 +574,8 @@ If <code class="docutils literal notranslate"><span class="pre">None</span></cod
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#functions">Functions</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#module-contents">Module Contents</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.visualization.region_map.logger"><code class="docutils literal notranslate"><span class="pre">logger</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.visualization.region_map.read_drought_shapefile"><code class="docutils literal notranslate"><span class="pre">read_drought_shapefile()</span></code></a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.visualization.region_map.plot_region_polygon"><code class="docutils literal notranslate"><span class="pre">plot_region_polygon()</span></code></a></li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#drought_forecast_eval.visualization.region_map.plot_region_map"><code class="docutils literal notranslate"><span class="pre">plot_region_map()</span></code></a></li>
 </ul>
 </li>
@@ -584,10 +604,10 @@ If <code class="docutils literal notranslate"><span class="pre">None</span></cod
     <div class="footer-items__start">
       
         <div class="footer-item"><!-- This will display the version of the docs -->
-Drought Forecast Eval, version: dev-421e049</div>
+Drought Forecast Eval, version: dev-a2f8705</div>
       
         <div class="footer-item"><p class="last-updated">
-  Last updated on 14.08.2026.
+  Last updated on 24.08.2026.
   <br/>
 </p></div>
       

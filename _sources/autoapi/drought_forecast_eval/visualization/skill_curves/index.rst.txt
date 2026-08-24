@@ -61,7 +61,7 @@ Module Contents
    :rtype: matplotlib.figure.Figure
 
 
-.. py:function:: plot_forecast_plume(ds_merged: xarray.Dataset, ds_ref_clim: xarray.Dataset, ds_ref_pers: xarray.Dataset, var: str, rid: int, ax: matplotlib.pyplot.Axes | None = None) -> tuple[matplotlib.pyplot.Figure, numpy.ndarray]
+.. py:function:: plot_forecast_plume(ds_merged: xarray.Dataset, var: str, rid: int, ds_ref_clim: xarray.Dataset | None = None, ds_ref_pers: xarray.Dataset | None = None, ax: matplotlib.pyplot.Axes | None = None, time_dim: str = 'forecast_reference_time', clim_dressed: bool = False) -> tuple[matplotlib.pyplot.Figure, numpy.ndarray]
 
    Plot forecast plume for a given variable and region.
 
