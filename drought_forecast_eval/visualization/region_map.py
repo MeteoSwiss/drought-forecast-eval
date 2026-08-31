@@ -23,11 +23,11 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
+import geopandas as gpd
 import matplotlib.colors as mcolors
 import matplotlib.pyplot as plt
 import numpy as np
 import xarray as xr
-import geopandas as gpd
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +45,6 @@ def read_drought_shapefile() -> gpd.GeoDataFrame:
 
 def plot_region_polygon() -> tuple[plt.Figure, plt.Axes]:
     """Plot the drought regions with their IDs and names."""
-
     gdf = read_drought_shapefile()
 
     fig, ax = plt.subplots(figsize=(12, 10))
