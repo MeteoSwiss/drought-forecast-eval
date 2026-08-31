@@ -35,6 +35,7 @@ from drought_forecast_eval.scoring.dispatcher import compute_scores
 # Logging
 # ---------------------------------------------------------------------------
 
+
 def _configure_logging(verbose: bool) -> None:
     level = logging.DEBUG if verbose else logging.INFO
     logging.basicConfig(
@@ -50,6 +51,7 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
+
 
 @click.command()
 @click.option(
@@ -105,10 +107,7 @@ logger = logging.getLogger(__name__)
     "--scores",
     default="default",
     show_default=True,
-    help=(
-        "Metrics to compute: 'default' or a comma-separated list "
-        "(e.g. mae,rmse,rpss)."
-    ),
+    help=("Metrics to compute: 'default' or a comma-separated list (e.g. mae,rmse,rpss)."),
 )
 @click.option(
     "--shapefile",
@@ -214,12 +213,7 @@ def cli(
     csv_path = output_dir / "scores_summary.csv"
 
     ds_scores.to_netcdf(nc_path)
-    summary_df = (
-        ds_scores
-        .mean(dim="drought_region_id")
-        .to_dataframe()
-        .round(4)
-    )
+    summary_df = ds_scores.mean(dim="drought_region_id").to_dataframe().round(4)
     summary_df.to_csv(csv_path)
 
     click.echo(f"\nOutputs written to {output_dir}/")
@@ -229,6 +223,7 @@ def cli(
     # ── 7. HTML report (optional) ───────────────────────────────────────────
     if html:
         from drought_forecast_eval.report.builder import ReportBuilder
+
         builder = ReportBuilder(
             archive_dir=archive_dir,
             historic_path=historic_path,

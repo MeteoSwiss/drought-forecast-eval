@@ -42,6 +42,7 @@ def read_drought_shapefile() -> gpd.GeoDataFrame:
     gdf = gpd.read_file(shapefile_path)
     return gdf
 
+
 def plot_region_polygon() -> tuple[plt.Figure, plt.Axes]:
     """Plot the drought regions with their IDs and names."""
 
@@ -55,7 +56,9 @@ def plot_region_polygon() -> tuple[plt.Figure, plt.Axes]:
         linewidth=0.7,
     )
 
-    for point, label in zip(gdf.geometry.representative_point(), gdf["REGION_NR"].astype(str) + " - " + gdf["Name"]):
+    for point, label in zip(
+        gdf.geometry.representative_point(), gdf["REGION_NR"].astype(str) + " - " + gdf["Name"]
+    ):
         ax.text(
             point.x,
             point.y,
@@ -67,7 +70,7 @@ def plot_region_polygon() -> tuple[plt.Figure, plt.Axes]:
         )
 
     ax.set_axis_off()
-    return fig,ax
+    return fig, ax
 
 
 def plot_region_map(

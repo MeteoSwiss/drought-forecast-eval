@@ -31,13 +31,13 @@ html_theme_options = {
         "image_light": "_static/app-icon_meteoswiss_rounded_rgb.png",
         "image_dark": "_static/app-icon_meteoswiss_rounded_rgb.png",
     },
-    'switcher': {
-        'json_url': os.getenv('VERSION_SWITCHER_CONFIG_URL', '_static/switcher_config.json'),
-        'version_match': os.getenv('VERSION', 'dev')
+    "switcher": {
+        "json_url": os.getenv("VERSION_SWITCHER_CONFIG_URL", "_static/switcher_config.json"),
+        "version_match": os.getenv("VERSION", "dev"),
     },
-    'navbar_end': ['navbar-icon-links', 'theme-switcher', 'version-switcher'],
+    "navbar_end": ["navbar-icon-links", "theme-switcher", "version-switcher"],
     "footer_start": ["version", "last-updated", "copyright"],
-    "footer_end": ["theme-version", "sphinx-version"]
+    "footer_end": ["theme-version", "sphinx-version"],
 }
 
 # Disable left side navigation of specific pages, since they are empty
@@ -48,4 +48,10 @@ napoleon_use_param = False  # improve parameters description
 add_module_names = False  # avoid the display of redundant module names
 
 autoapi_dirs = ["../drought_forecast_eval"]
-autoapi_options = ["members", "undoc-members", "show-inheritance", "show-module-summary", "imported-members"]
+autoapi_options = [
+    "members",
+    "undoc-members",
+    "show-inheritance",
+    "show-module-summary",
+    "imported-members",
+]

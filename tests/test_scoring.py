@@ -11,9 +11,11 @@ import xarray as xr
 # Variable map
 # ---------------------------------------------------------------------------
 
+
 class TestVariableMap:
     def test_all_entries_have_required_keys(self):
         from drought_forecast_eval.scoring.variable_map import VARIABLE_MAP
+
         for key, entry in VARIABLE_MAP.items():
             assert "obs" in entry, f"{key}: missing 'obs'"
             assert "fcst" in entry, f"{key}: missing 'fcst'"
@@ -21,12 +23,14 @@ class TestVariableMap:
 
     def test_mode_values(self):
         from drought_forecast_eval.scoring.variable_map import VARIABLE_MAP
+
         valid_modes = {"deterministic", "quantile"}
         for key, entry in VARIABLE_MAP.items():
             assert entry["mode"] in valid_modes, f"{key}: invalid mode '{entry['mode']}'"
 
     def test_quantile_mode_has_three_fcst_cols(self):
         from drought_forecast_eval.scoring.variable_map import VARIABLE_MAP
+
         for key, entry in VARIABLE_MAP.items():
             if entry["mode"] == "quantile":
                 assert len(entry["fcst"]) == 3, (
@@ -35,6 +39,7 @@ class TestVariableMap:
 
     def test_deterministic_mode_has_one_fcst_col(self):
         from drought_forecast_eval.scoring.variable_map import VARIABLE_MAP
+
         for key, entry in VARIABLE_MAP.items():
             if entry["mode"] == "deterministic":
                 assert len(entry["fcst"]) == 1, (
@@ -43,11 +48,13 @@ class TestVariableMap:
 
     def test_cdi_present_and_deterministic(self):
         from drought_forecast_eval.scoring.variable_map import VARIABLE_MAP
+
         assert "cdi" in VARIABLE_MAP
         assert VARIABLE_MAP["cdi"]["mode"] == "deterministic"
 
     def test_spi_1m_present_and_quantile(self):
         from drought_forecast_eval.scoring.variable_map import VARIABLE_MAP
+
         assert "spi_1m" in VARIABLE_MAP
         assert VARIABLE_MAP["spi_1m"]["mode"] == "quantile"
 
@@ -56,19 +63,24 @@ class TestVariableMap:
 # Registry
 # ---------------------------------------------------------------------------
 
+
 class TestRegistry:
     def test_mae_registered(self):
         from drought_forecast_eval.scoring.registry import SCORE_REGISTRY
+
         assert "mae" in SCORE_REGISTRY
 
     def test_rmse_registered(self):
         from drought_forecast_eval.scoring.registry import SCORE_REGISTRY
+
         assert "rmse" in SCORE_REGISTRY
 
     def test_register_custom_score(self):
         from drought_forecast_eval.scoring.registry import register_score, SCORE_REGISTRY
+
         def dummy_score(fcst, obs, **kw):
             return (fcst - obs).mean()
+
         register_score("dummy_test_score", dummy_score)
         assert "dummy_test_score" in SCORE_REGISTRY
         assert SCORE_REGISTRY["dummy_test_score"] is dummy_score
@@ -77,6 +89,7 @@ class TestRegistry:
 # ---------------------------------------------------------------------------
 # Skill score functions
 # ---------------------------------------------------------------------------
+
 
 class TestSkillFunctions:
     def _make_perfect_forecast(self):
@@ -96,6 +109,7 @@ class TestSkillFunctions:
 
     def test_mae_skill_perfect_forecast(self):
         from drought_forecast_eval.scoring.skill import mae_skill
+
         obs, perfect = self._make_perfect_forecast()
         ref = obs + 1.0  # reference has constant error = 1
         skill = mae_skill(perfect, obs, ref, reduce_dims=["forecast_reference_time"])
@@ -103,6 +117,7 @@ class TestSkillFunctions:
 
     def test_mae_skill_reference_forecast(self):
         from drought_forecast_eval.scoring.skill import mae_skill
+
         obs, _ = self._make_perfect_forecast()
         ref = obs + 1.0
         # Forecast equal to reference → skill = 0
@@ -111,12 +126,14 @@ class TestSkillFunctions:
 
     def test_pinball_loss_median_zero_for_perfect(self):
         from drought_forecast_eval.scoring.skill import pinball_loss_xr
+
         obs = xr.DataArray([1.0, 2.0, 3.0])
         loss = pinball_loss_xr(obs, obs, quantile=0.5)
         assert float(loss.sum()) == pytest.approx(0.0, abs=1e-9)
 
     def test_pinball_loss_positive(self):
         from drought_forecast_eval.scoring.skill import pinball_loss_xr
+
         obs = xr.DataArray([1.0, 2.0, 3.0])
         fcst = xr.DataArray([0.5, 1.5, 2.5])  # underforecast
         loss = pinball_loss_xr(obs, fcst, quantile=0.5)
@@ -124,6 +141,7 @@ class TestSkillFunctions:
 
     def test_interval_score_positive(self):
         from drought_forecast_eval.scoring.skill import interval_score_xr
+
         obs = xr.DataArray([1.0, 2.0, 3.0])
         lower = xr.DataArray([0.5, 1.5, 2.5])
         upper = xr.DataArray([1.5, 2.5, 3.5])
@@ -132,7 +150,8 @@ class TestSkillFunctions:
 
     def test_interval_score_penalty_for_miss(self):
         from drought_forecast_eval.scoring.skill import interval_score_xr
-        obs = xr.DataArray([10.0])   # well outside interval
+
+        obs = xr.DataArray([10.0])  # well outside interval
         lower = xr.DataArray([0.0])
         upper = xr.DataArray([1.0])
         score = interval_score_xr(obs, lower, upper, alpha=0.2)
@@ -141,6 +160,7 @@ class TestSkillFunctions:
 
     def test_roc_auc_perfect_discrimination(self):
         from drought_forecast_eval.scoring.skill import roc_auc_xr
+
         obs = xr.DataArray(
             [1.0, 1.0, 3.0, 3.0],
             dims=["forecast_reference_time"],
@@ -156,6 +176,7 @@ class TestSkillFunctions:
 # ---------------------------------------------------------------------------
 # Dispatcher
 # ---------------------------------------------------------------------------
+
 
 class TestDispatcher:
     def test_returns_dataset(self, ds_scores):
@@ -185,6 +206,7 @@ class TestDispatcher:
 
     def test_custom_variable_map(self, ds_merged, ds_clim_ref):
         from drought_forecast_eval.scoring.dispatcher import compute_scores
+
         custom_map = {
             "spi_1m": {
                 "obs": "spi_1m_obs",
@@ -193,16 +215,21 @@ class TestDispatcher:
             }
         }
         ds = compute_scores(
-            ds_merged, variables=["spi_1m"], scores=["mae"],
+            ds_merged,
+            variables=["spi_1m"],
+            scores=["mae"],
             variable_map=custom_map,
         )
         assert "spi_1m_mae" in ds
 
     def test_netcdf_output(self, ds_merged, ds_clim_ref, tmp_path):
         from drought_forecast_eval.scoring.dispatcher import compute_scores
+
         out = tmp_path / "scores.nc"
         compute_scores(
-            ds_merged, variables=["cdi"], scores=["mae"],
+            ds_merged,
+            variables=["cdi"],
+            scores=["mae"],
             output_path=out,
         )
         assert out.exists()
@@ -211,6 +238,7 @@ class TestDispatcher:
 
     def test_with_rpss(self, ds_merged, ds_clim_ref):
         from drought_forecast_eval.scoring.dispatcher import compute_scores
+
         ds = compute_scores(
             ds_merged,
             variables=["spi_1m"],
@@ -221,6 +249,7 @@ class TestDispatcher:
 
     def test_missing_variables_skipped_gracefully(self, ds_merged):
         from drought_forecast_eval.scoring.dispatcher import compute_scores
+
         # spi_999m does not exist in the dataset
         custom_map = {
             "spi_999m": {

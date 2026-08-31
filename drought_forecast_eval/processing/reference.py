@@ -111,8 +111,7 @@ def climatology_reference(
     shape = (n_frt, n_region, n_lead)
 
     results: dict[str, np.ndarray] = {
-        f"{v}_ref_{q}": np.full(shape, np.nan)
-        for v in obs_vars for q in ("p10", "p50", "p90")
+        f"{v}_ref_{q}": np.full(shape, np.nan) for v in obs_vars for q in ("p10", "p50", "p90")
     }
     q_map = {"p10": 0.1, "p50": 0.5, "p90": 0.9}
 
@@ -130,7 +129,9 @@ def climatology_reference(
         if sel_idx.size < 3:
             logger.debug(
                 "Climatology: only %d samples for woy=%d year_excl=%d",
-                sel_idx.size, woy_i, year_i,
+                sel_idx.size,
+                woy_i,
+                year_i,
             )
             continue
 

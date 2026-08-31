@@ -43,12 +43,14 @@ class TestComputeLeadWeeks:
 
     def test_series_length_preserved(self):
         frt = pd.Timestamp("2026-03-24")
-        valid_at = pd.Series([
-            pd.Timestamp("2026-03-23"),
-            pd.Timestamp("2026-03-30"),
-            pd.Timestamp("2026-04-06"),
-            pd.Timestamp("2026-04-13"),
-        ])
+        valid_at = pd.Series(
+            [
+                pd.Timestamp("2026-03-23"),
+                pd.Timestamp("2026-03-30"),
+                pd.Timestamp("2026-04-06"),
+                pd.Timestamp("2026-04-13"),
+            ]
+        )
         result = compute_lead_weeks(valid_at, frt)
         assert len(result) == 4
         assert result.tolist() == [0, 1, 2, 3]
@@ -75,6 +77,7 @@ class TestAlignObsToForecast:
 
     def test_missing_valid_at_raises(self, ds_fcst, ds_obs_combined):
         from drought_forecast_eval.processing.alignment import align_obs_to_forecast
+
         # Drop the valid_at coordinate to trigger the error
         ds_no_valid_at = ds_fcst.drop_vars("valid_at")
         with pytest.raises(ValueError, match="valid_at"):

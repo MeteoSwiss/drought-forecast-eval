@@ -60,6 +60,7 @@ class TestScanArchive:
     def test_deduplicates_same_date(self, tmp_path):
         """If two ZIPs share the same date, only the last (lexicographically) is kept."""
         import zipfile
+
         for suffix in ["2100", "2200"]:
             name = f"trockenheitsdaten-numerisch_current.csv.202507012{suffix[1:]}.zip"
             with zipfile.ZipFile(tmp_path / name, "w") as zf:

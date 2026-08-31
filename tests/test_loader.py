@@ -39,27 +39,29 @@ class TestLoadForecasts:
         assert "valid_at" in ds_fcst.coords
 
     def test_region_id_dtype(self, ds_fcst):
-        assert ds_fcst["drought_region_id"].dtype in (
-            np.dtype("int64"), np.dtype("int32")
-        )
+        assert ds_fcst["drought_region_id"].dtype in (np.dtype("int64"), np.dtype("int32"))
 
     def test_region_filter(self):
         from drought_forecast_eval.io.loader import load_forecasts
+
         ds = load_forecasts(ARCHIVE_DIR, region_ids=[1, 5])
         assert set(ds["drought_region_id"].values).issubset({1, 5})
 
     def test_date_range_filter(self):
         from drought_forecast_eval.io.loader import load_forecasts
+
         ds = load_forecasts(ARCHIVE_DIR, date_range=("2026-03-17", "2026-03-24"))
         assert len(ds["forecast_reference_time"]) >= 1
 
     def test_empty_archive_raises(self, tmp_path):
         from drought_forecast_eval.io.loader import load_forecasts
+
         with pytest.raises(RuntimeError, match="No valid ZIP files found"):
             load_forecasts(tmp_path)
 
     def test_missing_dir_raises(self):
         from drought_forecast_eval.io.loader import load_forecasts
+
         with pytest.raises(FileNotFoundError):
             load_forecasts("/path/does/not/exist")
 
@@ -84,12 +86,11 @@ class TestLoadObservations:
 
     def test_no_all_nan_columns(self, ds_obs):
         for var in ds_obs.data_vars:
-            assert not np.all(np.isnan(ds_obs[var].values)), (
-                f"Variable '{var}' is entirely NaN"
-            )
+            assert not np.all(np.isnan(ds_obs[var].values)), f"Variable '{var}' is entirely NaN"
 
     def test_missing_file_raises(self):
         from drought_forecast_eval.io.loader import load_observations
+
         with pytest.raises(FileNotFoundError):
             load_observations("/nonexistent/file.zip")
 
@@ -113,6 +114,7 @@ class TestLoadObservationsCombined:
     def test_historic_rows_preserved(self, ds_obs_combined, ds_obs):
         """All dates present in the historic dataset must still be present."""
         import numpy as np
+
         hist_dates = set(ds_obs["valid_at"].values.tolist())
         combined_dates = set(ds_obs_combined["valid_at"].values.tolist())
         assert hist_dates.issubset(combined_dates), (
@@ -127,10 +129,12 @@ class TestLoadObservationsCombined:
 
     def test_missing_historic_raises(self, tmp_path):
         from drought_forecast_eval.io.loader import load_observations_combined
+
         with pytest.raises(FileNotFoundError, match="Historic archive not found"):
             load_observations_combined("/nonexistent/historic.zip", tmp_path)
 
     def test_missing_archive_dir_raises(self):
         from drought_forecast_eval.io.loader import load_observations_combined
+
         with pytest.raises(FileNotFoundError, match="Archive directory not found"):
             load_observations_combined(HISTORIC_ZIP, "/nonexistent/dir")
