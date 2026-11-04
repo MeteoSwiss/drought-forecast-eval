@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trockenheitsplattform · Prototyp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap topbar-in">
+    <span class="proto-tag" title="Lokaler Prototyp, kein offizielles Produkt">Prototyp</span>
+    <span class="topbar-note">Entwicklungsstand · nicht öffentlich</span>
+    <span class="sp"></span>
+    <span class="lang">DE <svg width="14" height="8" viewBox="0 0 14 8" aria-hidden="true"><path d="M1 1l6 6 6-6" fill="none" stroke="currentColor" stroke-width="1.2"/></svg></span>
+  </div>
+</div>
+
+<header class="masthead">
+  <div class="wrap masthead-in">
+    <a class="brand" href="#/">
+      <svg class="cross" viewBox="0 0 32 38" aria-hidden="true"><path d="M0 0h32v22c0 8-7 13-16 16C7 35 0 30 0 22z" fill="#d8232a"/><path d="M13 7h6v6h6v6h-6v6h-6v-6H7v-6h6z" fill="#fff"/></svg>
+      <span class="brand-lines">Schweizerische Eidgenossenschaft<br>Confédération suisse<br>Confederazione Svizzera<br>Confederaziun svizra</span>
+    </a>
+    <span class="brand-sep" aria-hidden="true"></span>
+    <span class="brand-title">Nationale Trockenheitsplattform</span>
+    <span class="sp"></span>
+    <a class="contact" href="https://www.trockenheit.admin.ch/de/ueber-die-plattform/kontakt" target="_blank" rel="noopener">Kontakt</a>
+  </div>
+</header>
+
+<nav class="mainnav" aria-label="Hauptnavigation">
+  <div class="wrap mainnav-in">
+    <a href="#/" id="nav-home" class="on">Startseite</a>
+    <a href="https://www.trockenheit.admin.ch/de/faktoren/niederschlag" target="_blank" rel="noopener">Einflussfaktoren</a>
+    <a href="https://www.trockenheit.admin.ch/de/trockenheit/trockenheitsindex" target="_blank" rel="noopener">Über Trockenheit</a>
+    <a href="https://www.trockenheit.admin.ch/de/weitere-informationen/daten-beziehen" target="_blank" rel="noopener">Weitere Informationen</a>
+    <a href="https://www.trockenheit.admin.ch/de/ueber-die-plattform/ueber-das-projekt" target="_blank" rel="noopener">Über die Plattform</a>
+  </div>
+</nav>
+
+<main id="app"><div class="loading wrap">Daten werden geladen…</div></main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <div>
+      <h2>Über uns</h2>
+      <p>Die Trockenheitsplattform des Bundes. Klarheit bei Trockenheit – Grundlagen für informierte Entscheidungen.</p>
+      <p class="foot-proto">Dieser Prototyp läuft lokal und zeigt Archivdaten aus <code>drought-forecast-eval</code>. Die Verdunstung ist ein Demo-Datensatz.</p>
+    </div>
+    <div>
+      <h2>Weitere Informationen</h2>
+      <ul class="foot-links">
+        <li><a href="https://www.bafu.admin.ch" target="_blank" rel="noopener">Bundesamt für Umwelt <span>→</span></a></li>
+        <li><a href="https://www.meteoschweiz.admin.ch" target="_blank" rel="noopener">MeteoSchweiz <span>→</span></a></li>
+        <li><a href="https://www.swisstopo.admin.ch" target="_blank" rel="noopener">Swisstopo <span>→</span></a></li>
+        <li><a href="https://www.trockenheit.admin.ch/de" target="_blank" rel="noopener">Offizielle Plattform <span>→</span></a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot-bottom"><div class="wrap">Prototyp · kein offizielles Produkt</div></div>
+</footer>
+
+<div id="tip" hidden></div>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs id="patterns"></defs>
+</svg>
+
+<script src="app.js"></script>
+</body>
+</html>
