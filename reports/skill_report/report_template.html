@@ -1,0 +1,1166 @@
+<meta charset="utf-8">
+<title>Drought Index Categorical Skill</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Noto+Sans+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: white cards on a pale slate page, one ~72ch reading column, full-width figures.
+   Palette follows the drought platform: slate neutrals, factor colours for variables, CDI level colours. */
+:root {
+  --bg: #f0f4f7;
+  --surface: #ffffff;
+  --band: #f7f9fb;
+  --ink: #1c2834;
+  --ink-2: #46596b;
+  --muted: #828e9a;
+  --line: #dfe4e9;
+  --axis: #acb4bd;
+  --f: #3c6c99;            /* forecast p50 (precipitation factor colour) */
+  --f-band: #8aa6c2;
+  --p: #c26509;            /* persistence */
+  --obs: #131b22;
+  --clim: #dfe4e9;
+  --clim-line: #828e9a;
+  --pos: #3c6c99;          /* forecast better / too wet */
+  --neg: #c26509;          /* forecast worse / too dry */
+  --mid: #eef1f4;
+  --seq: #3c6c99;
+  --chip-pos-bg: #e6edf4;
+  --chip-neg-bg: #f9ecdf;
+  --chip-mid-bg: #eef1f4;
+  --on-strong: #ffffff;
+  --fam-precip: #3c6c99; --fam-precip-l: #8aa6c2;
+  --fam-soil: #83797a; --fam-soil-l: #b5afaf;
+  --fam-disch: #5b65a0; --fam-disch-l: #9da3c6;
+  --fam-cdi: #46596b; --fam-cdi-l: #acb4bd;
+  --lv1: #77e3bc; --lv2: #f9df95; --lv3: #eca257; --lv4: #c26509; --lv5: #662506;
+  --lv1-l: #e4f9f2; --lv2-l: #fef9ea; --lv3-l: #f7dabc; --lv4-l: #daa36b; --lv5-l: #a37c6a;
+  --shadow: 0 1px 2px rgba(0,0,0,0.06), 0 1px 5px rgba(0,0,0,0.08);
+  --sans: "Noto Sans", "Hind", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Noto Sans Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #131b22; --surface: #1c2834; --band: #18222c; --ink: #f0f4f7; --ink-2: #c3cad1; --muted: #8f9aa5;
+    --line: #2a3a4a; --axis: #46596b; --f: #8aa6c2; --f-band: #5c7fa3; --p: #eca257; --obs: #f0f4f7;
+    --clim: #263645; --clim-line: #8f9aa5; --pos: #8aa6c2; --neg: #eca257; --mid: #263645; --seq: #8aa6c2;
+    --chip-pos-bg: #22364a; --chip-neg-bg: #3d2a17; --chip-mid-bg: #263645; --on-strong: #131b22;
+    --fam-precip: #8aa6c2; --fam-precip-l: #5c7fa3; --fam-soil: #b5afaf; --fam-soil-l: #83797a;
+    --fam-disch: #9da3c6; --fam-disch-l: #5b65a0; --fam-cdi: #c3cad1; --fam-cdi-l: #596978;
+    --lv1-l: #1f3b33; --lv2-l: #3b3524; --lv3-l: #3f2c1a; --lv4-l: #4a2a10; --lv5-l: #3a1f12;
+    --shadow: 0 1px 2px rgba(0,0,0,0.4);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #131b22; --surface: #1c2834; --band: #18222c; --ink: #f0f4f7; --ink-2: #c3cad1; --muted: #8f9aa5;
+  --line: #2a3a4a; --axis: #46596b; --f: #8aa6c2; --f-band: #5c7fa3; --p: #eca257; --obs: #f0f4f7;
+  --clim: #263645; --clim-line: #8f9aa5; --pos: #8aa6c2; --neg: #eca257; --mid: #263645; --seq: #8aa6c2;
+  --chip-pos-bg: #22364a; --chip-neg-bg: #3d2a17; --chip-mid-bg: #263645; --on-strong: #131b22;
+  --fam-precip: #8aa6c2; --fam-precip-l: #5c7fa3; --fam-soil: #b5afaf; --fam-soil-l: #83797a;
+  --fam-disch: #9da3c6; --fam-disch-l: #5b65a0; --fam-cdi: #c3cad1; --fam-cdi-l: #596978;
+  --lv1-l: #1f3b33; --lv2-l: #3b3524; --lv3-l: #3f2c1a; --lv4-l: #4a2a10; --lv5-l: #3a1f12;
+  --shadow: 0 1px 2px rgba(0,0,0,0.4);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body {
+  background: var(--bg); color: var(--ink); font: 15px/1.6 var(--sans);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 64px;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--surface); }
+main { max-width: 1080px; margin: 0 auto; display: grid; gap: 48px; }
+.prose { max-width: 72ch; }
+h1, h2, h3 { font-weight: 700; text-wrap: balance; margin: 0; line-height: 1.2; }
+h1 { font-size: clamp(28px, 4.4vw, 40px); }
+h2 { font-size: 24px; }
+h3 { font-size: 17px; font-weight: 600; }
+p { margin: 0; }
+section { display: grid; gap: 16px; min-width: 0; scroll-margin-top: 72px; }
+.part { display: grid; gap: 40px; scroll-margin-top: 64px; }
+.part-head { display: grid; gap: 10px; padding-top: 8px; border-top: 3px solid var(--ink); }
+.part-head .k { font: 600 13px var(--sans); color: var(--ink-2); letter-spacing: 0.02em; }
+.eyebrow { font: 600 12px/1 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+.lede { font-size: 17px; color: var(--ink-2); max-width: 68ch; }
+.note { font-size: 13px; color: var(--muted); max-width: 78ch; }
+code, .num { font-family: var(--mono); font-size: 0.9em; }
+.num { font-variant-numeric: tabular-nums; }
+a { color: var(--f); }
+
+header.top { padding-top: 40px; display: grid; gap: 14px; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px 24px; font-size: 13px; color: var(--ink-2); }
+.meta b { font-weight: 600; color: var(--ink); }
+.levels { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13px; color: var(--ink-2); }
+.levels span { display: inline-flex; align-items: center; gap: 7px; }
+.lvsw { width: 18px; height: 18px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.12); display: inline-block; }
+
+.bar {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: var(--surface);
+  margin-inline: calc(-1 * max(16px, env(safe-area-inset-left, 0px)));
+  padding-inline: max(16px, env(safe-area-inset-left, 0px));
+  padding-block: 10px; box-shadow: var(--shadow);
+}
+.bar-in { max-width: 1080px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; }
+.bar nav { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 14px; font-weight: 500; }
+.bar nav a { color: var(--ink); text-decoration: none; padding-block: 2px; border-bottom: 2px solid transparent; }
+.bar nav a:hover { border-bottom-color: var(--ink); }
+.bar .sp { flex: 1 1 0; }
+.lbl { font: 600 12px var(--sans); color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.seg { display: inline-flex; border: 1px solid var(--axis); border-radius: 4px; overflow: hidden; flex-wrap: wrap; }
+.seg button {
+  font: 500 13px var(--sans); color: var(--ink-2); background: var(--surface); border: 0;
+  padding: 5px 11px; cursor: pointer; border-right: 1px solid var(--axis);
+}
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--surface); }
+.seg button:focus-visible, select:focus-visible, input:focus-visible, .bar nav a:focus-visible { outline: 2px solid var(--f); outline-offset: 2px; }
+select { font: 14px var(--sans); color: var(--ink); background: var(--surface); border: 1px solid var(--axis); border-radius: 4px; padding: 5px 8px; max-width: 100%; }
+.controls { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; font-size: 13px; color: var(--ink-2); }
+.controls label { display: inline-flex; gap: 8px; align-items: center; }
+.checks { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.checks label { gap: 6px; cursor: pointer; }
+.checks input { accent-color: var(--ink); width: 15px; height: 15px; margin: 0; }
+
+.findings { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; counter-reset: f; }
+.findings li { display: grid; grid-template-columns: 30px 1fr; gap: 4px; max-width: 80ch; }
+.findings li::before { counter-increment: f; content: counter(f); font: 700 13px/1.7 var(--sans); color: var(--muted); }
+.findings b { font-weight: 600; }
+
+.frame { background: var(--surface); border-radius: 4px; padding: 18px; min-width: 0; box-shadow: var(--shadow); }
+.scroll { overflow-x: auto; }
+
+.matrix { border-collapse: separate; border-spacing: 4px; font-size: 13px; }
+.matrix th { font: 500 12.5px var(--sans); color: var(--ink-2); text-align: left; padding: 2px 8px 2px 0; white-space: nowrap; }
+.matrix th.c { text-align: center; color: var(--muted); }
+.chip { display: flex; align-items: center; justify-content: center; gap: 6px; min-width: 112px; padding: 6px 8px; border-radius: 4px; font: 500 12.5px var(--sans); white-space: nowrap; }
+.chip.pos { background: var(--chip-pos-bg); color: var(--pos); }
+.chip.neg { background: var(--chip-neg-bg); color: var(--neg); }
+.chip.mid { background: var(--chip-mid-bg); color: var(--ink-2); }
+.chip .num { font-size: 12px; opacity: 0.9; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 13px; color: var(--ink-2); align-items: center; }
+.key { display: inline-flex; align-items: center; gap: 7px; }
+.sw { width: 18px; height: 3px; border-radius: 2px; display: inline-block; }
+.sw.dash { background: repeating-linear-gradient(90deg, var(--p) 0 5px, transparent 5px 8px) !important; }
+.sw.box { height: 12px; border-radius: 2px; }
+
+.panels { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 860px) { .panels { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .panels { grid-template-columns: minmax(0, 1fr); } }
+figure { margin: 0; min-width: 0; }
+.panel { background: var(--surface); border-radius: 4px; padding: 12px 12px 6px; box-shadow: var(--shadow); }
+.panel figcaption, .mg figcaption { font: 600 13px var(--sans); color: var(--ink); }
+.panel figcaption span, .mg figcaption span { color: var(--muted); font-weight: 400; }
+svg { display: block; width: 100%; height: auto; overflow: visible; }
+svg text { font-family: var(--sans); }
+.tick { font: 10.5px var(--mono); fill: var(--muted); }
+.axl { font: 11px var(--sans); fill: var(--muted); }
+.grid { stroke: var(--line); stroke-width: 1; }
+.base { stroke: var(--axis); stroke-width: 1; }
+.lab { font: 600 11px var(--sans); fill: var(--ink-2); }
+.hit { fill: transparent; cursor: crosshair; }
+.hit:hover + .hl, .hl.on { opacity: 1; }
+.hl { opacity: 0; stroke: var(--axis); stroke-width: 1; pointer-events: none; }
+
+table.data { border-collapse: collapse; width: 100%; font-size: 13.5px; }
+table.data th, table.data td { padding: 7px 10px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+table.data th { font: 600 11.5px var(--sans); color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; vertical-align: bottom; }
+table.data th:first-child, table.data td:first-child { text-align: left; }
+table.data td { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--ink-2); }
+table.data td b { color: var(--ink); font-weight: 600; }
+table.data td .vs { color: var(--muted); }
+table.data td.lead { font-family: var(--sans); color: var(--ink); }
+.ci-pos { color: var(--pos) !important; }
+.ci-neg { color: var(--neg) !important; }
+
+table.heat { border-collapse: separate; border-spacing: 3px; font-size: 13px; width: 100%; }
+table.heat th { font: 500 12.5px var(--sans); color: var(--ink-2); text-align: left; white-space: nowrap; padding: 2px 10px 2px 0; }
+table.heat th.c { text-align: center; color: var(--muted); font-weight: 500; }
+table.heat tr.g th { padding-top: 12px; font-weight: 700; color: var(--ink); }
+table.heat td { text-align: center; font: 13px var(--mono); font-variant-numeric: tabular-nums; padding: 7px 6px; border-radius: 3px; min-width: 88px; cursor: default; }
+table.heat td.sig { font-weight: 600; }
+
+.two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 700px) { .two { grid-template-columns: minmax(0, 1fr); } }
+.maps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 18px; }
+@media (max-width: 560px) { .maps { grid-template-columns: minmax(0, 1fr); } }
+.maps figcaption { font: 600 13px var(--sans); margin-bottom: 4px; }
+.maps figcaption span { color: var(--muted); font-weight: 400; }
+.region { stroke: var(--surface); stroke-width: 0.8; cursor: crosshair; }
+.region:hover { stroke: var(--ink); stroke-width: 1.5; }
+.ramp { height: 10px; width: 220px; max-width: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--neg), var(--mid), var(--pos)); }
+
+.mgs { display: grid; gap: 10px; }
+.mg { background: var(--surface); border-radius: 4px; padding: 12px 14px 8px; box-shadow: var(--shadow); }
+.mg-status { font-size: 13px; color: var(--muted); padding: 24px 0; }
+
+dl.defs { display: grid; grid-template-columns: minmax(130px, max-content) minmax(0, 1fr); gap: 10px 22px; margin: 0; max-width: 92ch; }
+dl.defs dt { font: 600 13px var(--sans); color: var(--ink); }
+dl.defs dd { margin: 0; color: var(--ink-2); font-size: 14px; }
+@media (max-width: 560px) { dl.defs { grid-template-columns: minmax(0, 1fr); gap: 2px; } dl.defs dd { margin-bottom: 10px; } }
+ul.plain { margin: 0; padding-left: 18px; display: grid; gap: 8px; max-width: 80ch; color: var(--ink-2); }
+
+#tip {
+  position: fixed; z-index: 20; pointer-events: none; background: var(--surface); color: var(--ink);
+  border: 1px solid var(--line); border-radius: 4px; padding: 8px 10px; font-size: 12.5px; line-height: 1.5;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.14); max-width: 280px;
+}
+#tip .num { font-size: 12px; }
+#tip .k { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 6px; }
+#tip .m { color: var(--muted); }
+@media (prefers-reduced-motion: no-preference) { .seg button { transition: background-color .12s, color .12s; } }
+</style>
+
+<div class="bar">
+  <div class="bar-in">
+    <nav aria-label="Sections">
+      <a href="#levels">Drought levels</a>
+      <a href="#numeric">Numerical variables</a>
+      <a href="#meteograms">Meteograms</a>
+      <a href="#method">Method</a>
+    </nav>
+    <span class="sp"></span>
+    <span class="lbl">Period</span>
+    <div class="seg" id="period" role="group" aria-label="Verification period">
+      <button type="button" data-v="full" aria-pressed="true">Full record</button>
+      <button type="button" data-v="season2026" aria-pressed="false">2026 drought season</button>
+      <button type="button" data-v="before2026season" aria-pressed="false">Jul 2025 – Apr 2026</button>
+    </div>
+  </div>
+</div>
+
+<main>
+  <header class="top">
+    <div class="eyebrow">Forecast verification · trockenheit.admin.ch drought forecasts</div>
+    <h1>How skilful are the weekly drought forecasts?</h1>
+    <p class="lede">This report verifies the 0–3 week forecasts of the drought indicators against observations. The first part scores the CDI and its sub-indices as drought levels 1–5. The second scores the precipitation sums, the SPI and soil moisture as numbers, using the full p10/p50/p90 forecast. Meteograms show the forecasts behind the scores, region by region. The benchmarks are persistence (last week's observation carried forward) and the 1991–2020 climatology.</p>
+    <div class="meta">
+      <span><b>64</b> Monday issue dates, 7 Jul 2025 – 28 Sep 2026</span>
+      <span><b>38</b> BAFU drought regions</span>
+      <span>lead weeks <b>0–3</b></span>
+      <span>90% intervals: 4-week block bootstrap, 2 000 resamples</span>
+    </div>
+    <div class="levels" aria-label="Drought levels">
+      <span><i class="lvsw" style="background:var(--lv1)"></i>1 Nicht trocken</span>
+      <span><i class="lvsw" style="background:var(--lv2)"></i>2 Leicht trocken</span>
+      <span><i class="lvsw" style="background:var(--lv3)"></i>3 Trocken</span>
+      <span><i class="lvsw" style="background:var(--lv4)"></i>4 Sehr trocken</span>
+      <span><i class="lvsw" style="background:var(--lv5)"></i>5 Extrem trocken</span>
+    </div>
+    <p class="note" id="period-note"></p>
+  </header>
+
+  <!-- ================= PART 1: DROUGHT LEVELS ================= -->
+  <div class="part" id="levels">
+    <div class="part-head">
+      <span class="k">Part 1 · CDI and sub-indices, p50 as drought level</span>
+      <h2>Drought levels</h2>
+    </div>
+
+    <section>
+      <h3>Key findings</h3>
+      <ol class="findings">
+        <li><span><b>The CDI forecast beats persistence for about one week.</b> At lead week 0, the Gerrity skill score is 0.79 against 0.64 for persistence. At lead week 1 it is 0.60 against 0.54, which is not significant over the full record but is significant within the 2026 drought season (0.45 against 0.26). At lead week 2 the two are level. At lead week 3 the forecast is significantly worse (0.34 against 0.48).</span></li>
+        <li><span><b>The forecast median becomes too mild as lead time grows.</b> For the CDI, the share of forecasts at least one level too mild rises from 16% to 38% between lead weeks 0 and 3. The share that is too severe stays near 10%. The frequency bias for CDI ≥ 3 falls from 0.97 to 0.62. Warnings are rarely false alarms (FAR 0.11–0.19), but by lead week 3 about half of the level-3+ weeks are missed (POD 0.51 against 0.65 for persistence). Soil moisture shows the same pattern more strongly (bias 0.28 at lead week 3).</span></li>
+        <li><span><b>The precipitation indices carry the added value.</b> For the 1-month index, which persistence handles badly, the forecast is better through lead week 2 (Gerrity 0.47 against 0.23 at lead week 1). The 24-month index is ahead of persistence at every lead (0.81 against 0.65 at lead week 3). Over the full record that gain is significant only at lead week 3, but within the 2026 season it is significant at every lead. The 3-month index is significantly better through lead week 1.</span></li>
+        <li><span><b>The hydrological index never beats persistence, and it over-warns.</b> It is level with persistence at lead weeks 0–1 and significantly worse from lead week 2 (0.31 against 0.50). It is the only index with a frequency bias above 1 (1.17–1.23 for level ≥ 3), and 13–18% of non-drought weeks get a false onset warning, against 0–6% for the other indices.</span></li>
+        <li><span><b>Forecasts do anticipate drought onsets, which persistence cannot.</b> Of the region-weeks where the CDI moved from below level 3 to level 3 or above, the forecast caught 68% at lead week 0, 52% at lead week 1, 35% at lead week 2 and 26% at lead week 3, with false onsets in 3–5% of cases.</span></li>
+      </ol>
+      <p class="note">The prose quotes the full record. The charts follow the period switch at the top. Almost all level-3+ drought in the record falls in April–September 2026, so in effect this verifies one drought season. Weeks and regions are strongly correlated, so treat the intervals as the honest measure of certainty, not the sample size.</p>
+    </section>
+
+    <section>
+      <div class="eyebrow">At a glance</div>
+      <h3>Where the forecast beats persistence</h3>
+      <p class="prose">Verdicts use the Gerrity skill score difference (forecast minus persistence) and its 90% block-bootstrap interval. “Better” and “worse” mean the interval excludes zero.</p>
+      <div class="frame scroll"><table class="matrix" id="matrix"></table></div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Multi-category skill</div>
+      <h3>Skill against lead time</h3>
+      <p class="prose">The Gerrity skill score (GSS) is the standard equitable score for ordered categories. A constant or random forecast scores 0 and a perfect one scores 1. A miss by one level costs less than a miss by three, and it pays more for getting a rare level right than a common one. The Heidke score (HSS) gives credit only for an exact match. PC is the proportion correct, and PC±1 counts forecasts within one level.</p>
+      <div class="controls">
+        <div class="seg" id="metric" role="group" aria-label="Score">
+          <button type="button" data-v="gss" aria-pressed="true">Gerrity</button>
+          <button type="button" data-v="hss" aria-pressed="false">Heidke</button>
+          <button type="button" data-v="pss" aria-pressed="false">Peirce</button>
+          <button type="button" data-v="pc" aria-pressed="false">PC</button>
+          <button type="button" data-v="pc1" aria-pressed="false">PC ±1</button>
+        </div>
+        <div class="legend">
+          <span class="key"><span class="sw" style="background:var(--f)"></span>Forecast p50</span>
+          <span class="key"><span class="sw dash"></span>Persistence</span>
+        </div>
+      </div>
+      <div class="panels" id="lines"></div>
+    </section>
+
+    <section>
+      <h3>Gain over persistence, with uncertainty</h3>
+      <p class="prose">This is the Gerrity skill score of the forecast minus that of persistence, scored on the same cases. Bars show the 90% interval from a moving-block bootstrap over issue weeks, with all 38 regions resampled together. Filled dots mark intervals that exclude zero.</p>
+      <div class="frame"><div id="forest"></div></div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Warning thresholds</div>
+      <h3>Yes/no scores for “level ≥ k”</h3>
+      <p class="prose">Each threshold turns the forecast into a yes/no warning. The table pairs forecast with persistence, and the better value of each pair is set in bold. ETS is the equitable threat score. SEDI (symmetric extremal dependence index) does not shrink to zero when an event is rare, so it compares fairly between thresholds and periods. The last column is the 90% interval of the ETS gain over persistence.</p>
+      <div class="controls">
+        <label for="bin-idx">Index <select id="bin-idx"></select></label>
+        <div class="seg" id="thr" role="group" aria-label="Threshold">
+          <button type="button" data-v="2" aria-pressed="false">≥ 2</button>
+          <button type="button" data-v="3" aria-pressed="true">≥ 3</button>
+          <button type="button" data-v="4" aria-pressed="false">≥ 4</button>
+        </div>
+      </div>
+      <div class="frame scroll"><table class="data" id="bin"></table></div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Error structure</div>
+      <h3>Too mild or too severe?</h3>
+      <p class="prose">This is the share of all forecasts that put the region at a lower level than observed (too mild) or a higher level (too severe). The gap between the two sides is the systematic part of the error. For most indices it grows on the “too mild” side with lead time.</p>
+      <div class="frame"><div id="bias"></div></div>
+    </section>
+
+    <section>
+      <h3>Contingency tables</h3>
+      <p class="prose">These are the full 5 × 5 tables behind the scores. Rows are the forecast level and columns the observed level. Cells on the diagonal are exact hits, and the shading shows each cell’s share of all cases.</p>
+      <div class="controls">
+        <label for="ct-idx">Index <select id="ct-idx"></select></label>
+        <div class="seg" id="ct-lead" role="group" aria-label="Lead week">
+          <button type="button" data-v="0" aria-pressed="false">Week 0</button>
+          <button type="button" data-v="1" aria-pressed="true">Week 1</button>
+          <button type="button" data-v="2" aria-pressed="false">Week 2</button>
+          <button type="button" data-v="3" aria-pressed="false">Week 3</button>
+        </div>
+      </div>
+      <div class="two" id="ct"></div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Changes of level</div>
+      <h3>Onsets and transitions</h3>
+      <p class="prose">Persistence is right whenever nothing changes, so a forecast only adds value when the level moves. These numbers count only the region-weeks where the observed level differs from the last observation available at issue time. An <i>onset</i> is a move from below level 3 to level 3 or above.</p>
+      <div class="frame scroll"><table class="data" id="chg"></table></div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Regions · full record</div>
+      <h3>CDI gain over persistence by region</h3>
+      <p class="prose">This is the Gerrity skill score difference (forecast minus persistence) for the CDI in each region, over the full record. Each region has only 64 issue dates, so single regions are noisy. Read the map for the overall pattern, not for individual regions.</p>
+      <div class="legend"><span>forecast worse</span><span class="ramp" aria-hidden="true"></span><span>forecast better</span><span class="note">scale ±0.5</span></div>
+      <div class="maps" id="maps"></div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Time series · full record</div>
+      <h3>Share of regions at level ≥ 3</h3>
+      <p class="prose">This chart shows the observed share of regions at level 3 or above, with the forecast and persistence for the same valid week. It shows where the scores come from: the spring 2026 onset, the summer plateau and the short dry spell around New Year.</p>
+      <div class="controls">
+        <label for="tl-idx">Index <select id="tl-idx"></select></label>
+        <div class="seg" id="tl-lead" role="group" aria-label="Lead week">
+          <button type="button" data-v="0" aria-pressed="false">Week 0</button>
+          <button type="button" data-v="1" aria-pressed="false">Week 1</button>
+          <button type="button" data-v="2" aria-pressed="true">Week 2</button>
+          <button type="button" data-v="3" aria-pressed="false">Week 3</button>
+        </div>
+        <div class="legend">
+          <span class="key"><span class="sw" style="background:var(--obs)"></span>Observed</span>
+          <span class="key"><span class="sw" style="background:var(--f)"></span>Forecast p50</span>
+          <span class="key"><span class="sw dash"></span>Persistence</span>
+        </div>
+      </div>
+      <div class="frame"><div id="timeline"></div></div>
+    </section>
+  </div>
+
+  <!-- ================= PART 2: NUMERICAL VARIABLES ================= -->
+  <div class="part" id="numeric">
+    <div class="part-head">
+      <span class="k">Part 2 · precipitation sums, SPI and soil moisture, p10/p50/p90</span>
+      <h2>Numerical variables</h2>
+    </div>
+
+    <section>
+      <h3>Key findings</h3>
+      <ol class="findings">
+        <li><span><b>All precipitation sums have the same absolute error, and the 1-month sum is the honest measure.</b> At each lead week the p50 error is identical for every window from 1 to 24 months: a mean absolute error of 11, 22, 30 and 37 mm at lead weeks 0–3. It is the error of the same one to four forecast weeks. The long windows score higher skill only because most of each window is already observed. For the 1-month sum, the MAE skill against climatology falls from 0.74 to 0.15 between lead weeks 0 and 3, and against persistence from 0.51 to 0.27. Both are significant at every lead.</span></li>
+        <li><span><b>The forecast was too wet during the 2026 drought.</b> At lead week 3 in the 2026 season, 83% of observed 1-month sums fell below the forecast median (50% expected), and the p50 was 31 mm (38%) too high. Over the full record the wet bias at lead week 3 is +11 mm (12%). The SPI shows the same thing (+0.65 for SPI-1 at lead week 3 in the season).</span></li>
+        <li><span><b>The p10–p90 range is a little too narrow on the dry side.</b> It holds 66–76% of observations instead of 80%. The misses fall mostly below p10 (17–20% of cases instead of 10%) and much less often above p90 (7–14%). At lead week 0 the range is very narrow, a fifth of the climatological range for the 1-month sum, and it covers only 66%.</span></li>
+        <li><span><b>Soil moisture is badly calibrated.</b> Only 31–51% of observations fall inside the p10–p90 range, 39–51% fall below p10, and the p50 is 1.5–9 percentage points too wet. It beats persistence at lead weeks 0–1 (MAE skill 0.53 and 0.27), but not at lead weeks 2–3 (0.06 and −0.05, both not significant).</span></li>
+        <li><span><b>Dry-decile weeks are well discriminated.</b> For the event “below the climatological 10th percentile”, the forecast probability for the 1-month sum has a Brier skill score against climatology of 0.77, 0.51, 0.39 and 0.27, and a ROC area of 0.98, 0.91, 0.87 and 0.81 at lead weeks 0–3. All four Brier skill scores are significant.</span></li>
+      </ol>
+    </section>
+
+    <section>
+      <div class="eyebrow">Skill table</div>
+      <h3>Scores by variable and lead week</h3>
+      <p class="prose">Each cell is one variable at one lead week, pooled over regions and issue dates. Bold values have a 90% interval that excludes zero. Hover a cell to see the interval.</p>
+      <div class="controls">
+        <div class="seg" id="nscore" role="group" aria-label="Score">
+          <button type="button" data-v="maess_p" aria-pressed="true">MAE skill vs persistence</button>
+          <button type="button" data-v="maess_c" aria-pressed="false">MAE skill vs climatology</button>
+          <button type="button" data-v="qss_c" aria-pressed="false">Quantile skill vs climatology</button>
+          <button type="button" data-v="bss" aria-pressed="false">Dry-decile Brier skill</button>
+          <button type="button" data-v="auc" aria-pressed="false">Dry-decile ROC area</button>
+          <button type="button" data-v="cov80_f" aria-pressed="false">p10–p90 coverage</button>
+          <button type="button" data-v="bias" aria-pressed="false">Bias of p50</button>
+        </div>
+      </div>
+      <p class="note" id="nscore-note"></p>
+      <div class="frame scroll"><table class="heat" id="heat"></table></div>
+    </section>
+
+    <section>
+      <div class="eyebrow">Calibration</div>
+      <h3>Where the observations fall in the forecast</h3>
+      <p class="prose">For a calibrated forecast, 10% of observations fall below p10, 40% between p10 and p50, 40% between p50 and p90, and 10% above p90. The black ticks mark those expected boundaries. The climatology row shows how the same observations sit within the 1991–2020 distribution, which shows how unusual the period was.</p>
+      <div class="controls">
+        <label for="cal-var">Variable <select id="cal-var"></select></label>
+        <div class="legend">
+          <span class="key"><span class="sw box" style="background:var(--lv4)"></span>below p10</span>
+          <span class="key"><span class="sw box" style="background:var(--lv3-l);border:1px solid var(--line)"></span>p10–p50</span>
+          <span class="key"><span class="sw box" style="background:#c5d4e3"></span>p50–p90</span>
+          <span class="key"><span class="sw box" style="background:#3c6c99"></span>above p90</span>
+        </div>
+      </div>
+      <div class="frame"><div id="cal"></div></div>
+    </section>
+  </div>
+
+  <!-- ================= PART 3: METEOGRAMS ================= -->
+  <div class="part" id="meteograms">
+    <div class="part-head">
+      <span class="k">Part 3 · forecasts and observations per region</span>
+      <h2>Meteograms</h2>
+    </div>
+    <section>
+      <p class="prose"><b>By lead week</b> works like <code>plot_forecast_plume</code> in the notebook. There is one panel per lead week, with the forecast drawn at its valid week, so the observed line is the same in all four panels. <b>One forecast</b> shows a single issue date: the weeks observed before it, the four forecast weeks, and what was then observed. The layer switches build the picture up step by step, and the axes stay fixed while you do. The time range follows the period switch at the top.</p>
+      <div class="controls">
+        <label for="mg-var">Variable <select id="mg-var"></select></label>
+        <label for="mg-reg">Region <select id="mg-reg"></select></label>
+        <div class="seg" id="mg-view" role="group" aria-label="View">
+          <button type="button" data-v="lead" aria-pressed="true">By lead week</button>
+          <button type="button" data-v="run" aria-pressed="false">One forecast</button>
+        </div>
+        <label for="mg-run" id="mg-run-wrap" hidden>Issued <select id="mg-run"></select></label>
+      </div>
+      <div class="controls">
+        <div class="checks" role="group" aria-label="Layers">
+          <label><input type="checkbox" id="ly-obs" checked><span class="sw" style="background:var(--obs)"></span>Observations</label>
+          <label><input type="checkbox" id="ly-clim" checked><span class="sw box" style="background:var(--clim);border:1px solid var(--axis)"></span>Climatology p10–p90</label>
+          <label><input type="checkbox" id="ly-pers" checked><span class="sw dash"></span>Persistence</label>
+          <label><input type="checkbox" id="ly-fcst" checked><span class="sw box" id="ly-fcst-sw" style="background:var(--fam-precip-l)"></span>Forecast p10–p90 and p50</label>
+        </div>
+      </div>
+      <div class="mgs" id="mgs"><div class="mg-status">Loading meteogram data…</div></div>
+    </section>
+  </div>
+
+  <!-- ================= METHOD ================= -->
+  <section id="method">
+    <div class="part-head">
+      <span class="k">Method</span>
+      <h2>Scores and set-up</h2>
+    </div>
+    <dl class="defs">
+      <dt>Sample</dt><dd>Monday issues only, as in <code>verification_summer2026.ipynb</code>. Observations are weekly, also on Mondays. Lead week 0 is valid on the issue Monday itself. Scores pool all regions and issue dates for each lead week.</dd>
+      <dt>Persistence</dt><dd>The last observation strictly before the issue date, held flat over all leads (<code>persistence_reference</code>). At lead week <i>k</i> it is therefore <i>k</i> + 1 weeks old.</dd>
+      <dt>Climatology</dt><dd>The 1991–2020 p10/p50/p90 for the same region and week of the year, ±1 week (<code>climatology_reference</code>). It is used for the numerical variables only. For the drought levels its median is level 1 almost everywhere, so a climatology forecast would score exactly 0 on every equitable score.</dd>
+      <dt>GSS</dt><dd>Gerrity (1992) skill score. Scoring weights come from the observed level frequencies in the sample being scored, and they are recomputed for every bootstrap resample. Levels never observed (level 5 of the 24-month index) are merged into the nearest observed level.</dd>
+      <dt>HSS · PSS</dt><dd>Multi-category Heidke and Peirce skill scores. They are equitable but give credit only for an exact level match.</dd>
+      <dt>POD · FAR · FBI</dt><dd>Hit rate, false alarm ratio and frequency bias (predicted ÷ observed events) for the yes/no event “level ≥ k”.</dd>
+      <dt>ETS · SEDI</dt><dd>Equitable threat score, and the symmetric extremal dependence index of Ferro &amp; Stephenson (2011). SEDI does not depend on how often the event happens.</dd>
+      <dt>MAE skill</dt><dd>1 − MAE(p50) ÷ MAE(reference), where the reference is persistence or the climatological median.</dd>
+      <dt>Quantile skill</dt><dd>1 − QS(forecast) ÷ QS(climatology), where QS is the pinball loss averaged over p10, p50 and p90. It scores the whole three-quantile forecast, spread included.</dd>
+      <dt>Dry decile</dt><dd>The event “observation below the climatological p10 for that region and week”. The forecast probability is read from a piecewise-linear CDF through (p10, 0.1), (p50, 0.5) and (p90, 0.9), extended linearly beyond. The Brier skill score is relative to climatology, which always gives 0.1.</dd>
+      <dt>Intervals</dt><dd>A moving-block bootstrap over issue weeks (blocks of 4 weeks, 2 000 resamples), resampling all regions together. Forecast and reference are resampled as pairs.</dd>
+    </dl>
+    <h3>Caveats</h3>
+    <ul class="plain">
+      <li>There is one drought season in the record. Spring and summer 2026 dominate every level-3+ statistic, and the July 2025 – April 2026 period has very few such events (base rate under 10%). Its scores are correspondingly unstable.</li>
+      <li>Some of the lead-week-0 gain is nowcasting. The forecast is valid on the issue date, while persistence is a week old.</li>
+      <li>The drought levels have only a p50 in the archive, so they are judged on the median alone. A median drifting toward “no drought” at longer leads is expected behaviour, and not necessarily a flaw of the ensemble.</li>
+      <li>Skill against climatology rises with the accumulation window mainly because more of the window is observed. Compare windows on absolute error, or against persistence.</li>
+      <li>The issue date 2026-07-20 is missing from the archive.</li>
+    </ul>
+    <p class="note">Code: <code>reports/skill_report/</code> in drought-forecast-eval (categorical_skill.py, numeric_skill.py, prep_report_data.py). Colours follow the drought platform’s level and indicator palette.</p>
+  </section>
+</main>
+
+<div id="tip" hidden></div>
+
+<script type="application/json" id="data">__DATA__</script>
+<script>
+(() => {
+const D = JSON.parse(document.getElementById('data').textContent);
+const IDX = ['cdi', 'precip_1m_index', 'precip_3m_index', 'precip_24m_index', 'hydro_index', 'soil_moisture_index'];
+const LABEL = {
+  cdi: 'CDI', precip_1m_index: 'Precip. index 1 month', precip_3m_index: 'Precip. index 3 months',
+  precip_24m_index: 'Precip. index 24 months', hydro_index: 'Hydrological index', soil_moisture_index: 'Soil moisture index',
+  precip_sum_1m: 'Precip. sum 1 month', precip_sum_3m: 'Precip. sum 3 months', precip_sum_6m: 'Precip. sum 6 months',
+  precip_sum_12m: 'Precip. sum 12 months', precip_sum_24m: 'Precip. sum 24 months',
+  spi_1m: 'SPI 1 month', spi_3m: 'SPI 3 months', spi_6m: 'SPI 6 months', spi_12m: 'SPI 12 months', spi_24m: 'SPI 24 months',
+  soil_moisture_ufc: 'Soil moisture'
+};
+const NUM_GROUPS = [
+  ['Precipitation sums', ['precip_sum_1m', 'precip_sum_3m', 'precip_sum_6m', 'precip_sum_12m', 'precip_sum_24m']],
+  ['SPI', ['spi_1m', 'spi_3m', 'spi_6m', 'spi_12m', 'spi_24m']],
+  ['Soil moisture', ['soil_moisture_ufc']]
+];
+const NUMVARS = NUM_GROUPS.flatMap(g => g[1]);
+const UNIT = v => v.startsWith('precip_sum') ? 'mm' : v === 'soil_moisture_ufc' ? '% uFC' : v.startsWith('spi') ? 'SPI' : 'level';
+const FAMILY = v => v === 'soil_moisture_ufc' || v === 'soil_moisture_index' ? 'soil' : v === 'hydro_index' ? 'disch' : v === 'cdi' ? 'cdi' : 'precip';
+const PERIOD_NOTE = {
+  full: 'Showing the full record: 64 issue weeks.',
+  season2026: 'Showing the 2026 drought season: 24 issue weeks, 13 Apr – 28 Sep 2026.',
+  before2026season: 'Showing July 2025 – April 2026: 40 issue weeks, mostly without drought.'
+};
+const PERIOD_RANGE = { full: ['2025-07-07', '2026-09-28'], season2026: ['2026-04-13', '2026-09-28'], before2026season: ['2025-07-07', '2026-04-06'] };
+const METRIC = { gss: 'Gerrity skill score', hss: 'Heidke skill score', pss: 'Peirce skill score', pc: 'Proportion correct', pc1: 'Within one level' };
+const state = {
+  period: 'full', metric: 'gss', binIdx: 'cdi', thr: '3', ctIdx: 'cdi', ctLead: 1, tlIdx: 'cdi', tlLead: 2,
+  nscore: 'maess_p', calVar: 'precip_sum_1m',
+  mgVar: 'precip_sum_1m', mgReg: '42', mgView: 'lead', mgRun: '2026-04-20',
+  layers: { obs: true, clim: true, pers: true, fcst: true }
+};
+
+const NS = 'http://www.w3.org/2000/svg';
+const $ = s => document.querySelector(s);
+function S(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const k in attrs || {}) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+const fmt = (x, d = 2) => x == null || Number.isNaN(x) ? '–' : (x < 0 ? '−' : '') + Math.abs(x).toFixed(d);
+const sgn = (x, d = 2) => x == null || Number.isNaN(x) ? '–' : (x > 0 ? '+' : x < 0 ? '−' : '±') + Math.abs(x).toFixed(d);
+const pct = x => x == null ? '–' : Math.round(x * 100) + '%';
+const C = () => D.cat[state.period];
+const N = () => D.num[state.period];
+const verdict = ci => !ci || ci[0] == null ? 'mid' : ci[0] > 0 ? 'pos' : ci[1] < 0 ? 'neg' : 'mid';
+const DAY = 86400000;
+const ts = d => Date.parse(d + 'T00:00:00Z');
+const iso = t => new Date(t).toISOString().slice(0, 10);
+const dshort = t => new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
+
+/* tooltip */
+const tip = $('#tip');
+function showTip(html, ev) {
+  tip.innerHTML = html; tip.hidden = false;
+  const r = tip.getBoundingClientRect();
+  let x = ev.clientX + 14, y = ev.clientY + 14;
+  if (x + r.width > innerWidth - 8) x = ev.clientX - r.width - 14;
+  if (y + r.height > innerHeight - 8) y = ev.clientY - r.height - 14;
+  tip.style.left = Math.max(8, x) + 'px'; tip.style.top = Math.max(8, y) + 'px';
+}
+const hideTip = () => { tip.hidden = true; };
+function bindTip(el, html) {
+  el.addEventListener('pointermove', ev => showTip(typeof html === 'function' ? html() : html, ev));
+  el.addEventListener('pointerleave', hideTip);
+}
+const dot = c => `<span class="k" style="background:var(${c})"></span>`;
+
+/* controls */
+function seg(id, key, cast, after) {
+  const host = $(id);
+  host.addEventListener('click', ev => {
+    const b = ev.target.closest('button'); if (!b) return;
+    host.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+    state[key] = cast ? cast(b.dataset.v) : b.dataset.v;
+    after();
+  });
+}
+function fillSelect(id, key, opts, after) {
+  const s = $(id);
+  s.innerHTML = opts;
+  s.value = state[key];
+  s.addEventListener('change', () => { state[key] = s.value; after(); });
+}
+const idxOptions = IDX.map(i => `<option value="${i}">${LABEL[i]}</option>`).join('');
+const numOptions = NUM_GROUPS.map(([g, vs]) => `<optgroup label="${g}">` + vs.map(v => `<option value="${v}">${LABEL[v]}</option>`).join('') + '</optgroup>').join('');
+
+/* nice ticks */
+function ticks(lo, hi, n = 5) {
+  const span = hi - lo || 1, step0 = span / n, mag = Math.pow(10, Math.floor(Math.log10(step0)));
+  const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => s >= step0) || 10 * mag;
+  const out = [];
+  for (let t = Math.ceil(lo / step) * step; t <= hi + 1e-9; t += step) out.push(+t.toFixed(10));
+  return { out, step };
+}
+const tickLabel = (t, step) => { const d = step < 0.1 ? 2 : step < 1 ? 1 : 0; return fmt(t, d); };
+
+/* ======================= PART 1 ======================= */
+function renderMatrix() {
+  let h = '<tr><th></th>' + [0, 1, 2, 3].map(l => `<th class="c">Lead week ${l}</th>`).join('') + '</tr>';
+  for (const v of IDX) {
+    h += `<tr><th>${LABEL[v]}</th>`;
+    C().idx[v].forEach(e => {
+      const k = verdict(e.diff.gss);
+      const d = (e.fcst.gss ?? NaN) - (e.pers.gss ?? NaN);
+      const word = k === 'pos' ? '▲ better' : k === 'neg' ? '▼ worse' : '≈ level';
+      h += `<td><span class="chip ${k}">${word} <span class="num">${sgn(isNaN(d) ? null : d)}</span></span></td>`;
+    });
+    h += '</tr>';
+  }
+  $('#matrix').innerHTML = h;
+}
+
+function renderLines() {
+  const host = $('#lines'); host.innerHTML = '';
+  const m = state.metric;
+  const [y0, y1] = (m === 'pc' || m === 'pc1') ? [0, 1] : [-0.25, 1];
+  const W = 300, H = 186, ml = 34, mr = 44, mt = 10, mb = 30;
+  const x = l => ml + (W - ml - mr) * l / 3;
+  const y = v => mt + (H - mt - mb) * (y1 - v) / (y1 - y0);
+  for (const v of IDX) {
+    const L = C().idx[v];
+    const fig = document.createElement('figure'); fig.className = 'panel';
+    fig.innerHTML = `<figcaption>${LABEL[v]} <span>· ${METRIC[m]}</span></figcaption>`;
+    const svg = S('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': `${METRIC[m]} by lead week for ${LABEL[v]}` }, fig);
+    for (let t = y0; t <= y1 + 1e-9; t += 0.25) {
+      S('line', { x1: ml, x2: W - mr, y1: y(t), y2: y(t), class: Math.abs(t) < 1e-9 ? 'base' : 'grid' }, svg);
+      S('text', { x: ml - 6, y: y(t) + 3.5, 'text-anchor': 'end', class: 'tick' }, svg).textContent = fmt(t, 2).replace('0.', '.');
+    }
+    [0, 1, 2, 3].forEach(l => { S('text', { x: x(l), y: H - 14, 'text-anchor': 'middle', class: 'tick' }, svg).textContent = l; });
+    S('text', { x: (ml + W - mr) / 2, y: H - 1, 'text-anchor': 'middle', class: 'axl' }, svg).textContent = 'lead week';
+    const ends = {};
+    for (const [src, col, dash] of [['pers', '--p', '5 3'], ['fcst', '--f', null]]) {
+      const pts = L.map((e, l) => [x(l), e[src][m]]).filter(p => p[1] != null).map(p => [p[0], y(p[1])]);
+      const a = { d: 'M' + pts.map(p => p.join(',')).join('L'), fill: 'none', style: `stroke:var(${col})`, 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' };
+      if (dash) a['stroke-dasharray'] = dash;
+      S('path', a, svg);
+      pts.forEach(p => S('circle', { cx: p[0], cy: p[1], r: 3.6, style: `fill:var(${col});stroke:var(--surface)`, 'stroke-width': 1.5 }, svg));
+      ends[src] = pts[pts.length - 1];
+    }
+    let yf = ends.fcst[1], yp = ends.pers[1];
+    if (Math.abs(yf - yp) < 12) { const mid = (yf + yp) / 2; const up = yf <= yp; yf = mid + (up ? -6 : 6); yp = mid + (up ? 6 : -6); }
+    S('text', { x: x(3) + 8, y: yf + 4, class: 'lab' }, svg).textContent = 'Fcst';
+    S('text', { x: x(3) + 8, y: yp + 4, class: 'lab' }, svg).textContent = 'Pers';
+    [0, 1, 2, 3].forEach(l => {
+      const g = S('g', {}, svg);
+      const hit = S('rect', { x: x(l) - (W - ml - mr) / 6, y: mt, width: (W - ml - mr) / 3, height: H - mt - mb, class: 'hit' }, g);
+      S('line', { x1: x(l), x2: x(l), y1: mt, y2: H - mb, class: 'hl' }, g);
+      const e = L[l], ci = e.diff[m];
+      bindTip(hit, `<b>${LABEL[v]} · lead week ${l}</b><br>${dot('--f')}Forecast <span class="num">${fmt(e.fcst[m])}</span><br>${dot('--p')}Persistence <span class="num">${fmt(e.pers[m])}</span>` +
+        (ci ? `<br><span class="m">Gain 90% CI</span> <span class="num">[${sgn(ci[0])}, ${sgn(ci[1])}]</span>` : ''));
+    });
+    host.appendChild(fig);
+  }
+}
+
+function renderForest() {
+  const host = $('#forest'); host.innerHTML = '';
+  const rows = [];
+  IDX.forEach(v => C().idx[v].forEach((e, l) => rows.push({ v, l, e, d: (e.fcst.gss ?? NaN) - (e.pers.gss ?? NaN), ci: e.diff.gss })));
+  let lo = Math.min(...rows.map(r => r.ci[0] ?? 0)), hi = Math.max(...rows.map(r => r.ci[1] ?? 0));
+  lo = Math.floor(Math.min(lo, -0.2) * 5) / 5; hi = Math.ceil(Math.max(hi, 0.2) * 5) / 5;
+  const W = 760, ml = 170, mr = 24, rowH = 15, gap = 14, mt = 8;
+  const H = mt + IDX.length * (4 * rowH + gap) + 30;
+  const x = v => ml + (W - ml - mr) * (v - lo) / (hi - lo);
+  const svg = S('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Gerrity skill score gain over persistence with 90% intervals' }, host);
+  for (let t = lo; t <= hi + 1e-9; t += 0.2) {
+    S('line', { x1: x(t), x2: x(t), y1: mt, y2: H - 26, class: Math.abs(t) < 1e-9 ? 'base' : 'grid' }, svg);
+    S('text', { x: x(t), y: H - 10, 'text-anchor': 'middle', class: 'tick' }, svg).textContent = sgn(Math.abs(t) < 1e-9 ? 0 : t, 1).replace('±', '');
+  }
+  S('line', { x1: x(0), x2: x(0), y1: mt, y2: H - 26, style: 'stroke:var(--ink-2)', 'stroke-width': 1 }, svg);
+  rows.forEach((r, i) => {
+    const gi = Math.floor(i / 4);
+    const cy = mt + gi * (4 * rowH + gap) + r.l * rowH + rowH / 2;
+    if (r.l === 0) S('text', { x: 0, y: cy + 4, class: 'lab', style: 'font-weight:700;fill:var(--ink)' }, svg).textContent = LABEL[r.v];
+    S('text', { x: ml - 14, y: cy + 3.5, 'text-anchor': 'end', class: 'tick' }, svg).textContent = 'wk ' + r.l;
+    const k = verdict(r.ci);
+    const col = k === 'pos' ? '--pos' : k === 'neg' ? '--neg' : '--muted';
+    if (r.ci[0] != null) S('line', { x1: x(r.ci[0]), x2: x(r.ci[1]), y1: cy, y2: cy, style: `stroke:var(${col})`, 'stroke-width': 2, 'stroke-linecap': 'round' }, svg);
+    S('circle', { cx: x(r.d), cy, r: 4.5, style: k === 'mid' ? `fill:var(--surface);stroke:var(${col})` : `fill:var(${col});stroke:var(--surface)`, 'stroke-width': 2 }, svg);
+    const hit = S('rect', { x: 0, y: cy - rowH / 2, width: W, height: rowH, class: 'hit' }, svg);
+    bindTip(hit, `<b>${LABEL[r.v]} · lead week ${r.l}</b><br>Gain <span class="num">${sgn(r.d)}</span>, 90% CI <span class="num">[${sgn(r.ci[0])}, ${sgn(r.ci[1])}]</span><br>Forecast <span class="num">${fmt(r.e.fcst.gss)}</span> · Persistence <span class="num">${fmt(r.e.pers.gss)}</span>`);
+  });
+}
+
+function renderBinary() {
+  const k = state.thr, L = C().idx[state.binIdx];
+  const score = (a, rule) => rule === 'low' ? -a : rule === 'one' ? -Math.abs(Math.log(a || 1e-9)) : a;
+  const pair = (a, b, rule) => {
+    const fa = a != null && b != null && score(a, rule) > score(b, rule) + 1e-9;
+    const fb = a != null && b != null && score(b, rule) > score(a, rule) + 1e-9;
+    return `${fa ? `<b>${fmt(a)}</b>` : fmt(a)} <span class="vs">/</span> ${fb ? `<b>${fmt(b)}</b>` : fmt(b)}`;
+  };
+  let h = `<tr><th>Lead</th><th>Event freq.</th><th>POD<br>fcst / pers</th><th>FAR<br>fcst / pers</th><th>Freq. bias<br>fcst / pers</th><th>ETS<br>fcst / pers</th><th>SEDI<br>fcst / pers</th><th>ETS gain<br>90% CI</th></tr>`;
+  L.forEach((e, l) => {
+    const f = e.fcst.bin[k], p = e.pers.bin[k], ci = e.diff['ets' + k];
+    const vk = verdict(ci);
+    h += `<tr><td class="lead">Week ${l}</td><td>${pct(f.base_rate)}</td><td>${pair(f.pod, p.pod)}</td><td>${pair(f.far, p.far, 'low')}</td><td>${pair(f.fbi, p.fbi, 'one')}</td><td>${pair(f.ets, p.ets)}</td><td>${pair(f.sedi, p.sedi)}</td><td class="${vk === 'pos' ? 'ci-pos' : vk === 'neg' ? 'ci-neg' : ''}">[${sgn(ci[0])}, ${sgn(ci[1])}]</td></tr>`;
+  });
+  $('#bin').innerHTML = h;
+}
+
+function renderBias() {
+  const host = $('#bias'); host.innerHTML = '';
+  const W = 760, mid = 440, rowH = 15, gap = 14, mt = 22, lw = 150;
+  const H = mt + IDX.length * (4 * rowH + gap) + 8;
+  const x = v => v * 280;
+  const svg = S('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Share of forecasts too mild and too severe by lead week' }, host);
+  S('text', { x: mid - 8, y: 12, 'text-anchor': 'end', class: 'axl' }, svg).textContent = '← too mild (forecast level < observed)';
+  S('text', { x: mid + 8, y: 12, class: 'axl' }, svg).textContent = 'too severe (forecast level > observed) →';
+  S('line', { x1: mid, x2: mid, y1: mt - 4, y2: H - 4, style: 'stroke:var(--ink-2)', 'stroke-width': 1 }, svg);
+  IDX.forEach((v, gi) => {
+    C().idx[v].forEach((e, l) => {
+      const cy = mt + gi * (4 * rowH + gap) + l * rowH + rowH / 2;
+      if (l === 0) S('text', { x: 0, y: cy + 4, class: 'lab', style: 'font-weight:700;fill:var(--ink)' }, svg).textContent = LABEL[v];
+      S('text', { x: lw + 30, y: cy + 3.5, class: 'tick' }, svg).textContent = 'wk ' + l;
+      const u = e.fcst.under || 0, o = e.fcst.over || 0;
+      S('rect', { x: mid - x(u), y: cy - 5, width: x(u), height: 10, rx: 2, style: 'fill:var(--ink-2)' }, svg);
+      S('rect', { x: mid, y: cy - 5, width: x(o), height: 10, rx: 2, style: 'fill:var(--axis)' }, svg);
+      S('text', { x: mid - x(u) - 5, y: cy + 3.5, 'text-anchor': 'end', class: 'tick' }, svg).textContent = pct(u);
+      S('text', { x: mid + x(o) + 5, y: cy + 3.5, class: 'tick' }, svg).textContent = pct(o);
+      const hit = S('rect', { x: 0, y: cy - rowH / 2, width: W, height: rowH, class: 'hit' }, svg);
+      bindTip(hit, `<b>${LABEL[v]} · lead week ${l}</b><br>Too mild <span class="num">${pct(u)}</span> · exact <span class="num">${pct(e.fcst.pc)}</span> · too severe <span class="num">${pct(o)}</span><br><span class="m">Persistence: too mild ${pct(e.pers.under)}, too severe ${pct(e.pers.over)}</span>`);
+    });
+  });
+}
+
+function renderCT() {
+  const host = $('#ct'); host.innerHTML = '';
+  const e = C().idx[state.ctIdx][state.ctLead];
+  for (const [src, name] of [['fcst', 'Forecast p50'], ['pers', 'Persistence']]) {
+    const tab = e.tab[src], n = tab.flat().reduce((a, b) => a + b, 0);
+    const fig = document.createElement('figure');
+    fig.innerHTML = `<figcaption class="eyebrow" style="margin-bottom:8px">${name} · GSS ${fmt(e[src].gss)} · exact ${pct(e[src].pc)}</figcaption>`;
+    const W = 330, c = 50, ox = 56, oy = 34;
+    const svg = S('svg', { viewBox: `0 0 ${W} ${oy + 5 * c + 10}`, role: 'img', 'aria-label': `${name} contingency table` }, fig);
+    S('text', { x: ox + 2.5 * c, y: 10, 'text-anchor': 'middle', class: 'axl' }, svg).textContent = 'observed level';
+    S('text', { x: 10, y: oy + 2.5 * c, 'text-anchor': 'middle', class: 'axl', transform: `rotate(-90 10 ${oy + 2.5 * c})` }, svg).textContent = 'forecast level';
+    for (let j = 0; j < 5; j++) {
+      S('rect', { x: ox + j * c + c / 2 - 13, y: oy - 16, width: 9, height: 9, rx: 2, style: `fill:var(--lv${j + 1})` }, svg);
+      S('text', { x: ox + j * c + c / 2 + 1, y: oy - 8, class: 'tick' }, svg).textContent = j + 1;
+      S('rect', { x: ox - 30, y: oy + j * c + c / 2 - 7, width: 9, height: 9, rx: 2, style: `fill:var(--lv${j + 1})` }, svg);
+      S('text', { x: ox - 18, y: oy + j * c + c / 2 + 1, class: 'tick' }, svg).textContent = j + 1;
+    }
+    const mx = Math.max(...tab.flat()) / n;
+    for (let i = 0; i < 5; i++) for (let j = 0; j < 5; j++) {
+      const v = tab[i][j], share = v / n, a = Math.round(Math.pow(share / mx, 0.5) * 85);
+      const r = S('rect', { x: ox + j * c + 1, y: oy + i * c + 1, width: c - 2, height: c - 2, rx: 3, style: `fill:color-mix(in oklab, var(--seq) ${a}%, var(--surface))` + (i === j ? ';stroke:var(--ink);stroke-width:1.5' : '') }, svg);
+      const t = S('text', { x: ox + j * c + c / 2, y: oy + i * c + c / 2 + 4, 'text-anchor': 'middle', class: 'tick', style: `fill:${a > 50 ? 'var(--on-strong)' : 'var(--ink-2)'}` }, svg);
+      t.textContent = v;
+      bindTip(r, `<b>${name}</b><br>forecast level ${i + 1}, observed level ${j + 1}<br><span class="num">${v}</span> cases (${(share * 100).toFixed(1)}%)`);
+    }
+    host.appendChild(fig);
+  }
+}
+
+function renderChange() {
+  let h = `<tr><th>Index</th><th>Lead</th><th>Level changed</th><th>Exact on change</th><th>Right direction</th><th>Onsets</th><th>Onsets caught</th><th>False onsets</th></tr>`;
+  IDX.forEach(v => C().idx[v].forEach((e, l) => {
+    const c = e.chg;
+    h += `<tr><td class="lead">${l === 0 ? LABEL[v] : ''}</td><td>${l}</td><td>${pct(c.frac_change)}</td><td>${pct(c.change_exact)}</td><td>${pct(c.change_direction)}</td><td>${Math.round(c.n_onset)}</td><td><b>${pct(c.onset_pod)}</b></td><td>${pct(c.onset_false_rate)}</td></tr>`;
+  }));
+  $('#chg').innerHTML = h;
+}
+
+function renderMaps() {
+  const host = $('#maps'); host.innerHTML = '';
+  const M = D.map;
+  for (let l = 0; l < 4; l++) {
+    const better = M.regions.filter(r => r.v[l] && r.v[l].f - r.v[l].p > 0).length;
+    const fig = document.createElement('figure');
+    fig.innerHTML = `<figcaption>Lead week ${l} <span>· forecast ahead in ${better} of ${M.regions.length} regions</span></figcaption>`;
+    const svg = S('svg', { viewBox: `-4 -4 ${M.w + 8} ${M.h + 8}`, role: 'img', 'aria-label': `CDI GSS gain by region, lead week ${l}` }, fig);
+    for (const r of M.regions) {
+      const e = r.v[l];
+      const d = e && e.f != null && e.p != null ? e.f - e.p : null;
+      let fill = 'var(--mid)';
+      if (d != null) fill = `color-mix(in oklab, var(${d > 0 ? '--pos' : '--neg'}) ${Math.round(Math.min(Math.abs(d) / 0.5, 1) * 100)}%, var(--mid))`;
+      const p = S('path', { d: r.d, class: 'region', style: `fill:${fill}` }, svg);
+      bindTip(p, `<b>${r.name}</b> <span class="m num">#${r.id}</span><br>Gain <span class="num">${sgn(d)}</span><br>Forecast <span class="num">${fmt(e && e.f)}</span> · Persistence <span class="num">${fmt(e && e.p)}</span>`);
+    }
+    host.appendChild(fig);
+  }
+}
+
+function renderTimeline() {
+  const host = $('#timeline'); host.innerHTML = '';
+  const T = D.timeline[state.tlIdx], lk = String(state.tlLead);
+  const obs = new Map();
+  for (const k of ['0', '1', '2', '3']) T[k].valid.forEach((d, i) => { if (T[k].obs[i] != null && !obs.has(d)) obs.set(d, T[k].obs[i]); });
+  const od = [...obs.entries()].sort((a, b) => a[0] < b[0] ? -1 : 1);
+  const fc = T[lk].valid.map((d, i) => [d, T[lk].fcst[i]]);
+  const pe = T[lk].valid.map((d, i) => [d, T[lk].pers[i]]);
+  const t0 = ts(od[0][0]), t1 = ts(od[od.length - 1][0]);
+  const W = 760, H = 260, ml = 40, mr = 16, mt = 12, mb = 30;
+  const x = d => ml + (W - ml - mr) * (ts(d) - t0) / (t1 - t0);
+  const y = v => mt + (H - mt - mb) * (1 - v);
+  const svg = S('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': 'Share of regions at level 3 or above over time' }, host);
+  [0, 0.25, 0.5, 0.75, 1].forEach(t => {
+    S('line', { x1: ml, x2: W - mr, y1: y(t), y2: y(t), class: t === 0 ? 'base' : 'grid' }, svg);
+    S('text', { x: ml - 6, y: y(t) + 3.5, 'text-anchor': 'end', class: 'tick' }, svg).textContent = Math.round(t * 100) + '%';
+  });
+  for (let d = new Date(Date.UTC(2025, 7, 1)); d.getTime() <= t1; d.setUTCMonth(d.getUTCMonth() + 2)) {
+    const m = d.toISOString().slice(0, 10);
+    S('text', { x: x(m), y: H - 10, 'text-anchor': 'middle', class: 'tick' }, svg).textContent = new Date(m).toLocaleDateString('en-GB', { month: 'short', year: '2-digit', timeZone: 'UTC' });
+  }
+  const line = (pts, col, dash) => {
+    const a = { d: 'M' + pts.filter(p => p[1] != null).map(p => `${x(p[0]).toFixed(1)},${y(p[1]).toFixed(1)}`).join('L'), fill: 'none', style: `stroke:var(${col})`, 'stroke-width': 2, 'stroke-linejoin': 'round' };
+    if (dash) a['stroke-dasharray'] = dash;
+    S('path', a, svg);
+  };
+  line(pe, '--p', '5 3'); line(fc, '--f'); line(od, '--obs');
+  const hl = S('line', { y1: mt, y2: H - mb, class: 'hl' }, svg);
+  const hit = S('rect', { x: ml, y: mt, width: W - ml - mr, height: H - mt - mb, class: 'hit' }, svg);
+  const fcMap = new Map(fc), peMap = new Map(pe), dates = od.map(p => p[0]);
+  hit.addEventListener('pointermove', ev => {
+    const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+    const loc = pt.matrixTransform(svg.getScreenCTM().inverse());
+    let best = dates[0], bd = Infinity;
+    for (const d of dates) { const dd = Math.abs(x(d) - loc.x); if (dd < bd) { bd = dd; best = d; } }
+    hl.setAttribute('x1', x(best)); hl.setAttribute('x2', x(best)); hl.classList.add('on');
+    showTip(`<b>Valid ${dshort(ts(best))}</b><br>${dot('--obs')}Observed <span class="num">${pct(obs.get(best))}</span><br>${dot('--f')}Forecast, week ${lk} <span class="num">${pct(fcMap.get(best))}</span><br>${dot('--p')}Persistence <span class="num">${pct(peMap.get(best))}</span>`, ev);
+  });
+  hit.addEventListener('pointerleave', () => { hideTip(); hl.classList.remove('on'); });
+}
+
+/* ======================= PART 2 ======================= */
+const NSCORE = {
+  maess_p: { note: 'MAE skill of the p50 against persistence: 1 − MAE(forecast) ÷ MAE(persistence). Positive means the forecast is closer to what happened.', ci: 'maess_p', kind: 'skill' },
+  maess_c: { note: 'MAE skill of the p50 against the climatological median. Long accumulation windows score high mainly because most of the window is already observed.', ci: 'maess_c', kind: 'skill' },
+  qss_c: { note: 'Quantile skill score of the p10/p50/p90 forecast against the climatological p10/p50/p90 (pinball loss averaged over the three quantiles).', ci: 'qss_c', kind: 'skill' },
+  bss: { note: 'Brier skill score against climatology for the event “below the climatological 10th percentile”. The forecast probability comes from the three quantiles.', ci: 'bss', kind: 'skill' },
+  auc: { note: 'ROC area for the same dry-decile event. 0.5 means no discrimination and 1 means perfect.', kind: 'auc' },
+  cov80_f: { note: 'Share of observations inside the forecast p10–p90 range. The target is 80%. Lower means the range is too narrow.', kind: 'cov' },
+  bias: { note: 'Mean p50 minus observation, in the variable’s own units. Positive means too wet, negative too dry.', kind: 'bias' }
+};
+function heatColor(v, e, kind) {
+  if (v == null) return ['var(--mid)', false];
+  let s, col;
+  if (kind === 'skill') { s = v >= 0 ? Math.min(v, 1) : Math.min(-v / 0.5, 1); col = v >= 0 ? '--pos' : '--neg'; }
+  else if (kind === 'auc') { s = Math.max(0, Math.min((v - 0.5) / 0.5, 1)); col = '--pos'; }
+  else if (kind === 'cov') { s = Math.min(Math.abs(v - 0.8) / 0.4, 1); col = '--neg'; }
+  else { s = Math.min(Math.abs(v) / (e.mae_c || 1) / 0.3, 1); col = v >= 0 ? '--pos' : '--neg'; }
+  const a = Math.round(s * 88);
+  return [`color-mix(in oklab, var(${col}) ${a}%, var(--mid))`, a > 52];
+}
+function fmtVal(v, key, varName) {
+  if (key === 'cov80_f') return pct(v);
+  if (key === 'bias') { const d = varName.startsWith('spi') ? 2 : 1; const u = varName.startsWith('precip') ? ' mm' : varName === 'soil_moisture_ufc' ? ' pt' : ''; return sgn(v, d) + u; }
+  return fmt(v);
+}
+function renderHeat() {
+  const key = state.nscore, cfg = NSCORE[key];
+  $('#nscore-note').textContent = cfg.note;
+  let h = '<tr><th></th>' + [0, 1, 2, 3].map(l => `<th class="c">Lead week ${l}</th>`).join('') + '</tr>';
+  for (const [g, vs] of NUM_GROUPS) {
+    h += `<tr class="g"><th colspan="5">${g}</th></tr>`;
+    for (const v of vs) {
+      h += `<tr><th>${LABEL[v]}</th>`;
+      N()[v].forEach((e, l) => {
+        const val = e[key];
+        const ci = cfg.ci ? e.ci[cfg.ci] : null;
+        const sig = ci && ci[0] != null && (ci[0] > 0 || ci[1] < 0);
+        const [bg, strong] = heatColor(val, e, cfg.kind);
+        h += `<td class="${sig ? 'sig' : ''}" style="background:${bg};color:${strong ? 'var(--on-strong)' : 'var(--ink)'}" data-v="${v}" data-l="${l}">${fmtVal(val, key, v)}</td>`;
+      });
+      h += '</tr>';
+    }
+  }
+  const t = $('#heat'); t.innerHTML = h;
+  t.querySelectorAll('td[data-v]').forEach(td => {
+    const v = td.dataset.v, l = +td.dataset.l;
+    bindTip(td, () => {
+      const e = N()[v][l], ci = cfg.ci ? e.ci[cfg.ci] : null;
+      const u = UNIT(v);
+      return `<b>${LABEL[v]} · lead week ${l}</b><br>${td.textContent}` + (ci ? ` <span class="m">90% CI</span> <span class="num">[${fmt(ci[0])}, ${fmt(ci[1])}]</span>` : '') +
+        `<br><span class="m">MAE p50 ${fmt(e.mae_f, 2)} · persistence ${fmt(e.mae_p, 2)} · climatology ${fmt(e.mae_c, 2)} ${u}</span>` +
+        `<br><span class="m">Dry-decile weeks ${pct(e.event_rate)} of cases</span>`;
+    });
+  });
+}
+
+function renderCal() {
+  const host = $('#cal'); host.innerHTML = '';
+  const L = N()[state.calVar];
+  const rows = L.map((e, l) => ({ name: `Forecast, week ${l}`, b: e.bins_f, e })).concat([{ name: 'Climatology', b: L[0].bins_c, clim: true }]);
+  const W = 760, ml = 130, mr = 190, rowH = 30, mt = 18;
+  const H = mt + rows.length * rowH + 22;
+  const bw = W - ml - mr;
+  const fills = ['var(--lv4)', 'var(--lv3-l)', '#c5d4e3', '#3c6c99'];
+  const ink = ['#ffffff', '#131b22', '#131b22', '#ffffff'];
+  const svg = S('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': `Calibration of ${LABEL[state.calVar]}` }, host);
+  [0.1, 0.5, 0.9].forEach(q => S('text', { x: ml + bw * q, y: 11, 'text-anchor': 'middle', class: 'tick' }, svg).textContent = Math.round(q * 100) + '%');
+  rows.forEach((r, i) => {
+    const y0 = mt + i * rowH + (r.clim ? 8 : 0);
+    S('text', { x: ml - 10, y: y0 + 15, 'text-anchor': 'end', class: 'lab', style: r.clim ? 'fill:var(--muted)' : '' }, svg).textContent = r.name;
+    let acc = 0;
+    r.b.forEach((v, k) => {
+      const w = bw * (v || 0);
+      S('rect', { x: ml + bw * acc, y: y0 + 3, width: Math.max(0, w - 1), height: 20, style: `fill:${fills[k]}` }, svg);
+      if (w > 30) S('text', { x: ml + bw * acc + w / 2, y: y0 + 17, 'text-anchor': 'middle', class: 'tick', style: `fill:${ink[k]}` }, svg).textContent = pct(v);
+      acc += v || 0;
+    });
+    [0.1, 0.5, 0.9].forEach(q => {
+      S('line', { x1: ml + bw * q, x2: ml + bw * q, y1: y0 - 1, y2: y0 + 5, style: 'stroke:var(--ink)', 'stroke-width': 2 }, svg);
+      S('line', { x1: ml + bw * q, x2: ml + bw * q, y1: y0 + 21, y2: y0 + 27, style: 'stroke:var(--ink)', 'stroke-width': 2 }, svg);
+    });
+    if (!r.clim) S('text', { x: W - mr + 12, y: y0 + 16, class: 'tick' }, svg).textContent = `${pct(r.e.cov80_f)} inside · ${fmt(r.e.width_ratio)}× clim width`;
+    const hit = S('rect', { x: 0, y: y0, width: W, height: rowH - 2, class: 'hit' }, svg);
+    bindTip(hit, `<b>${LABEL[state.calVar]} · ${r.name}</b><br>below p10 <span class="num">${pct(r.b[0])}</span> (10%)<br>p10–p50 <span class="num">${pct(r.b[1])}</span> (40%)<br>p50–p90 <span class="num">${pct(r.b[2])}</span> (40%)<br>above p90 <span class="num">${pct(r.b[3])}</span> (10%)`);
+  });
+}
+
+/* ======================= PART 3: METEOGRAMS ======================= */
+const shards = new Map();
+function loadShard(v) {
+  if (!shards.has(v)) shards.set(v, fetch(`mg/${v}.json`).then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }));
+  return shards.get(v);
+}
+function fillRegions() {
+  const s = $('#mg-reg');
+  s.innerHTML = Object.entries(D.regions).sort((a, b) => a[0] - b[0]).map(([id, n]) => `<option value="${id}">${id} · ${n}</option>`).join('');
+  s.value = state.mgReg;
+}
+function stepPath(pts, x, y) {
+  let d = '', prevT = null;
+  for (const [t, v] of pts) {
+    if (v == null) { prevT = null; continue; }
+    const x0 = x(t - 3.5 * DAY).toFixed(1), x1 = x(t + 3.5 * DAY).toFixed(1), yy = y(v).toFixed(1);
+    d += (prevT == null || t - prevT > 8 * DAY ? 'M' : 'L') + `${x0},${yy}L${x1},${yy}`;
+    prevT = t;
+  }
+  return d;
+}
+function stepBand(pts, x, y) {
+  const runs = []; let cur = [], prevT = null;
+  for (const p of pts) {
+    if (p[1] == null || p[2] == null || (prevT != null && p[0] - prevT > 8 * DAY)) { if (cur.length) runs.push(cur); cur = []; }
+    if (p[1] != null && p[2] != null) cur.push(p);
+    prevT = p[1] == null ? null : p[0];
+  }
+  if (cur.length) runs.push(cur);
+  return runs.map(run => {
+    const up = run.map(([t, , hi]) => `${x(t - 3.5 * DAY).toFixed(1)},${y(hi).toFixed(1)}L${x(t + 3.5 * DAY).toFixed(1)},${y(hi).toFixed(1)}`).join('L');
+    const dn = run.slice().reverse().map(([t, lo]) => `${x(t + 3.5 * DAY).toFixed(1)},${y(lo).toFixed(1)}L${x(t - 3.5 * DAY).toFixed(1)},${y(lo).toFixed(1)}`).join('L');
+    return `M${up}L${dn}Z`;
+  }).join('');
+}
+function famVars(v) { const f = FAMILY(v); return [`--fam-${f}`, `--fam-${f}-l`]; }
+function monthTicks(t0, t1, svg, x, yb) {
+  const months = (t1 - t0) / (30 * DAY);
+  const stepM = months > 10 ? 2 : 1;
+  const d = new Date(t0); d.setUTCDate(1); d.setUTCMonth(d.getUTCMonth() + 1);
+  for (; d.getTime() <= t1; d.setUTCMonth(d.getUTCMonth() + stepM)) {
+    const t = d.getTime();
+    S('line', { x1: x(t), x2: x(t), y1: yb, y2: yb + 4, class: 'base' }, svg);
+    S('text', { x: x(t), y: yb + 15, 'text-anchor': 'middle', class: 'tick' }, svg).textContent = d.toLocaleDateString('en-GB', { month: 'short', year: '2-digit', timeZone: 'UTC' });
+  }
+}
+function levelBands(svg, x0, x1, y) {
+  for (let k = 1; k <= 5; k++) S('rect', { x: x0, y: y(k - 0.5), width: x1 - x0, height: y(k + 0.5) - y(k - 0.5), style: `fill:var(--lv${k}-l)` }, svg);
+}
+
+function seriesFor(sh, rid) {
+  const R = sh.r[rid];
+  const di = new Map(sh.dates.map((d, i) => [d, i]));
+  const at = (arr, t) => { const i = di.get(iso(t)); return i == null || !arr ? null : arr[i]; };
+  return {
+    R, frt: sh.frt.map(ts), dates: sh.dates.map(ts),
+    obs: t => at(R.obs, t),
+    clim: (q, t) => R.clim ? at(R.clim[q], t) : null,
+    fq: (q, l, i) => R.f[q] ? R.f[q][l][i] : null
+  };
+}
+
+async function renderMeteograms() {
+  const host = $('#mgs');
+  const v = state.mgVar, rid = state.mgReg;
+  const [fc, fl] = famVars(v);
+  $('#ly-fcst-sw').style.background = `var(${fl})`;
+  $('#mg-run-wrap').hidden = state.mgView !== 'run';
+  let sh;
+  try { sh = await loadShard(v); }
+  catch (err) { host.innerHTML = `<div class="mg-status">The meteogram data for ${LABEL[v]} did not load (${err.message}). Reload the page to try again.</div>`; return; }
+  if (v !== state.mgVar || rid !== state.mgReg) return;
+  const s = seriesFor(sh, rid);
+  const runSel = $('#mg-run');
+  if (!runSel.options.length) {
+    runSel.innerHTML = sh.frt.map(d => `<option value="${d}">${dshort(ts(d))}</option>`).join('');
+    runSel.value = state.mgRun;
+  }
+  host.innerHTML = '';
+  if (state.mgView === 'lead') drawByLead(host, s, v, fc, fl); else drawRun(host, s, v, fc, fl);
+}
+
+function yDomain(vals, v) {
+  if (IDX.includes(v)) return [0.5, 5.5];
+  const a = vals.filter(x => x != null && isFinite(x));
+  let lo = Math.min(...a), hi = Math.max(...a);
+  const pad = (hi - lo) * 0.06 || 1;
+  lo -= pad; hi += pad;
+  if (v.startsWith('precip_sum')) lo = Math.max(0, lo);
+  if (v === 'soil_moisture_ufc') { lo = Math.max(0, lo); hi = Math.min(105, hi); }
+  return [lo, hi];
+}
+function yAxis(svg, lo, hi, v, ml, W, y, inverted) {
+  if (IDX.includes(v)) {
+    for (let k = 1; k <= 5; k++) S('text', { x: ml - 8, y: y(k) + 3.5, 'text-anchor': 'end', class: 'tick' }, svg).textContent = k;
+    return;
+  }
+  const { out, step } = ticks(lo, hi, 4);
+  out.forEach(t => {
+    S('line', { x1: ml, x2: W, y1: y(t), y2: y(t), class: Math.abs(t) < 1e-9 ? 'base' : 'grid' }, svg);
+    S('text', { x: ml - 8, y: y(t) + 3.5, 'text-anchor': 'end', class: 'tick' }, svg).textContent = tickLabel(t, step);
+  });
+}
+const yScale = (lo, hi, mt, h, inverted) => inverted ? (val => mt + h * (val - lo) / (hi - lo)) : (val => mt + h * (hi - val) / (hi - lo));
+const mgFmt = (x, v) => x == null ? '–' : IDX.includes(v) ? String(x) : fmt(x, v.startsWith('spi') ? 2 : 1);
+
+function drawByLead(host, s, v, fc, fl) {
+  const [a, b] = PERIOD_RANGE[state.period];
+  const tA = ts(a), tB = ts(b) + 21 * DAY;
+  const t0 = tA - 4 * DAY, t1 = tB + 4 * DAY;
+  const idx = IDX.includes(v);
+  const LY = state.layers;
+  // y-domain from every layer, shown or not, so the axes do not move between layer toggles
+  const vals = [];
+  for (let l = 0; l < 4; l++) s.frt.forEach((f, i) => {
+    const t = f + 7 * l * DAY; if (t < tA || t > tB) return;
+    vals.push(s.fq('p10', l, i), s.fq('p50', l, i), s.fq('p90', l, i), s.obs(t), s.obs(f - 7 * DAY), s.clim('p10', t), s.clim('p90', t));
+  });
+  const [lo, hi] = yDomain(vals, v);
+  const W = 760, H = 168, ml = 46, mr = 10, mt = 8, mb = 22;
+  const x = t => ml + (W - ml - mr) * (t - t0) / (t1 - t0);
+  const y = yScale(lo, hi, mt, H - mt - mb, idx);
+  for (let l = 0; l < 4; l++) {
+    const fig = document.createElement('figure'); fig.className = 'mg';
+    fig.innerHTML = `<figcaption>Lead week ${l} <span>· ${LABEL[v]} · ${D.regions[state.mgReg]} · valid week on the x-axis${l === 0 ? ' · ' + UNIT(v) : ''}</span></figcaption>`;
+    const svg = S('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': `${LABEL[v]} forecast plume, lead week ${l}` }, fig);
+    if (idx) levelBands(svg, ml, W - mr, y);
+    yAxis(svg, lo, hi, v, ml, W - mr, y, idx);
+    S('line', { x1: ml, x2: W - mr, y1: H - mb, y2: H - mb, class: 'base' }, svg);
+    monthTicks(t0, t1, svg, x, H - mb);
+    const pts = s.frt.map((f, i) => ({ f, t: f + 7 * l * DAY, i })).filter(p => p.t >= tA && p.t <= tB);
+    const obsPts = s.dates.filter(t => t >= tA && t <= tB).map(t => [t, s.obs(t)]);
+    if (LY.clim && !idx) {
+      const band = s.dates.filter(t => t >= tA && t <= tB).map(t => [t, s.clim('p10', t), s.clim('p90', t)]);
+      S('path', { d: stepBand(band, x, y), style: 'fill:var(--clim);opacity:.9' }, svg);
+      S('path', { d: stepPath(band.map(p => [p[0], s.clim('p50', p[0])]), x, y), fill: 'none', style: 'stroke:var(--clim-line)', 'stroke-width': 1.2, 'stroke-dasharray': '2 3' }, svg);
+    }
+    if (LY.fcst && !idx) S('path', { d: stepBand(pts.map(p => [p.t, s.fq('p10', l, p.i), s.fq('p90', l, p.i)]), x, y), style: `fill:var(${fl});opacity:.45` }, svg);
+    if (LY.pers) S('path', { d: stepPath(pts.map(p => [p.t, s.obs(p.f - 7 * DAY)]), x, y), fill: 'none', style: 'stroke:var(--p)', 'stroke-width': 1.6, 'stroke-dasharray': '5 3' }, svg);
+    if (LY.fcst) S('path', { d: stepPath(pts.map(p => [p.t, s.fq('p50', l, p.i)]), x, y), fill: 'none', style: `stroke:var(${fc})`, 'stroke-width': 2 }, svg);
+    if (LY.obs) S('path', { d: stepPath(obsPts, x, y), fill: 'none', style: 'stroke:var(--obs)', 'stroke-width': 2 }, svg);
+    const hl = S('line', { y1: mt, y2: H - mb, class: 'hl' }, svg);
+    const hit = S('rect', { x: ml, y: mt, width: W - ml - mr, height: H - mt - mb, class: 'hit' }, svg);
+    hit.addEventListener('pointermove', ev => {
+      const pt = svg.createSVGPoint(); pt.x = ev.clientX; pt.y = ev.clientY;
+      const lx = pt.matrixTransform(svg.getScreenCTM().inverse()).x;
+      let best = null, bd = Infinity;
+      for (const p of pts) { const d = Math.abs(x(p.t) - lx); if (d < bd) { bd = d; best = p; } }
+      if (!best) return;
+      hl.setAttribute('x1', x(best.t)); hl.setAttribute('x2', x(best.t)); hl.classList.add('on');
+      const i = best.i;
+      showTip(`<b>Valid ${dshort(best.t)}</b> <span class="m">· issued ${dshort(best.f)}</span><br>` +
+        `${dot('--obs')}Observed <span class="num">${mgFmt(s.obs(best.t), v)}</span><br>` +
+        (idx ? `${dot(fc)}Forecast p50 <span class="num">${mgFmt(s.fq('p50', l, i), v)}</span><br>` :
+          `${dot(fc)}Forecast <span class="num">${mgFmt(s.fq('p10', l, i), v)} · <b>${mgFmt(s.fq('p50', l, i), v)}</b> · ${mgFmt(s.fq('p90', l, i), v)}</span><br>`) +
+        `${dot('--p')}Persistence <span class="num">${mgFmt(s.obs(best.f - 7 * DAY), v)}</span>` +
+        (idx ? '' : `<br>${dot('--clim-line')}Climatology <span class="num">${mgFmt(s.clim('p10', best.t), v)} · ${mgFmt(s.clim('p50', best.t), v)} · ${mgFmt(s.clim('p90', best.t), v)}</span>`), ev);
+    });
+    hit.addEventListener('pointerleave', () => { hideTip(); hl.classList.remove('on'); });
+    host.appendChild(fig);
+  }
+}
+
+function drawRun(host, s, v, fc, fl) {
+  const fi = s.frt.indexOf(ts(state.mgRun));
+  if (fi < 0) { host.innerHTML = '<div class="mg-status">No forecast for that issue date.</div>'; return; }
+  const f0 = s.frt[fi];
+  const idx = IDX.includes(v), LY = state.layers;
+  const tA = f0 - 8 * 7 * DAY, tB = f0 + 3 * 7 * DAY;
+  const t0 = tA - 4 * DAY, t1 = tB + 4 * DAY;
+  const weeks = s.dates.filter(t => t >= tA && t <= tB);
+  const pers = s.obs(f0 - 7 * DAY);
+  const vals = [pers];
+  weeks.forEach(t => vals.push(s.obs(t), s.clim('p10', t), s.clim('p90', t)));
+  for (let l = 0; l < 4; l++) vals.push(s.fq('p10', l, fi), s.fq('p50', l, fi), s.fq('p90', l, fi));
+  const [lo, hi] = yDomain(vals, v);
+  const W = 760, H = 320, ml = 46, mr = 10, mt = 18, mb = 24;
+  const x = t => ml + (W - ml - mr) * (t - t0) / (t1 - t0);
+  const y = yScale(lo, hi, mt, H - mt - mb, idx);
+  const fig = document.createElement('figure'); fig.className = 'mg';
+  fig.innerHTML = `<figcaption>${LABEL[v]} <span>· ${D.regions[state.mgReg]} · issued ${dshort(f0)} · ${UNIT(v)}</span></figcaption>`;
+  const svg = S('svg', { viewBox: `0 0 ${W} ${H}`, role: 'img', 'aria-label': `${LABEL[v]} forecast issued ${state.mgRun}` }, fig);
+  S('rect', { x: x(f0 - 3.5 * DAY), y: mt, width: x(t1) - x(f0 - 3.5 * DAY), height: H - mt - mb, style: 'fill:var(--band)' }, svg);
+  if (idx) levelBands(svg, ml, W - mr, y);
+  yAxis(svg, lo, hi, v, ml, W - mr, y, idx);
+  S('line', { x1: ml, x2: W - mr, y1: H - mb, y2: H - mb, class: 'base' }, svg);
+  weeks.forEach(t => S('text', { x: x(t), y: H - mb + 15, 'text-anchor': 'middle', class: 'tick' }, svg).textContent =
+    new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' }));
+  S('line', { x1: x(f0 - 3.5 * DAY), x2: x(f0 - 3.5 * DAY), y1: mt - 6, y2: H - mb, style: 'stroke:var(--ink-2)', 'stroke-width': 1, 'stroke-dasharray': '3 3' }, svg);
+  S('text', { x: x(f0 - 3.5 * DAY) + 6, y: mt + 4, class: 'lab' }, svg).textContent = 'issued · forecast weeks 0–3 →';
+  if (LY.clim && !idx) {
+    const band = weeks.map(t => [t, s.clim('p10', t), s.clim('p90', t)]);
+    S('path', { d: stepBand(band, x, y), style: 'fill:var(--clim);opacity:.9' }, svg);
+    S('path', { d: stepPath(weeks.map(t => [t, s.clim('p50', t)]), x, y), fill: 'none', style: 'stroke:var(--clim-line)', 'stroke-width': 1.2, 'stroke-dasharray': '2 3' }, svg);
+  }
+  if (LY.pers && pers != null) S('line', { x1: x(f0 - 3.5 * DAY), x2: x(f0 + 21 * DAY + 3.5 * DAY), y1: y(pers), y2: y(pers), style: 'stroke:var(--p)', 'stroke-width': 1.6, 'stroke-dasharray': '5 3' }, svg);
+  if (LY.fcst) {
+    const fp = [];
+    for (let l = 0; l < 4; l++) {
+      const t = f0 + 7 * l * DAY, p10 = s.fq('p10', l, fi), p50 = s.fq('p50', l, fi), p90 = s.fq('p90', l, fi);
+      if (!idx && p10 != null && p90 != null) S('rect', { x: x(t) - 9, y: Math.min(y(p10), y(p90)), width: 18, height: Math.max(2, Math.abs(y(p90) - y(p10))), rx: 3, style: `fill:var(${fl});opacity:.6` }, svg);
+      if (p50 != null) fp.push([x(t), y(p50)]);
+    }
+    if (fp.length) S('path', { d: 'M' + fp.map(p => p.map(n => n.toFixed(1)).join(',')).join('L'), fill: 'none', style: `stroke:var(${fc})`, 'stroke-width': 2 }, svg);
+    fp.forEach(p => S('circle', { cx: p[0], cy: p[1], r: 4.5, style: `fill:var(${fc});stroke:var(--surface)`, 'stroke-width': 1.5 }, svg));
+  }
+  if (LY.obs) {
+    const op = weeks.map(t => [t, s.obs(t)]).filter(p => p[1] != null);
+    S('path', { d: 'M' + op.map(p => `${x(p[0]).toFixed(1)},${y(p[1]).toFixed(1)}`).join('L'), fill: 'none', style: 'stroke:var(--obs)', 'stroke-width': 2 }, svg);
+    op.forEach(p => S('circle', { cx: x(p[0]), cy: y(p[1]), r: 3.5, style: p[0] >= f0 ? 'fill:var(--surface);stroke:var(--obs)' : 'fill:var(--obs);stroke:var(--surface)', 'stroke-width': 1.5 }, svg));
+  }
+  weeks.forEach(t => {
+    const hit = S('rect', { x: x(t - 3.5 * DAY), y: mt, width: x(t + 3.5 * DAY) - x(t - 3.5 * DAY), height: H - mt - mb, class: 'hit' }, svg);
+    const l = Math.round((t - f0) / (7 * DAY));
+    bindTip(hit, () => `<b>${dshort(t)}</b>${l >= 0 ? ` <span class="m">· lead week ${l}</span>` : ' <span class="m">· before issue</span>'}<br>` +
+      `${dot('--obs')}Observed <span class="num">${mgFmt(s.obs(t), v)}</span>` +
+      (l >= 0 ? (idx ? `<br>${dot(fc)}Forecast p50 <span class="num">${mgFmt(s.fq('p50', l, fi), v)}</span>` :
+        `<br>${dot(fc)}Forecast <span class="num">${mgFmt(s.fq('p10', l, fi), v)} · <b>${mgFmt(s.fq('p50', l, fi), v)}</b> · ${mgFmt(s.fq('p90', l, fi), v)}</span>`) +
+        `<br>${dot('--p')}Persistence <span class="num">${mgFmt(pers, v)}</span>` : '') +
+      (idx ? '' : `<br>${dot('--clim-line')}Climatology <span class="num">${mgFmt(s.clim('p10', t), v)} · ${mgFmt(s.clim('p50', t), v)} · ${mgFmt(s.clim('p90', t), v)}</span>`));
+  });
+  host.appendChild(fig);
+  const note = document.createElement('p'); note.className = 'note';
+  note.textContent = 'Filled dots are observations known at issue time, and hollow dots are the observations that verify the forecast. Bars are the forecast p10–p90.';
+  host.appendChild(note);
+}
+
+/* ======================= wiring ======================= */
+function renderPeriod() {
+  $('#period-note').textContent = PERIOD_NOTE[state.period];
+  renderMatrix(); renderLines(); renderForest(); renderBinary(); renderBias(); renderCT(); renderChange();
+  renderHeat(); renderCal(); renderMeteograms();
+}
+seg('#period', 'period', null, renderPeriod);
+seg('#metric', 'metric', null, renderLines);
+seg('#thr', 'thr', null, renderBinary);
+seg('#ct-lead', 'ctLead', Number, renderCT);
+seg('#tl-lead', 'tlLead', Number, renderTimeline);
+seg('#nscore', 'nscore', null, renderHeat);
+seg('#mg-view', 'mgView', null, renderMeteograms);
+fillSelect('#bin-idx', 'binIdx', idxOptions, renderBinary);
+fillSelect('#ct-idx', 'ctIdx', idxOptions, renderCT);
+fillSelect('#tl-idx', 'tlIdx', idxOptions, renderTimeline);
+fillSelect('#cal-var', 'calVar', numOptions, renderCal);
+fillSelect('#mg-var', 'mgVar', numOptions + `<optgroup label="Drought indices (p50 only)">${idxOptions}</optgroup>`, renderMeteograms);
+fillRegions();
+$('#mg-reg').addEventListener('change', e => { state.mgReg = e.target.value; renderMeteograms(); });
+$('#mg-run').addEventListener('change', e => { state.mgRun = e.target.value; renderMeteograms(); });
+['obs', 'clim', 'pers', 'fcst'].forEach(k => $('#ly-' + k).addEventListener('change', e => { state.layers[k] = e.target.checked; renderMeteograms(); }));
+renderPeriod(); renderMaps(); renderTimeline();
+})();
+</script>

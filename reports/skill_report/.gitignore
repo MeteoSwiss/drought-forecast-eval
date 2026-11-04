@@ -1,0 +1,4 @@
+# Intermediate outputs; the built report in out/site/ is committed.
+out/*.json
+out/mg/
+__pycache__/
