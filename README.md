@@ -153,9 +153,28 @@ drought_forecast_eval/
 ├── report/        # ReportBuilder + Jinja2 HTML template
 └── config/        # defaults and constants
 notebooks/         # template_verification.ipynb
+reports/           # skill report (scripts + built HTML)
+prototypes/        # drought platform prototype (static site + export scripts)
 tests/             # pytest suite with synthetic fixtures
 docs/              # data_access.md, methodology.md, reproducibility.md
 ```
+
+---
+
+## Reports and prototypes
+
+Work built on top of the library. Neither folder is part of the installed
+package, and both ship a prebuilt snapshot, so you can view them with only a
+local web server (no data, no Poetry):
+
+| Folder | What it is | View it |
+|--------|------------|---------|
+| [`reports/skill_report/`](reports/skill_report/README.md) | Interactive skill report: categorical scores for the CDI and its sub-indices (Gerrity, Heidke, Peirce, POD/FAR, SEDI), quantile skill for precipitation, SPI and soil moisture, and per-region meteograms | `python3 -m http.server -d reports/skill_report/out/site 8000` |
+| [`prototypes/drought_platform/`](prototypes/drought_platform/README.md) | Local copy of the national drought platform with a selectable forecast issue date, a new evaporation row, and a combined precipitation/evaporation view | `python3 -m http.server -d prototypes/drought_platform/site 8000` |
+
+Then open <http://localhost:8000>. Rebuilding either one needs the NetCDF
+files in `data/netcdf/`, which are not in git; each README explains how to get
+or build them.
 
 ---
 
