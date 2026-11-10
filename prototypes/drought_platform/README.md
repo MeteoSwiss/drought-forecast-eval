@@ -135,11 +135,21 @@ The "Demo-Daten" label disappears once real data is loaded.
 | `w=0..4` | Map week: 0 = last observed week, 1–4 = forecast weeks 0–3 |
 | `view=liste` | List instead of map |
 | `kombi=1` | Combined precipitation and evaporation row |
+| `unsicher=1` | Mark forecast weeks +2 and +3 as uncertain |
 | `f=<row>` | Scroll to a row: `niederschlag`, `bodenfeuchte`, `verdunstung`, `vegetation` |
 
 On the region page, **"Spätere Beobachtungen einblenden"** draws the observations
 that came in after the issue date over the forecast weeks. Use it to judge a
 past forecast at a glance.
+
+**"Unsicherheit anzeigen"** marks forecast weeks +2 and +3 (the last two
+forecast bars) as unreliable. Their bars fade (55 % and 35 % opacity), but the
+p10–p90 whiskers keep full strength. A faint tint and an "unsicher" bracket
+cover the two weeks, and their tooltips say why. The rule is fixed for now and
+comes from the skill report (`reports/skill_report`): for the CDI, the forecast
+matches persistence at lead week 2 and does significantly worse at lead week 3.
+Change `UNC_FROM` and `FC_OPACITY` in `app.js` to adjust it. The Jahresvergleich
+tab doesn't change.
 
 ### Combined precipitation and evaporation
 
