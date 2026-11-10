@@ -172,6 +172,14 @@ button, select, input { font: inherit; }
 .unc-zone { fill: rgba(255,255,255,.045); pointer-events: none; }
 .unc-brk { stroke: var(--secondary-300); stroke-width: 1.2; }
 .unc-lbl { font-style: italic; }
+.unc-empty { stroke: var(--secondary-400); stroke-width: 1.2; stroke-dasharray: 4 3; }
+.unc-tend { font-size: 11px; fill: var(--secondary-300); }
+.unc-code { font-size: 14px; font-weight: 700; fill: var(--secondary-300); }
+.proto-banner .unc-select { appearance: none; -webkit-appearance: none; font: inherit; font-weight: 700; color: var(--secondary-900); background: transparent no-repeat right 4px center;
+  border: 0; border-bottom: 1px dashed var(--secondary-500); padding: 0 22px 0 2px; cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23131b22' stroke-width='1.5'/%3E%3C/svg%3E"); }
+.proto-banner .unc-select option { color: var(--secondary-900); background: #fff; }
+.proto-banner .unc-hint { flex-basis: 100%; font-size: 13px; color: var(--secondary-700); }
 .unc-note { display: block; max-width: 260px; margin-top: 4px; padding-top: 4px; border-top: 1px solid rgba(255,255,255,.2); white-space: normal; }
 .proto-banner input { width: 16px; height: 16px; accent-color: var(--link-light); margin: 0; }
 .title-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 8px 24px; margin-top: 14px; }

@@ -141,6 +141,10 @@ function makePatterns() {
     const p = S('pattern', { id, patternUnits: 'userSpaceOnUse', width: 7, height: 7, patternTransform: 'rotate(45)' }, defs);
     S('rect', { width: 7, height: 7, style: `fill:${color}` }, p);
     S('line', { x1: 0, y1: 0, x2: 0, y2: 7, style: 'stroke:rgba(19,27,34,.55)', 'stroke-width': 2.4 }, p);
+    // Uncertain forecast: dots instead of lines, same colour and about the same dark share
+    const d = S('pattern', { id: `${id}-dots`, patternUnits: 'userSpaceOnUse', width: 6, height: 6 }, defs);
+    S('rect', { width: 6, height: 6, style: `fill:${color}` }, d);
+    for (const [cx, cy] of [[1.5, 1.5], [4.5, 4.5]]) S('circle', { cx, cy, r: 1.35, style: 'fill:rgba(19,27,34,.6)' }, d);
   };
   for (let k = 1; k <= 5; k++) mk(`hatch-lv${k}`, cssv(`--cdi-${k}`));
   for (const r of ROWS) if (r.color) mk(`hatch-${r.key}`, cssv(r.color));
@@ -170,7 +174,7 @@ function parseRoute() {
   let frt = q.get('frt');
   if (!frts.includes(frt)) frt = frts[frts.length - 1];
   if (parts[0] === 'regionen' && parts[1]) {
-    return { page: 'region', rid: parts[1], tab: TABS[parts[2]] ? parts[2] : 'aktuelle-lage', frt, f: q.get('f'), kombi: q.get('kombi') === '1', unsicher: q.get('unsicher') === '1' };
+    return { page: 'region', rid: parts[1], tab: TABS[parts[2]] ? parts[2] : 'aktuelle-lage', frt, f: q.get('f'), kombi: q.get('kombi') === '1', unsicher: uncMode(q.get('unsicher')) };
   }
   return { page: 'home', frt, w: Math.min(4, Math.max(0, +(q.get('w') ?? 0) || 0)), view: q.get('view') === 'liste' ? 'liste' : 'karte' };
 }
@@ -181,7 +185,7 @@ function link(path, params) {
   return `#${path}?${q}`;
 }
 const homeLink = (over = {}) => link('/', { frt: route.frt, w: route.w || null, view: route.view === 'liste' ? 'liste' : null, ...over });
-const regionLink = (rid, tab = 'aktuelle-lage', over = {}) => link(`/regionen/${rid}/${tab}`, { frt: route.frt, kombi: route.kombi ? 1 : null, unsicher: route.unsicher ? 1 : null, ...over });
+const regionLink = (rid, tab = 'aktuelle-lage', over = {}) => link(`/regionen/${rid}/${tab}`, { frt: route.frt, kombi: route.kombi ? 1 : null, unsicher: route.unsicher || null, ...over });
 
 function frtControl(id) {
   const frts = DATA.overview.frts, i = frts.indexOf(route.frt);
@@ -373,7 +377,8 @@ async function renderRegion(keepScroll) {
       <span class="ic" aria-hidden="true">i</span>
       <span>Prognose vom <b>${dmy(frt)}</b> · Beobachtungen bis ${frtControl('frt-region')}</span>
       <label class="chk"><input type="checkbox" id="verify"${state.verify ? ' checked' : ''}> Spätere Beobachtungen einblenden</label>
-      <label class="chk" title="Blendet die Prognosewochen +2 und +3 ab, weil sie laut Verifikation wenig verlässlich sind"><input type="checkbox" id="unsicher"${route.unsicher ? ' checked' : ''}> Unsicherheit anzeigen</label>
+      <label class="chk">Unsicherheit <select class="unc-select" id="unsicher" aria-label="Darstellung der Unsicherheit">${UNC_MODES.map(([k, t]) => `<option value="${k}"${(route.unsicher || '') === k ? ' selected' : ''}>${t}</option>`).join('')}</select></label>
+      ${route.unsicher ? `<span class="unc-hint">${UNC_MODES.find(m => m[0] === route.unsicher)[2]}</span>` : ''}
     </div>
     <div class="title-row"><h1>${esc(regionName(rid))}</h1><a class="link" href="${homeLink()}">← Zurück zur Startseite</a></div>
     <p class="outlook">${outlook} Die Einschätzung der lokalen Behörden kann davon abweichen.</p>
@@ -383,7 +388,7 @@ async function renderRegion(keepScroll) {
   app.appendChild(head);
   wireFrt(head, f => { location.hash = regionLink(rid, route.tab, { frt: f }); });
   $('#verify', head).addEventListener('change', e => { state.verify = e.target.checked; drawRows(); });
-  $('#unsicher', head).addEventListener('change', e => { location.hash = regionLink(rid, route.tab, { unsicher: e.target.checked ? 1 : null }); });
+  $('#unsicher', head).addEventListener('change', e => { location.hash = regionLink(rid, route.tab, { unsicher: e.target.value || null }); });
 
   const body = H(`<section class="rbody"><div class="wrap" id="rows"></div></section>`);
   app.appendChild(body);
@@ -457,28 +462,146 @@ async function renderRegion(keepScroll) {
 }
 
 /* ---------------------------------------------------------------- forecast uncertainty (switch "Unsicherheit") */
-/* Fixed rule for now: lead weeks +2 and +3 count as unreliable. The skill report
-   (reports/skill_report) finds the CDI level with persistence at lead week 2 and
-   significantly below it at lead week 3. */
+/* For forecast weeks +2 and +3, the forecast state (median and p10 against the
+   drought threshold) is looked up in overview.reliability: how often drought
+   followed that state in the archive. That rate sets stipple and label. Rows
+   without verification (synthetic evaporation) fall back to the stipple. */
 const UNC_FROM = 2;
-const FC_OPACITY = [1, 1, 0.55, 0.35];
-const fcOpacity = c => route.unsicher && c.fc ? FC_OPACITY[c.lead] : 1;
 const UNC_NOTE = [null, null,
   'Ab Woche +2 ist die Prognose im Mittel nicht besser als die Annahme, dass die Lage gleich bleibt.',
   'In Woche +3 ist die Prognose im Mittel schlechter als die Annahme, dass die Lage gleich bleibt.'];
-const uncTip = c => route.unsicher && c.fc && UNC_NOTE[c.lead] ? `<span class="unc-note"><b>Geringe Verlässlichkeit.</b> ${UNC_NOTE[c.lead]}</span>` : '';
+// [minimum drought rate, dot stipple, bracket label, tooltip heading]
+const UNC_CLASSES = [
+  [0.7, false, null, 'Trockenheit wahrscheinlich'],
+  [0.3, true, 'möglich', 'Trockenheit möglich'],
+  [0.15, true, 'unsicher', 'Trockenheit nicht ausgeschlossen'],
+  [0, false, null, 'Trockenheit unwahrscheinlich']];
+const UNC_MIN_N = 30;
 
-/* Faint tint and an "unsicher" bracket over the unreliable forecast weeks */
+/* Display modes of the dropdown: [url value, label, hint under the banner] */
+const UNC_MODES = [
+  ['', 'aus', ''],
+  ['punkte', 'punktiert', 'Wenig verlässliche Prognosewochen sind punktiert statt schraffiert.'],
+  ['leer', 'keine Aussage', 'Wie die „equal chances“ der NOAA-Outlooks: wenig verlässliche Wochen bleiben leer.'],
+  ['tendenz', 'Tendenz', 'Wie der US Drought Outlook: Wochen +2 und +3 zeigen nur, ob Trockenheit anhält, nachlässt oder entsteht.'],
+  ['skill', 'Verlässlichkeit separat', 'Wie die Skill-Karten von C3S: Prognose unverändert, darunter wie oft solche Prognosen zutrafen.']];
+function uncMode(v) {
+  if (v === '1') return 'punkte'; // links from the first version
+  return UNC_MODES.some(m => m[0] && m[0] === v) ? v : null;
+}
+
+/* Forecast state of one week and how often drought followed it in the archive */
+function forecastState(r, c) {
+  const rel = DATA.overview.reliability, e = rel?.vars?.[r.v]?.[c.lead];
+  if (!e || c.v == null) return null;
+  const cdi = r.kind === 'cdi';
+  let st;
+  if (cdi) st = c.v >= 3 ? 'dry' : 'no';
+  else if (c.thr == null || c.q?.[0] == null) return null;
+  else st = c.q[1] < c.thr ? 'dry' : c.q[0] < c.thr ? 'possible' : 'no';
+  const s = e[st];
+  return s && s.n >= UNC_MIN_N ? { st, s, e, rel, cdi } : null;
+}
+
+/* Tendency (mode "tendenz"), with IPCC-style likely/possible bands on the drought chance */
+const TENDENCY = {
+  persist: ['=', 'Trockenheit hält wahrscheinlich an', '--cdi-4'],
+  easeMaybe: ['−?', 'Entspannung möglich', '--secondary-300'],
+  ease: ['−', 'Entspannung wahrscheinlich', '--cdi-1'],
+  develop: ['+', 'Trockenheit entsteht wahrscheinlich', '--cdi-4'],
+  developMaybe: ['+?', 'Trockenheit kann entstehen', '--cdi-3'],
+  none: ['0', 'Keine Trockenheit erwartet', '--secondary-400'] };
+function tendency(p, nowDry) {
+  const k = nowDry ? (p >= 0.66 ? 'persist' : p >= 0.33 ? 'easeMaybe' : 'ease')
+    : (p >= 0.66 ? 'develop' : p >= 0.33 ? 'developMaybe' : 'none');
+  const [code, text, color] = TENDENCY[k];
+  return { code, text, color: cssv(color) };
+}
+
+function uncState(r, c, nowDry) {
+  const mode = route.unsicher;
+  if (!mode || mode === 'skill' || !c.fc || c.lead < UNC_FROM || r.noForecast || c.v == null) return null;
+  const fallback = { dots: true, label: 'unsicher', note: `<b>Geringe Verlässlichkeit.</b> ${UNC_NOTE[c.lead]}<br><span class="m">Für diese Zeile gibt es keine Verifikation.</span>` };
+  const fs = forecastState(r, c);
+  if (!fs) return fallback;
+  const { st, s, e, rel, cdi } = fs;
+  const [, dots, label, heading] = UNC_CLASSES.find(k => s.rate >= k[0]);
+  const fcText = {
+    dry: cdi ? 'Die Prognose zeigt Trockenheit' : 'Der Median liegt unter der Trockenheitsschwelle',
+    possible: 'Der Median liegt über der Schwelle, das untere Ende des Bereichs (10 %) darunter',
+    no: cdi ? 'Die Prognose zeigt keine Trockenheit' : 'Der ganze Bereich liegt über der Schwelle' }[st];
+  const outcome = cdi ? `war es in Woche +${c.lead} trocken (Stufe 3 und höher)` : `lag der Wert in Woche +${c.lead} unter der Trockenheitsschwelle`;
+  const pct = x => Math.round(x * 100);
+  const body = `${fcText}. In ${pct(s.rate)} % solcher Fälle ${outcome}; über alle Wochen in ${pct(e.base)} %.`
+    + `<br><span class="m">Archiv ${dmy(ts(rel.period[0]))}–${dmy(ts(rel.period[1]))}, alle Regionen, n = ${s.n}</span>`;
+  if (mode === 'leer') return dots
+    ? { hide: true, label: 'keine Aussage', note: `<b>${heading}: keine Aussage.</b> ${body}` }
+    : { dots: false, label: null, note: `<b>${heading}.</b> ${body}` };
+  if (mode === 'tendenz') {
+    const t = tendency(s.rate, nowDry);
+    return { hide: true, tend: t, label: null, note: `<b>${t.text}.</b> ${nowDry ? 'Zuletzt beobachtet: trocken.' : 'Zuletzt beobachtet: nicht trocken.'} ${body}` };
+  }
+  return { dots, label, note: `<b>${heading}.</b> ${body}` };
+}
+
+/* Replaces the bar of a hidden week: dashed empty column ("leer") or tendency box ("tendenz") */
+function uncColumn(svg, c, x, bw, top, bottom) {
+  const h = bottom - top, cx = x + bw / 2, cy = (top + bottom) / 2, tall = h > 120;
+  const t = c.unc.tend;
+  if (t) {
+    S('rect', { x: x + 1, y: top + 1, width: bw - 2, height: h - 2, style: `fill:${t.color};fill-opacity:.14;stroke:${t.color}`, 'stroke-width': 1.5 }, svg);
+    if (tall) S('text', { x: cx, y: cy, 'text-anchor': 'middle', 'dominant-baseline': 'central', transform: `rotate(-90 ${cx} ${cy})`, class: 'ax unc-tend', style: `fill:${t.color}` }, svg).textContent = t.text;
+    else S('text', { x: cx, y: cy, 'text-anchor': 'middle', 'dominant-baseline': 'central', class: 'ax unc-code', style: `fill:${t.color}` }, svg).textContent = t.code;
+    return;
+  }
+  S('rect', { x: x + 1, y: top + 1, width: bw - 2, height: h - 2, fill: 'none', class: 'unc-empty' }, svg);
+  if (tall) S('text', { x: cx, y: cy, 'text-anchor': 'middle', 'dominant-baseline': 'central', transform: `rotate(-90 ${cx} ${cy})`, class: 'ax unc-tend' }, svg).textContent = 'keine Aussage';
+  else S('text', { x: cx, y: cy, 'text-anchor': 'middle', 'dominant-baseline': 'central', class: 'ax unc-code' }, svg).textContent = '?';
+}
+
+/* Mode "skill": a strip under the axis with how often this kind of forecast held */
+const SKILL_STRIP = 30;
+const hasStrip = r => route.unsicher === 'skill' && !r.noForecast;
+function skillStrip(svg, r, cols, x0, bw, y0, ml, long) {
+  S('text', { x: ml - 6, y: y0 + 18, 'text-anchor': 'end', class: 'ax' }, svg).textContent = 'Treffer';
+  cols.forEach((c, i) => {
+    if (!c.fc) return;
+    const fs = forecastState(r, c), x = x0(i);
+    const hit = !fs ? null : fs.st === 'dry' ? fs.s.rate : fs.st === 'no' ? 1 - fs.s.rate : null;
+    S('rect', { x, y: y0 + 14, width: bw, height: 6, style: 'fill:rgba(255,255,255,.15)' }, svg);
+    if (hit != null) S('rect', { x, y: y0 + 14, width: bw * hit, height: 6, style: `fill:${Math.round(hit * 100) >= 66 ? '#fff' : cssv('--cdi-3')}` }, svg);
+    if (!long) S('text', { x: x + bw / 2, y: y0 + 10, 'text-anchor': 'middle', class: 'ax' }, svg).textContent = hit != null ? `${Math.round(hit * 100)} %` : fs ? 'offen' : '–';
+    bindTip(S('rect', { x, y: y0, width: bw, height: 24, class: 'hit' }, svg), () => skillTip(c, fs, hit));
+  });
+}
+function skillTip(c, fs, hit) {
+  const head = `<b>KW ${isoWeek(c.t)}</b> <span class="m">Prognose Woche +${c.lead}</span>`;
+  if (!fs) return `${head}<br><span class="m">Für diese Zeile gibt es keine Verifikation.</span>`;
+  const pct = x => Math.round(x * 100), n = `<br><span class="m">Archiv, alle Regionen, n = ${fs.s.n}</span>`;
+  if (hit == null) return `${head}<br>Median über, unteres Ende (10 %) unter der Schwelle: keine klare Aussage. In ${pct(fs.s.rate)} % solcher Fälle trat Trockenheit ein.${n}`;
+  const what = fs.st === 'dry' ? 'Trockenheit' : 'keine Trockenheit';
+  return `${head}<br>Prognose „${what}“: traf in <b>${pct(hit)} %</b> solcher Fälle zu.${n}`;
+}
+
+const fcFill = (id, c) => `url(#${id}${c.unc?.dots ? '-dots' : ''})`;
+const uncTip = c => c.unc ? `<span class="unc-note">${c.unc.note}</span>` : '';
+
+/* Faint tint and a labelled bracket over each run of flagged forecast weeks */
 function uncertainZone(svg, cols, x0, bw, gap, mt, base, long) {
-  if (!route.unsicher) return;
-  const i0 = cols.findIndex(c => c.fc && c.lead >= UNC_FROM);
-  if (i0 < 0) return;
-  const xa = x0(i0) - gap / 2, xb = x0(cols.length - 1) + bw + gap / 2;
-  S('rect', { x: xa, y: mt - 8, width: xb - xa, height: base - mt + 8, class: 'unc-zone' }, svg);
-  if (long) return; // columns are too narrow in the Zeitreihe for a label
-  const yb = mt - 16;
-  S('path', { d: `M${xa + 3},${yb + 5}V${yb}H${xb - 3}V${yb + 5}`, fill: 'none', class: 'unc-brk' }, svg);
-  S('text', { x: (xa + xb) / 2, y: yb - 6, 'text-anchor': 'middle', class: 'ax unc-lbl' }, svg).textContent = 'unsicher';
+  for (let i = 0; i < cols.length; i++) {
+    const lab = cols[i].unc?.label;
+    if (!lab) continue;
+    let j = i;
+    while (j + 1 < cols.length && cols[j + 1].unc?.label === lab) j++;
+    const xa = x0(i) - gap / 2, xb = x0(j) + bw + gap / 2;
+    S('rect', { x: xa, y: mt - 8, width: xb - xa, height: base - mt + 8, class: 'unc-zone' }, svg);
+    if (!long) { // columns are too narrow in the Zeitreihe for a label
+      const yb = mt - 16;
+      S('path', { d: `M${xa + 3},${yb + 5}V${yb}H${xb - 3}V${yb + 5}`, fill: 'none', class: 'unc-brk' }, svg);
+      S('text', { x: (xa + xb) / 2, y: yb - 6, 'text-anchor': 'middle', class: 'ax unc-lbl' }, svg).textContent = lab;
+    }
+    i = j;
+  }
 }
 
 /* ---------------------------------------------------------------- week chart (Aktuelle Lage, Zeitreihe) */
@@ -499,6 +622,9 @@ function columns(rec, r, frt, long) {
     cols.push({ t, fc: true, lead: l, q, v: q ? q[1] : null, line: r.line ? f[r.line]?.[l] ?? null : null,
       thr: r.thr ? thrAt(r.v, t, 'p10') : null, min: r.thr ? thrAt(r.v, t, 'min') : null, ver: obsAt(r.v, t) });
   }
+  const last = cols.filter(c => !c.fc).at(-1);
+  const nowDry = last?.v == null ? false : r.kind === 'cdi' ? last.v >= 3 : last.thr != null && last.v < last.thr;
+  cols.forEach(c => { c.unc = uncState(r, c, nowDry); });
   return cols;
 }
 
@@ -549,7 +675,7 @@ function weekChart(rec, r, frt, long) {
   const cdi = r.kind === 'cdi';
   const W = 1240, ml = 62, mr = 62;
   const mt = cdi ? 46 : 60, plotH = cdi ? 46 : 220, mb = 44;
-  const H0 = mt + plotH + mb;
+  const H0 = mt + plotH + mb + (hasStrip(r) ? SKILL_STRIP : 0);
   const n = cols.length, step = (W - ml - mr) / n;
   const gap = long ? Math.max(0.6, step * 0.12) : Math.max(2, step * 0.09);
   const bw = step - gap;
@@ -584,13 +710,13 @@ function weekChart(rec, r, frt, long) {
   uncertainZone(svg, cols, x0, bw, gap, mt, base, long);
 
   // bars
-  const fcPat = `url(#hatch-${r.key})`;
   cols.forEach((c, i) => {
     const x = x0(i);
     if (cdi) {
       const lv = c.v;
-      if (lv != null) {
-        S('rect', { x, y: mt, width: bw, height: plotH, opacity: fcOpacity(c), style: `fill:${c.fc ? `url(#hatch-lv${lv})` : cssv(`--cdi-${lv}`)}` }, svg);
+      if (c.unc?.hide) uncColumn(svg, c, x, bw, mt, base);
+      else if (lv != null) {
+        S('rect', { x, y: mt, width: bw, height: plotH, style: `fill:${c.fc ? fcFill(`hatch-lv${lv}`, c) : cssv(`--cdi-${lv}`)}` }, svg);
         if (!c.fc) S('rect', { x, y: mt, width: bw, height: plotH, fill: 'none', style: 'stroke:rgba(255,255,255,.25)' }, svg);
       }
       if (c.fc && state.verify && c.ver != null) {
@@ -599,7 +725,8 @@ function weekChart(rec, r, frt, long) {
     } else {
       if (r.noForecast && c.fc) S('rect', { x, y: mt, width: bw, height: plotH, style: 'fill:rgba(255,255,255,.05)' }, svg);
       if (!c.fc && c.v == null) S('rect', { x, y: mt, width: bw, height: plotH, style: 'fill:rgba(255,255,255,.03)' }, svg);
-      if (c.v != null) S('rect', { x, y: y(c.v), width: bw, height: base - y(c.v), opacity: fcOpacity(c), style: `fill:${c.fc ? fcPat : cssv(r.color)}` }, svg);
+      if (c.unc?.hide) uncColumn(svg, c, x, bw, mt, base);
+      else if (c.v != null) S('rect', { x, y: y(c.v), width: bw, height: base - y(c.v), style: `fill:${c.fc ? fcFill(`hatch-${r.key}`, c) : cssv(r.color)}` }, svg);
       if (c.fc && state.verify && c.ver != null) {
         S('rect', { x: x + 1, y: y(c.ver), width: bw - 2, height: base - y(c.ver), fill: 'none', style: 'stroke:#fff', 'stroke-width': 1.4, 'stroke-dasharray': '4 3' }, svg);
         S('line', { x1: x - 2, x2: x + bw + 2, y1: y(c.ver), y2: y(c.ver), style: 'stroke:#fff', 'stroke-width': 2.5 }, svg);
@@ -621,7 +748,7 @@ function weekChart(rec, r, frt, long) {
     }
     // whiskers
     cols.forEach((c, i) => {
-      if (!c.fc || !c.q || c.q[0] == null || c.q[2] == null) return;
+      if (!c.fc || !c.q || c.unc?.hide || c.q[0] == null || c.q[2] == null) return;
       const cx = x0(i) + bw / 2, cw = Math.min(14, bw * 0.4);
       S('path', { d: `M${cx},${y(c.q[0])}V${y(c.q[2])}M${cx - cw / 2},${y(c.q[0])}h${cw}M${cx - cw / 2},${y(c.q[2])}h${cw}`, fill: 'none', style: 'stroke:#fff', 'stroke-width': 1.6 }, svg);
     });
@@ -632,6 +759,7 @@ function weekChart(rec, r, frt, long) {
     const hit = S('rect', { x: ml + i * step, y: mt - 8, width: step, height: plotH + 8, class: 'hit' }, svg);
     bindTip(hit, () => colTip(r, c));
   });
+  if (hasStrip(r)) skillStrip(svg, r, cols, x0, bw, base + mb - 4, ml, long);
   return svg;
 }
 
@@ -674,7 +802,7 @@ function balanceChart(rec, frt, long) {
   });
 
   const W = 1240, ml = 62, mr = 62, mt = 60, plotH = 320, mb = 44;
-  const base = mt + plotH, H0 = base + mb;
+  const base = mt + plotH, H0 = base + mb + (hasStrip(P) ? SKILL_STRIP : 0);
   const n = cols.length, step = (W - ml - mr) / n;
   const gap = long ? Math.max(0.6, step * 0.12) : Math.max(2, step * 0.09);
   const bw = step - gap;
@@ -707,8 +835,9 @@ function balanceChart(rec, frt, long) {
   // bars: precipitation above zero, evaporation below
   cols.forEach((c, i) => {
     const x = x0(i);
-    if (c.v != null) S('rect', { x, y: y(c.v), width: bw, height: zero - y(c.v), opacity: fcOpacity(c), style: `fill:${c.fc ? 'url(#hatch-niederschlag)' : cssv(P.color)}` }, svg);
-    if (c.e != null) S('rect', { x, y: zero, width: bw, height: y(-c.e) - zero, opacity: fcOpacity(c), style: `fill:${c.fc ? 'url(#hatch-verdunstung)' : cssv(E.color)}` }, svg);
+    if (c.unc?.hide) uncColumn(svg, c, x, bw, mt, base);
+    else if (c.v != null) S('rect', { x, y: y(c.v), width: bw, height: zero - y(c.v), style: `fill:${c.fc ? fcFill('hatch-niederschlag', c) : cssv(P.color)}` }, svg);
+    if (c.e != null && !c.unc?.hide) S('rect', { x, y: zero, width: bw, height: y(-c.e) - zero, style: `fill:${c.fc ? fcFill('hatch-verdunstung', c) : cssv(E.color)}` }, svg);
     if (c.fc && state.verify) {
       for (const v of [c.ver, c.verE == null ? null : -c.verE]) {
         if (v == null) continue;
@@ -732,7 +861,7 @@ function balanceChart(rec, frt, long) {
   }
   // whiskers in both directions
   cols.forEach((c, i) => {
-    if (!c.fc) return;
+    if (!c.fc || c.unc?.hide) return;
     const cx = x0(i) + bw / 2, cw = Math.min(14, bw * 0.4);
     for (const [a, b] of [[c.q?.[0], c.q?.[2]], [c.eq ? -c.eq[0] : null, c.eq ? -c.eq[2] : null]]) {
       if (a == null || b == null) continue;
@@ -757,11 +886,13 @@ function balanceChart(rec, frt, long) {
     const hit = S('rect', { x: ml + i * step, y: mt - 8, width: step, height: plotH + 8, class: 'hit' }, svg);
     bindTip(hit, () => balanceTip(c));
   });
+  if (hasStrip(P)) skillStrip(svg, P, cols, x0, bw, base + mb - 4, ml, long);
 
   wrap.appendChild(H(`<div class="bal-legend">
     <span><i style="background:var(${P.color})"></i>Niederschlag</span>
     <span><i style="background:var(${E.color})"></i>Tatsächliche Verdunstung</span>
     <span><i style="background:repeating-linear-gradient(45deg, var(--secondary-300) 0 3px, var(--secondary-700) 3px 6px)"></i>Prognose (Median, 10–90 %)</span>
+    ${route.unsicher === 'punkte' ? '<span><i style="background:radial-gradient(circle, var(--secondary-700) 1.3px, transparent 1.6px) 0 0/6px 6px, var(--secondary-300)"></i>Prognose unsicher</span>' : ''}
     ${tg.line ? `<span><i style="height:3px;background:var(${E.light})"></i>Potenzielle Verdunstung</span>` : ''}
     ${tg.wb ? '<span><b class="wbdot"></b>Wasserbilanz</span>' : ''}
   </div>`));

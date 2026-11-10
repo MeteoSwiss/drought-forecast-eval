@@ -135,21 +135,46 @@ The "Demo-Daten" label disappears once real data is loaded.
 | `w=0..4` | Map week: 0 = last observed week, 1–4 = forecast weeks 0–3 |
 | `view=liste` | List instead of map |
 | `kombi=1` | Combined precipitation and evaporation row |
-| `unsicher=1` | Mark forecast weeks +2 and +3 as uncertain |
+| `unsicher=punkte\|leer\|tendenz\|skill` | How forecast weeks +2 and +3 show their uncertainty (see below) |
 | `f=<row>` | Scroll to a row: `niederschlag`, `bodenfeuchte`, `verdunstung`, `vegetation` |
 
 On the region page, **"Spätere Beobachtungen einblenden"** draws the observations
 that came in after the issue date over the forecast weeks. Use it to judge a
 past forecast at a glance.
 
-**"Unsicherheit anzeigen"** marks forecast weeks +2 and +3 (the last two
-forecast bars) as unreliable. Their bars fade (55 % and 35 % opacity), but the
-p10–p90 whiskers keep full strength. A faint tint and an "unsicher" bracket
-cover the two weeks, and their tooltips say why. The rule is fixed for now and
-comes from the skill report (`reports/skill_report`): for the CDI, the forecast
-matches persistence at lead week 2 and does significantly worse at lead week 3.
-Change `UNC_FROM` and `FC_OPACITY` in `app.js` to adjust it. The Jahresvergleich
-tab doesn't change.
+The **"Unsicherheit"** dropdown in the blue bar (URL `unsicher=…`) offers four ways
+to show how reliable forecast weeks +2 and +3 are. The modes copy ideas from
+other centres, so you can compare them:
+
+| Mode | `unsicher=` | Idea from | What it shows |
+|---|---|---|---|
+| punktiert | `punkte` | IPCC AR6 hatching | Uncertain weeks swap the diagonal hatching for a dot stipple in the same colour. Nothing is faded, so the CDI level colours stay readable. |
+| keine Aussage | `leer` | NOAA CPC "equal chances" | Uncertain weeks are left empty (dashed outline) |
+| Tendenz | `tendenz` | US Drought Outlook | Weeks +2 and +3 become a tendency box: drought persists, easing possible/likely, drought can develop/likely develops, or none. It compares the last observed week with the drought chance, using 66 %/33 % bands. |
+| Verlässlichkeit separat | `skill` | C3S skill maps | Bars stay unchanged. A "Treffer" strip under the axis gives, for every forecast week, how often this kind of forecast was right. |
+
+Old links with `unsicher=1` open the stipple mode.
+
+Each week gets a state from its median and p10 against the drought threshold
+line: *dry* (median below), *possible* (median above, p10 below) or *no* (p10
+above too). The CDI has only a median, so it uses level 3 and higher, with no
+*possible* state. `export_data.py` counts how often drought actually followed
+each state in the archive, pooled over all regions and Monday issue dates
+(`reliability` in `overview.json`). The stipple and empty modes turn that rate
+into a class:
+
+| Drought rate | Class | Uncertain? |
+|---|---|---|
+| ≥ 70 % | "Trockenheit wahrscheinlich" | no |
+| 30–70 % | "Trockenheit möglich" | yes, bracket "möglich" |
+| 15–30 % | "Trockenheit nicht ausgeschlossen" | yes, bracket "unsicher" |
+| < 15 % | "Trockenheit unwahrscheinlich" | no |
+
+The tooltip gives the rate, the rate over all weeks and n. Rows without
+verification (the synthetic evaporation) and states with fewer than 30 cases
+are always treated as uncertain. The rates are in-sample: the archive used for
+counting includes the forecast on screen. The classes are `UNC_CLASSES` in
+`app.js`. The Jahresvergleich tab doesn't change.
 
 ### Combined precipitation and evaporation
 

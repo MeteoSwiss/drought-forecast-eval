@@ -7,7 +7,8 @@ Inputs: data/netcdf/merged.nc and the newest data/netcdf/observations_*.nc
 (override with --obs). Build them with build_netcdf.py if you don't have them.
 
 Writes prototypes/drought_platform/site/data/:
-    overview.json       issue dates and CDI per region (obs + forecast) for the map
+    overview.json       issue dates, CDI per region (obs + forecast) for the map, and
+                        how often drought followed each forecast state (reliability)
     regions.json        region names and SVG outlines
     region/<id>.json    weekly series for one region (obs, thresholds, forecasts)
 
@@ -132,6 +133,50 @@ def week_thresholds(series: pd.Series) -> dict[str, list]:
     return {"p10": p10, "min": mn}
 
 
+def drought_hit_rates(fc: xr.Dataset, obs: xr.Dataset, thr: dict) -> dict:
+    """How often drought followed each forecast state, per variable and lead week.
+
+    Drought means the observation is below the chart threshold (p10 for the
+    calendar week), or CDI level 3 and higher. Forecast states:
+    dry (p50 below), possible (p50 above, p10 below), no (p10 above too).
+    The CDI has only a median, so it has no "possible" state.
+    Pooled over all regions and Monday issue dates with an observation.
+    """
+    frts = pd.to_datetime(fc.forecast_reference_time.values)
+    regions = [int(r) for r in fc.drought_region_id.values]
+    out = {}
+    for var in ["cdi", *QUANTILE_VARS]:
+        leads = []
+        for lw in range(4):
+            valid = frts + pd.Timedelta(days=7 * lw)
+            woy = valid.isocalendar().week.values.astype(int)
+            k = {s: [0, 0] for s in ("dry", "possible", "no")}  # [drought weeks, all weeks]
+            for rid in regions:
+                o = obs[var].sel(drought_region_id=rid).to_series().reindex(valid).values
+                f = fc.sel(drought_region_id=rid).isel(lead_week=lw)
+                if var == "cdi":
+                    f50 = f["cdi_p50"].values
+                    ok = np.isfinite(o) & np.isfinite(f50)
+                    event = o >= 3
+                    state = np.where(f50 >= 3, "dry", "no")
+                else:
+                    t = np.array([np.nan if x is None else x for x in thr[var][rid]])[woy - 1]
+                    f10, f50 = f[f"{var}_p10"].values, f[f"{var}_p50"].values
+                    ok = np.isfinite(o) & np.isfinite(f10) & np.isfinite(f50) & np.isfinite(t)
+                    event = o < t
+                    state = np.where(f50 < t, "dry", np.where(f10 < t, "possible", "no"))
+                for st in k:
+                    m = ok & (state == st)
+                    k[st][0] += int(event[m].sum())
+                    k[st][1] += int(m.sum())
+            n_all = sum(v[1] for v in k.values())
+            e = {st: {"n": n, "rate": round(d / n, 3)} for st, (d, n) in k.items() if n}
+            e["base"] = round(sum(v[0] for v in k.values()) / n_all, 3) if n_all else None
+            leads.append(e)
+        out[var] = leads
+    return {"period": [frts[0].strftime("%Y-%m-%d"), frts[-1].strftime("%Y-%m-%d")], "vars": out}
+
+
 def region_paths() -> dict:
     """Region names and simplified outlines as SVG paths (equirectangular at 46.8°N)."""
     g = gpd.read_file(SHAPEFILE)
@@ -217,6 +262,11 @@ def main() -> None:
             p = fc["cdi_p50"].isel(forecast_reference_time=i).sel(drought_region_id=rid).values
             row[str(rid)] = rnd(np.concatenate([[o], p]), 0)  # [obs last week, lead 0..3]
         overview["cdi"][f.strftime("%Y-%m-%d")] = row
+    thr = {
+        v: {rid: week_thresholds(obs[v].sel(drought_region_id=rid).to_series())["p10"] for rid in regions}
+        for v in QUANTILE_VARS
+    }
+    overview["reliability"] = drought_hit_rates(fc, obs, thr)
     (OUT / "overview.json").write_text(json.dumps(overview, separators=(",", ":")))
 
     (OUT / "regions.json").write_text(
