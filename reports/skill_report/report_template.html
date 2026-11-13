@@ -36,6 +36,7 @@
   --fam-cdi: #46596b; --fam-cdi-l: #acb4bd;
   --lv1: #77e3bc; --lv2: #f9df95; --lv3: #eca257; --lv4: #c26509; --lv5: #662506;
   --lv1-l: #e4f9f2; --lv2-l: #fef9ea; --lv3-l: #f7dabc; --lv4-l: #daa36b; --lv5-l: #a37c6a;
+  --mg-f: #d8232a; --mg-f-l: #f2a7aa;
   --shadow: 0 1px 2px rgba(0,0,0,0.06), 0 1px 5px rgba(0,0,0,0.08);
   --sans: "Noto Sans", "Hind", system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: "Noto Sans Mono", ui-monospace, "SF Mono", Menlo, monospace;
@@ -49,6 +50,7 @@
     --fam-precip: #8aa6c2; --fam-precip-l: #5c7fa3; --fam-soil: #b5afaf; --fam-soil-l: #83797a;
     --fam-disch: #9da3c6; --fam-disch-l: #5b65a0; --fam-cdi: #c3cad1; --fam-cdi-l: #596978;
     --lv1-l: #1f3b33; --lv2-l: #3b3524; --lv3-l: #3f2c1a; --lv4-l: #4a2a10; --lv5-l: #3a1f12;
+    --mg-f: #ff6f78; --mg-f-l: #b8434c;
     --shadow: 0 1px 2px rgba(0,0,0,0.4);
     color-scheme: dark;
   }
@@ -61,6 +63,7 @@
   --fam-precip: #8aa6c2; --fam-precip-l: #5c7fa3; --fam-soil: #b5afaf; --fam-soil-l: #83797a;
   --fam-disch: #9da3c6; --fam-disch-l: #5b65a0; --fam-cdi: #c3cad1; --fam-cdi-l: #596978;
   --lv1-l: #1f3b33; --lv2-l: #3b3524; --lv3-l: #3f2c1a; --lv4-l: #4a2a10; --lv5-l: #3a1f12;
+  --mg-f: #ff6f78; --mg-f-l: #b8434c;
   --shadow: 0 1px 2px rgba(0,0,0,0.4);
   color-scheme: dark;
 }
@@ -947,7 +950,8 @@ function stepBand(pts, x, y) {
     return `M${up}L${dn}Z`;
   }).join('');
 }
-function famVars(v) { const f = FAMILY(v); return [`--fam-${f}`, `--fam-${f}-l`]; }
+// Meteogram forecast colours: red for every variable, so the plume stands out from the observations.
+function famVars() { return ['--mg-f', '--mg-f-l']; }
 function monthTicks(t0, t1, svg, x, yb) {
   const months = (t1 - t0) / (30 * DAY);
   const stepM = months > 10 ? 2 : 1;
