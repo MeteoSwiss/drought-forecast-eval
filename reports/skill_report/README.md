@@ -25,6 +25,15 @@ python3 -m http.server -d reports/skill_report/out/site 8000
 # open http://localhost:8000
 ```
 
+There are two versions of the same report, built from the same data:
+
+| Page | Style |
+|------|-------|
+| `index.html` | Neutral report style (also published as a claude.ai artifact) |
+| `platform.html` | Drought platform style, matching `prototypes/drought_platform/`: federal masthead, dark hero, red-underlined section navigation, meteograms on the dark region-page background, platform footer |
+
+Open <http://localhost:8000/platform.html> for the platform version.
+
 The rest of this page is only needed to rebuild it.
 
 ## Inputs
@@ -60,7 +69,7 @@ The first two take about a minute together. They write:
 - `out/numeric_skill.json`: scores for the numerical variables
 - `out/mg/<variable>.json`: meteogram data, one file per variable
 
-The third step builds the report in `out/site/`, the only output that is
+The third step builds both pages (`index.html` and `platform.html`) in `out/site/`, the only output that is
 committed (`.gitignore` skips the intermediate files). `index.html` holds the
 template with the scores inlined, and the meteogram data is copied to `mg/`.
 
@@ -103,3 +112,10 @@ from the current data, so check them against the new output after a rerun.
 | `numeric_skill.py` | Scores for the quantile variables and the meteogram data files |
 | `prep_report_data.py` | Packs the outputs into `report_template.html` and copies the meteogram files |
 | `report_template.html` | Report page, with a `__DATA__` placeholder for the inlined scores |
+| `platform.css` | Platform skin for `platform.html`: the prototype's tokens (`secondary-*`, `primary-600`), bands and controls |
+| `platform_chrome.html` | Platform top bar, masthead and footer, split at `<!-- REPORT -->` around the report |
+
+`platform.html` is `report_template.html` with `platform.css` inlined after the
+report's own styles and the chrome wrapped around it (`platform_skin()` in
+`prep_report_data.py`). Edit the report content in the template only; both
+pages pick it up on the next build.

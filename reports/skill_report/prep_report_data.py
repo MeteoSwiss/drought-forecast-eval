@@ -117,9 +117,23 @@ def main() -> None:
     (site / "mg").mkdir(parents=True, exist_ok=True)
     html = (HERE / "report_template.html").read_text().replace("__DATA__", s)
     (site / "index.html").write_text(html)
+    (site / "platform.html").write_text(platform_skin(html))
     for f in (out_dir / "mg").glob("*.json"):
         shutil.copy(f, site / "mg" / f.name)
-    print(f"index.html {len(html) / 1e3:.0f} kB")
+    print(f"index.html {len(html) / 1e3:.0f} kB, platform.html")
+
+
+def platform_skin(html: str) -> str:
+    """Wrap the report in the drought platform's chrome and styles (same data, same mg/)."""
+    css = (HERE / "platform.css").read_text()
+    top, foot = (HERE / "platform_chrome.html").read_text().split("<!-- REPORT -->")
+    html = html.replace(
+        "<title>Drought Index Categorical Skill</title>",
+        "<title>Prognoseverifikation · Trockenheitsplattform</title>",
+        1,
+    )
+    html = html.replace("</style>", f"</style>\n<style>\n{css}</style>\n{top}", 1)
+    return html.replace("</main>", f"</main>\n{foot}", 1)
 
 
 if __name__ == "__main__":

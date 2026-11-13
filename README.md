@@ -169,7 +169,7 @@ local web server (no data, no Poetry):
 
 | Folder | What it is | View it |
 |--------|------------|---------|
-| [`reports/skill_report/`](reports/skill_report/README.md) | Interactive skill report: categorical scores for the CDI and its sub-indices (Gerrity, Heidke, Peirce, POD/FAR, SEDI), quantile skill for precipitation, SPI and soil moisture, and per-region meteograms | `python3 -m http.server -d reports/skill_report/out/site 8000` |
+| [`reports/skill_report/`](reports/skill_report/README.md) | Interactive skill report: categorical scores for the CDI and its sub-indices (Gerrity, Heidke, Peirce, POD/FAR, SEDI), quantile skill for precipitation, SPI and soil moisture, and per-region meteograms | `python3 -m http.server -d reports/skill_report/out/site 8000` (`/platform.html` for the platform-styled version) |
 | [`prototypes/drought_platform/`](prototypes/drought_platform/README.md) | Local copy of the national drought platform with a selectable forecast issue date, a new evaporation row, and a combined precipitation/evaporation view | `python3 -m http.server -d prototypes/drought_platform/site 8000` |
 
 Then open <http://localhost:8000>. Rebuilding either one needs the NetCDF
